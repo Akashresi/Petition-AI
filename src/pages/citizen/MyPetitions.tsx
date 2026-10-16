@@ -52,7 +52,7 @@ export default function MyPetitions() {
   const complaints = getByUser(user?.id || "u1");
 
   const filtered = useMemo(() => {
-    let result = complaints.filter(c => {
+    const result = complaints.filter(c => {
       const matchStatus = statusFilter === "all" || c.status === statusFilter;
       const matchPriority = priorityFilter === "all" || c.priority === priorityFilter;
       const matchSearch = !search ||

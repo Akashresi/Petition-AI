@@ -1,5 +1,4 @@
 """Authentication router (register / login) with JWT tokens."""
-import hashlib
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -9,12 +8,9 @@ from pydantic import BaseModel, EmailStr
 
 from app.config import settings
 from app.database import db
+from app.security import hash_password, needs_rehash, verify_password
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
-
-
-def _hash_password(password: str) -> str:
-    return hashlib.sha256(f"petitionai:{password}".encode()).hexdigest()
 
 
 def create_token(user_id: str) -> str:
@@ -60,8 +56,11 @@ def _public_user(u: dict) -> dict:
 @router.post("/login", response_model=AuthResponse)
 def login(req: LoginRequest) -> AuthResponse:
     user = db.find_one("users", {"email": req.email.lower()})
-    if not user or user.get("password_hash") != _hash_password(req.password):
+    if not user or not verify_password(req.password, user.get("password_hash", "")):
         raise HTTPException(status_code=401, detail="Invalid email or password")
+    # Transparently upgrade legacy hashes to bcrypt on successful login.
+    if needs_rehash(user.get("password_hash", "")):
+        db.update("users", {"id": user["id"]}, {"password_hash": hash_password(req.password)})
     return AuthResponse(token=create_token(user["id"]), user=_public_user(user))
 
 
@@ -79,7 +78,7 @@ def register(req: RegisterRequest) -> AuthResponse:
         "phone": req.phone,
         "address": req.address,
         "joinedAt": datetime.now().strftime("%Y-%m-%d"),
-        "password_hash": _hash_password(req.password),
+        "password_hash": hash_password(req.password),
     }
     db.insert("users", user)
     return AuthResponse(token=create_token(user["id"]), user=_public_user(user))

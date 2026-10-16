@@ -13,6 +13,7 @@ AI-powered REST API backend for the PetitionAI grievance & petition management s
 | **Email (SMTP)** | Status notifications to petitioners |
 | **SMS** | SMS notifications (console or Twilio provider) |
 | **JWT** | Token-based authentication |
+| **bcrypt** | Salted password hashing (legacy SHA-256 hashes auto-upgraded on login) |
 
 ## Quick Start
 
@@ -45,10 +46,10 @@ app always works.
 |--------|----------|-------------|
 | POST | `/api/auth/register` | Register a new citizen |
 | POST | `/api/auth/login` | Login, returns JWT |
-| GET | `/api/complaints` | List complaints (filters: role, department, status, submittedBy, assignedOfficer) |
+| GET | `/api/complaints` | List complaints (filters: department, status, submittedBy, assignedOfficer) |
 | POST | `/api/complaints` | Submit petition (runs AI analysis + duplicate detection, sends email/SMS) |
-| GET | `/api/complaints/{id}` | Get single complaint |
-| PATCH | `/api/complaints/{id}` | Update status / assign officer / add remarks |
+| GET | `/api/complaints/{id}` | Get single complaint (owner / officer of dept / admin only) |
+| PATCH | `/api/complaints/{id}` | Update status / assign officer / add remarks (owner / officer of dept / admin only) |
 | GET | `/api/notifications` | List user notifications |
 | PATCH | `/api/notifications/{id}/read` | Mark notification read |
 | PATCH | `/api/notifications/read-all` | Mark all read |

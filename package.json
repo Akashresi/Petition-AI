@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "backend": "cd backend && .venv\\Scripts\\python.exe -m uvicorn app.main:app --reload --port 8000",
-    "backend:install": "python -m venv backend\\.venv && backend\\.venv\\Scripts\\python.exe -m pip install -r backend\\requirements.txt"
+    "backend:install": "python -m venv backend\\.venv || py -m venv backend\\.venv && backend\\.venv\\Scripts\\python.exe -m pip install -r backend\\requirements.txt"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -52,6 +52,8 @@
     "@tanstack/react-query": "^5.56.2",
     "@tanstack/react-query-devtools": "^5.90.2",
     "axios": "^1.12.2",
+    "baseline-browser-mapping": "^2.11.29",
+    "caniuse-lite": "^1.0.30001816",
     "chart.js": "^4.5.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

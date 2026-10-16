@@ -1,5 +1,4 @@
 """Complaints router - submission, listing, tracking, status updates."""
-import re
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -17,18 +16,33 @@ router = APIRouter(prefix="/api/complaints", tags=["complaints"])
 
 
 def _petition_id() -> str:
+    """Allocate the next sequential petition id, e.g. PET-2026-001."""
     year = datetime.now().year
-    for _ in range(1000):
-        num = re.sub(r"\D", "", str(datetime.now().microsecond))[-3:].zfill(3)
-        pid = f"PET-{year}-{num}"
-        if not db.find_one("complaints", {"petitionId": pid}):
-            return pid
-    raise RuntimeError("Could not allocate petition ID")
+    prefix = f"PET-{year}-"
+    existing = {c.get("petitionId", "") for c in db.find("complaints", {})}
+    seq = 1
+    while f"{prefix}{seq:03d}" in existing:
+        seq += 1
+    return f"{prefix}{seq:03d}"
 
 
 def _public_complaint(c: dict) -> dict:
     c.pop("_id", None)
     return c
+
+
+def _can_access(user: dict, complaint: dict) -> bool:
+    """Owners, the assigned/same-department officer, and admins may access."""
+    if user.get("role") == "admin":
+        return True
+    if complaint.get("submittedBy") == user.get("id"):
+        return True
+    if user.get("role") == "officer":
+        if complaint.get("assignedOfficer") == user.get("id"):
+            return True
+        if user.get("department") and complaint.get("assignedDepartment") == user.get("department"):
+            return True
+    return False
 
 
 class ComplaintIn(BaseModel):
@@ -51,7 +65,6 @@ class StatusUpdateIn(BaseModel):
 
 @router.get("")
 def list_complaints(
-    role: Optional[str] = None,
     department: Optional[str] = None,
     status: Optional[str] = None,
     submittedBy: Optional[str] = None,
@@ -139,6 +152,8 @@ def get_complaint(complaint_id: str, user: dict = Depends(get_current_user)) -> 
     c = db.find_one("complaints", {"id": complaint_id})
     if not c:
         raise HTTPException(status_code=404, detail="Complaint not found")
+    if not _can_access(user, c):
+        raise HTTPException(status_code=403, detail="Not allowed to view this complaint")
     return _public_complaint(c)
 
 
@@ -149,6 +164,8 @@ def update_complaint(
     c = db.find_one("complaints", {"id": complaint_id})
     if not c:
         raise HTTPException(status_code=404, detail="Complaint not found")
+    if not _can_access(user, c):
+        raise HTTPException(status_code=403, detail="Not allowed to update this complaint")
 
     now = datetime.now().isoformat()
     updates: dict = {"status": req.status}

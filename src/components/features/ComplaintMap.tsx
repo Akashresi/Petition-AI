@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import type { Map as LeafletMap } from "leaflet";
 import { Complaint } from "@/types";
 import { statusLabel } from "@/lib/utils";
 import "leaflet/dist/leaflet.css";
@@ -79,7 +80,7 @@ function getLocationCoords(complaint: Complaint): [number, number] | null {
 
 export default function ComplaintMap({ complaints, height = "400px" }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<any>(null);
+  const mapInstanceRef = useRef<LeafletMap | null>(null);
 
   useEffect(() => {
     if (!mapRef.current || complaints.length === 0) return;

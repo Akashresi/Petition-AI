@@ -4,6 +4,7 @@ pymongo==4.10.1
 pydantic==2.13.4
 pydantic[email]
 PyJWT==2.10.1
+bcrypt==4.2.1
 python-dotenv==1.0.1
 python-multipart==0.0.20
 # Optional: SMS via Twilio

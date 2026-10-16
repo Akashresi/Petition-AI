@@ -3,13 +3,7 @@ from datetime import datetime
 
 from app.ai.ml_pipeline import DEPARTMENT_MAP, generate_ai_analysis
 from app.database import db
-
-
-def _hash_password(password: str) -> str:
-    # Simple demo hashing - use bcrypt in production.
-    import hashlib
-
-    return hashlib.sha256(f"petitionai:{password}".encode()).hexdigest()
+from app.security import hash_password
 
 
 def seed_users() -> None:
@@ -20,37 +14,37 @@ def seed_users() -> None:
             "id": "u1", "name": "Akash Rajan", "email": "citizen@demo.com",
             "role": "citizen", "phone": "+919876543210",
             "address": "12, Gandhi Nagar, Coimbatore - 641001",
-            "joinedAt": "2024-03-15", "password_hash": _hash_password("citizen123"),
+            "joinedAt": "2024-03-15", "password_hash": hash_password("citizen123"),
         },
         {
             "id": "u4", "name": "Bala Murugan", "email": "bala@demo.com",
             "role": "citizen", "phone": "+919444411111",
             "address": "45, RS Puram, Coimbatore - 641002",
-            "joinedAt": "2024-05-20", "password_hash": _hash_password("citizen123"),
+            "joinedAt": "2024-05-20", "password_hash": hash_password("citizen123"),
         },
         {
             "id": "u5", "name": "Arun Kumar", "email": "arun@demo.com",
             "role": "citizen", "phone": "+919555522222",
             "address": "78, Saibaba Colony, Coimbatore - 641011",
-            "joinedAt": "2024-06-10", "password_hash": _hash_password("citizen123"),
+            "joinedAt": "2024-06-10", "password_hash": hash_password("citizen123"),
         },
         {
             "id": "u6", "name": "Aathi Selvan", "email": "aathi@demo.com",
             "role": "citizen", "phone": "+919666633333",
             "address": "23, Peelamedu, Coimbatore - 641004",
-            "joinedAt": "2024-07-01", "password_hash": _hash_password("citizen123"),
+            "joinedAt": "2024-07-01", "password_hash": hash_password("citizen123"),
         },
         {
             "id": "u2", "name": "Priya Suresh", "email": "officer@demo.com",
             "role": "officer", "phone": "+918765432109",
             "address": "Coimbatore", "department": "Roads & Infrastructure",
-            "joinedAt": "2023-08-20", "password_hash": _hash_password("officer123"),
+            "joinedAt": "2023-08-20", "password_hash": hash_password("officer123"),
         },
         {
             "id": "u3", "name": "Admin Rajesh", "email": "admin@demo.com",
             "role": "admin", "phone": "+917654321098",
             "address": "Coimbatore", "joinedAt": "2022-01-10",
-            "password_hash": _hash_password("admin123"),
+            "password_hash": hash_password("admin123"),
         },
     ]
     for u in users:

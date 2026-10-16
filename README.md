@@ -73,6 +73,7 @@ Complete petition lifecycle management:
 - **Email (SMTP)** - Status notifications to petitioners
 - **SMS** - Pluggable SMS provider (console / Twilio)
 - **JWT** - Token-based authentication
+- **bcrypt** - Salted password hashing (legacy hashes upgraded on login)
 
 ### AI/ML Integration
 - **TF-IDF + Cosine Similarity (scikit-learn style)** - Real NLP text classification for category/department routing
@@ -182,6 +183,7 @@ backend/                # FastAPI backend
 │   ├── config.py      # Environment configuration
 │   ├── database.py    # MongoDB layer (with in-memory fallback)
 │   ├── models.py      # Pydantic models
+│   ├── security.py    # Password hashing (bcrypt + legacy fallback)
 │   ├── seed.py        # Seed users, complaints, notifications
 │   ├── ai/
 │   │   ├── ml_pipeline.py   # NLP/ML: TF-IDF classification, sentiment, priority

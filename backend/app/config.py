@@ -24,7 +24,8 @@ class Settings:
 
     # CORS
     CORS_ORIGINS: list[str] = os.getenv(
-        "CORS_ORIGINS", "http://localhost:5173,http://localhost:3000"
+        "CORS_ORIGINS",
+        "http://localhost:8080,http://localhost:5173,http://localhost:3000",
     ).split(",")
 
     # Email (SMTP)
