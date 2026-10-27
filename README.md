@@ -55,16 +55,16 @@ Complete petition lifecycle management:
 - **TypeScript** - Type-safe development
 - **Vite** - Fast build tool
 - **Tailwind CSS** - Utility-first styling
-- **shadcn/ui** - Accessible component library
-- **Radix UI** - Headless UI primitives
 - **React Router** - Client-side routing
-- **React Hook Form + Zod** - Form validation
-- **TanStack Query** - Server state management
-- **Redux Toolkit** - Global state management
+- **Tailwind Merge + clsx** - Class composition utilities
 - **Lucide React** - Icon library
 - **Recharts** - Data visualization
 - **Framer Motion** - Animations
-- **Leaflet/React-Leaflet** - Map integration
+- **Leaflet** - Map integration
+- **Sonner** - Toast notifications
+- **i18next / react-i18next** - Internationalization (English / Hindi)
+- **jsPDF + html2canvas + xlsx** - PDF / Excel export
+- **qrcode** - Petition QR codes
 
 ### Backend (FastAPI)
 - **FastAPI** - High-performance Python REST API framework
@@ -201,8 +201,8 @@ backend/                # FastAPI backend
 
 src/                    # React frontend
 ├── components/          # Reusable UI components
-│   ├── ui/             # shadcn/ui components
-│   └── features/       # Feature-specific components
+│   ├── features/       # Feature components (AI cards, map, QR, SLA, timeline...)
+│   └── layout/         # Navbar and page shell
 ├── pages/              # Page components
 │   ├── citizen/        # Citizen portal pages
 │   ├── officer/        # Officer dashboard pages
@@ -217,8 +217,15 @@ src/                    # React frontend
 │   │   ├── duplicateDetection.ts
 │   │   └── imageAnalysis.ts  # Gemini image analysis
 │   ├── auth.ts         # Authentication utilities
+│   ├── pdfExport.ts    # PDF generation
+│   ├── excelExport.ts  # Excel export
+│   ├── i18n.ts         # English / Hindi translations
+│   ├── sla.ts          # SLA calculations
 │   └── utils.ts        # General utilities
 ├── constants/          # Mock data and constants
 ├── types/              # TypeScript type definitions
 └── main.tsx            # Application entry point
+
+public/                 # Static assets (favicons, robots.txt)
+Presentation/           # Pitch deck + generator scripts (optional)
 ```
