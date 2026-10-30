@@ -24,6 +24,12 @@ import logging
 import sys
 from pathlib import Path
 
+# Fix Windows console UTF-8 output for Indic languages & unicode arrows
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 # ── Logging setup ─────────────────────────────────────────────────────────────
 logging.basicConfig(
     level=logging.INFO,
