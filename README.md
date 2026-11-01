@@ -167,7 +167,6 @@ npm run lint
 Frontend `.env` (for AI image analysis):
 
 ```env
-VITE_GEMINI_API_KEY=your_gemini_api_key_here
 VITE_API_URL=/api   # defaults to /api (proxied to backend)
 ```
 

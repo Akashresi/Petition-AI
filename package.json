@@ -13,7 +13,6 @@
     "backend:install": "python -m venv backend\\.venv || py -m venv backend\\.venv && backend\\.venv\\Scripts\\python.exe -m pip install -r backend\\requirements.txt"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.24",
     "i18next": "^26.4.2",
