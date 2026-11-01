@@ -1,0 +1,16 @@
+Confusion Matrix
+============================================================
+                                Animal C   Building   Corrupti   Educatio   Electric   Healthca   Noise Po   Public S   Public T   Road & I   Sanitati   Waste Ma   Water Su
+Animal Control                         2          0          0          0          0          0          0          0          0          0          0          0          0
+Building & Construction                0          1          0          0          0          0          0          0          0          2          0          0          0
+Corruption & Malpractice               0          0          2          0          0          0          0          0          0          0          0          0          0
+Education                              0          0          0          3          0          0          0          0          0          0          0          0          0
+Electricity                            0          0          0          0          5          0          0          0          0          0          0          0          0
+Healthcare                             0          0          0          0          0          3          0          0          0          0          0          0          0
+Noise Pollution                        0          0          0          0          0          0          3          0          0          0          0          0          0
+Public Safety                          0          1          0          0          0          0          0          2          0          0          0          0          0
+Public Transport                       0          0          0          0          0          0          0          0          3          0          0          0          0
+Road & Infrastructure                  0          0          0          0          0          0          0          0          0          6          0          0          0
+Sanitation                             0          0          0          0          0          0          0          0          0          0          1          0          0
+Waste Management                       0          1          0          0          0          0          0          0          0          0          1          4          0
+Water Supply                           0          0          0          0          0          0          0          0          0          0          0          0          5
