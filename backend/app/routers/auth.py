@@ -53,6 +53,21 @@ def _public_user(u: dict) -> dict:
     }
 
 
+def get_current_user(authorization: Optional[str] = Header(None)) -> dict:
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    try:
+        payload = jwt.decode(
+            authorization.split(" ", 1)[1], settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
+        user = db.find_one("users", {"id": payload["sub"]})
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+        return user
+    except jwt.PyJWTError as exc:
+        raise HTTPException(status_code=401, detail="Invalid token") from exc
+
+
 @router.post("/login", response_model=AuthResponse)
 def login(req: LoginRequest) -> AuthResponse:
     user = db.find_one("users", {"email": req.email.lower()})
@@ -84,16 +99,6 @@ def register(req: RegisterRequest) -> AuthResponse:
     return AuthResponse(token=create_token(user["id"]), user=_public_user(user))
 
 
-def get_current_user(authorization: Optional[str] = Header(None)) -> dict:
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    try:
-        payload = jwt.decode(
-            authorization.split(" ", 1)[1], settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
-        )
-        user = db.find_one("users", {"id": payload["sub"]})
-        if not user:
-            raise HTTPException(status_code=401, detail="User not found")
-        return user
-    except jwt.PyJWTError as exc:
-        raise HTTPException(status_code=401, detail="Invalid token") from exc
+@router.get("/me")
+def get_me(user: dict = Depends(get_current_user)) -> dict:
+    return _public_user(user)
