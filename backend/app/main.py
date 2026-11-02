@@ -35,6 +35,20 @@ def on_startup() -> None:
     # Demo credentials and seed complaints are only populated in local development
     if settings.ENV == "development" or settings.DEBUG:
         seed_all()
+    try:
+        from app.services.scheduler import start_scheduler
+        start_scheduler()
+    except Exception:
+        pass
+
+
+@app.on_event("shutdown")
+def on_shutdown() -> None:
+    try:
+        from app.services.scheduler import shutdown_scheduler
+        shutdown_scheduler()
+    except Exception:
+        pass
 
 
 @app.get("/")

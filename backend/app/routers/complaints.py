@@ -111,6 +111,11 @@ def create_complaint(req: ComplaintIn, user: dict = Depends(get_current_user)) -
     analysis["duplicateCount"] = dup["duplicateCount"]
     analysis["similarComplaints"] = dup["similarComplaints"]
 
+    from app.services.scheduler import calculate_sla_deadline, SLA_DEADLINES
+
+    sla_hours = SLA_DEADLINES.get(analysis["priority"].lower(), 168)
+    sla_deadline = calculate_sla_deadline(now, analysis["priority"])
+
     complaint = {
         "id": f"c_{int(datetime.now().timestamp() * 1000)}",
         "petitionId": _petition_id(),
@@ -125,6 +130,10 @@ def create_complaint(req: ComplaintIn, user: dict = Depends(get_current_user)) -
         "status": "under_review",
         "priority": analysis["priority"],
         "assignedDepartment": analysis["department"],
+        "slaDeadline": sla_deadline,
+        "slaHours": sla_hours,
+        "reminderSent": False,
+        "isEscalated": False,
         "human_review_required": analysis.get("human_review_required", False),
         "aiAnalysis": analysis,
         "statusHistory": [
@@ -181,6 +190,13 @@ def list_all_audit_logs(user: dict = Depends(get_current_user)) -> list[dict]:
         raise HTTPException(status_code=403, detail="Admin permission required")
     logs = db.find("audit_logs", {}, sort=[("timestamp", -1)])
     return [_clean_doc(d) for d in logs]
+
+
+@router.post("/check-sla")
+def trigger_sla_check(user: dict = Depends(get_current_user)) -> dict:
+    """Manually trigger background SLA inspection for reminders and auto-escalations."""
+    from app.services.scheduler import check_sla_breaches_and_reminders
+    return check_sla_breaches_and_reminders()
 
 
 @router.get("/{complaint_id}")
