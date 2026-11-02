@@ -156,7 +156,7 @@ export default function SubmitPetition() {
     const combinedDescription = form.description + 
       (imageAnalysisResults.length > 0 ? "\n\nAI Image Analysis:\n" + imageAnalysisResults.join("\n") : "");
 
-    const aiResult = generateAIAnalysis(form.title, combinedDescription, form.category);
+    const aiResult = await generateAIAnalysis(form.title, combinedDescription, form.category, form.location, form.district);
     const petitionId = generatePetitionId();
     const now = new Date().toISOString();
 

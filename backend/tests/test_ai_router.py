@@ -1,4 +1,4 @@
-"""Tests for POST /api/ai/analyze-image endpoint."""
+"""Tests for backend AI Router (/api/ai/* endpoints)."""
 import base64
 import pytest
 from fastapi.testclient import TestClient
@@ -93,7 +93,6 @@ def test_analyze_image_unsupported_file_type():
 
 def test_analyze_image_oversized():
     """Payload exceeding 5 MB limit should return 400."""
-    # 5.1 MB of dummy bytes
     oversized_data = base64.b64encode(b"\xff\xd8\xff" + b"0" * (5 * 1024 * 1024 + 100)).decode("utf-8")
     token = create_token("u1")
     headers = {"Authorization": f"Bearer {token}"}
@@ -127,3 +126,90 @@ def test_analyze_image_rate_limiting():
     )
     assert res.status_code == 429
     assert "Rate limit exceeded" in res.json()["detail"]
+
+
+def test_analyze_petition_endpoint():
+    """POST /api/ai/analyze returns full classification, priority, confidence, explanation."""
+    token = create_token("u1")
+    headers = {"Authorization": f"Bearer {token}"}
+    res = client.post(
+        "/api/ai/analyze",
+        headers=headers,
+        json={
+            "title": "Severe pothole on main road causing accidents",
+            "description": "Large dangerous pothole near the bus stand needs immediate resurfacing.",
+            "category": "Road & Infrastructure",
+        },
+    )
+    assert res.status_code == 200
+    data = res.json()
+    assert data["category"] == "Road & Infrastructure"
+    assert data["department"] == "Roads & Infrastructure"
+    assert "confidence" in data and 0.0 <= data["confidence"] <= 1.0
+    assert "explanation" in data and len(data["explanation"]) > 0
+    assert "priority" in data
+    assert "sentiment" in data
+
+
+def test_classify_endpoint():
+    """POST /api/ai/classify returns department routing with confidence and explanation."""
+    token = create_token("u1")
+    headers = {"Authorization": f"Bearer {token}"}
+    res = client.post(
+        "/api/ai/classify",
+        headers=headers,
+        json={"category": "Water Supply"},
+    )
+    assert res.status_code == 200
+    data = res.json()
+    assert data["department"] == "Water Works"
+    assert data["confidence"] >= 0.70
+    assert "explanation" in data and len(data["explanation"]) > 0
+
+
+def test_priority_endpoint():
+    """POST /api/ai/priority predicts urgency with confidence and explanation."""
+    token = create_token("u1")
+    headers = {"Authorization": f"Bearer {token}"}
+    res = client.post(
+        "/api/ai/priority",
+        headers=headers,
+        json={"text": "Emergency fire and building collapse danger!"},
+    )
+    assert res.status_code == 200
+    data = res.json()
+    assert data["priority"] == "critical"
+    assert data["confidence"] >= 0.90
+    assert "explanation" in data
+
+
+def test_sentiment_endpoint():
+    """POST /api/ai/sentiment evaluates citizen mood with score, confidence, explanation."""
+    token = create_token("u1")
+    headers = {"Authorization": f"Bearer {token}"}
+    res = client.post(
+        "/api/ai/sentiment",
+        headers=headers,
+        json={"text": "This is unacceptable and absolutely disgusting behavior by authorities!"},
+    )
+    assert res.status_code == 200
+    data = res.json()
+    assert data["sentiment"] == "angry"
+    assert data["confidence"] > 0.0
+    assert "explanation" in data
+
+
+def test_duplicates_endpoint():
+    """POST /api/ai/duplicates evaluates similarity against database."""
+    token = create_token("u1")
+    headers = {"Authorization": f"Bearer {token}"}
+    res = client.post(
+        "/api/ai/duplicates",
+        headers=headers,
+        json={"text": "Water leakage in pipe"},
+    )
+    assert res.status_code == 200
+    data = res.json()
+    assert "isDuplicate" in data
+    assert "confidence" in data
+    assert "explanation" in data

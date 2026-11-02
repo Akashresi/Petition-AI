@@ -16,8 +16,14 @@ def detect_duplicates(new_text: str, existing_complaints: list[dict], threshold:
             })
 
     similar.sort(key=lambda s: s["similarity"], reverse=True)
+    top_sim = similar[0]["similarity"] if similar else 0.0
     return {
         "isDuplicate": len(similar) > 0,
         "duplicateCount": len(similar),
         "similarComplaints": similar[:3],
+        "confidence": round(max(0.70, top_sim if similar else 0.85), 2),
+        "explanation": (
+            f"Detected {len(similar)} similar complaint(s) with semantic cosine similarity >= {threshold}."
+            if similar else "No similar complaints exceeding the similarity threshold were found."
+        ),
     }

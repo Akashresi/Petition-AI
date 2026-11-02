@@ -102,4 +102,4 @@ export function confidenceBar(score: number): string {
   return "bg-red-500";
 }
 
-export { generateAIAnalysis } from "./ai";
+export { generateAIAnalysis, generateAIAnalysisSync, generateMockAIAnalysis } from "./ai";

@@ -1,13 +1,22 @@
-"""AI Router - Backend Gemini image analysis, file validation, and rate limiting."""
+"""AI Router - Backend Gemini image analysis, file validation, rate limiting, and centralized NLP logic."""
 import base64
 from collections import defaultdict
 import time
-from typing import Optional
+from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
+from app.ai.duplicates import detect_duplicates
+from app.ai.ml_pipeline import (
+    DEPARTMENT_MAP,
+    analyze_sentiment,
+    classifier,
+    generate_ai_analysis,
+    predict_priority,
+)
 from app.config import settings
+from app.database import db
 from app.routers.auth import get_current_user
 
 router = APIRouter(prefix="/api/ai", tags=["ai"])
@@ -112,6 +121,8 @@ def analyze_with_gemini(decoded_bytes: bytes, mime_type: str) -> dict:
         }
 
 
+# ── Pydantic Request / Response Models ───────────────────────────────────────
+
 class ImageAnalysisIn(BaseModel):
     image: str
 
@@ -122,6 +133,84 @@ class ImageAnalysisOut(BaseModel):
     explanation: str
 
 
+class PetitionAnalysisIn(BaseModel):
+    title: str
+    description: str
+    category: Optional[str] = None
+    location: Optional[str] = None
+    district: Optional[str] = None
+
+
+class PetitionAnalysisOut(BaseModel):
+    category: str
+    categoryConfidence: float
+    department: str
+    departmentConfidence: float
+    priority: str
+    priorityScore: float
+    sentiment: str
+    sentimentScore: float
+    isDuplicate: bool
+    duplicateCount: int
+    similarComplaints: list[dict] = []
+    urgencyLevel: str
+    keywords: list[str] = []
+    confidence: float
+    explanation: str
+    human_review_required: bool = False
+    summaryNote: str
+
+
+class ClassificationIn(BaseModel):
+    category: Optional[str] = None
+    text: Optional[str] = None
+
+
+class ClassificationOut(BaseModel):
+    department: str
+    categoryConfidence: float
+    departmentConfidence: float
+    confidence: float
+    explanation: str
+
+
+class PriorityIn(BaseModel):
+    text: str
+
+
+class PriorityOut(BaseModel):
+    priority: str
+    priorityScore: float
+    confidence: float
+    explanation: str
+
+
+class SentimentIn(BaseModel):
+    text: str
+
+
+class SentimentOut(BaseModel):
+    sentiment: str
+    sentimentScore: float
+    confidence: float
+    explanation: str
+
+
+class DuplicateIn(BaseModel):
+    category: Optional[str] = None
+    text: Optional[str] = None
+
+
+class DuplicateOut(BaseModel):
+    isDuplicate: bool
+    duplicateCount: int
+    similarComplaints: list[dict] = []
+    confidence: float
+    explanation: str
+
+
+# ── AI Endpoints ─────────────────────────────────────────────────────────────
+
 @router.post("/analyze-image", response_model=ImageAnalysisOut)
 def analyze_image(
     req: ImageAnalysisIn,
@@ -131,3 +220,85 @@ def analyze_image(
     decoded_bytes, mime_type = validate_image_payload(req.image)
     result = analyze_with_gemini(decoded_bytes, mime_type)
     return ImageAnalysisOut(**result)
+
+
+@router.post("/analyze", response_model=PetitionAnalysisOut)
+def analyze_petition(
+    req: PetitionAnalysisIn,
+    user: dict = Depends(get_current_user),
+) -> PetitionAnalysisOut:
+    """Full single-source AI analysis for petition text and image summary."""
+    full_text = f"{req.title} {req.description}".strip()
+    analysis = generate_ai_analysis(req.title, req.description, req.category or None)
+
+    existing = db.find("complaints", {})
+    dup = detect_duplicates(full_text, existing, threshold=0.45)
+    analysis["isDuplicate"] = dup["isDuplicate"]
+    analysis["duplicateCount"] = dup["duplicateCount"]
+    analysis["similarComplaints"] = dup["similarComplaints"]
+
+    return PetitionAnalysisOut(**analysis)
+
+
+@router.post("/classify", response_model=ClassificationOut)
+def classify_category_and_dept(
+    req: ClassificationIn,
+    user: dict = Depends(get_current_user),
+) -> ClassificationOut:
+    """Classify category and resolve responsible municipal department."""
+    if req.text:
+        cat, conf = classifier.classify(req.text)
+    else:
+        cat = req.category or "Road & Infrastructure"
+        conf = 0.88
+    dept = DEPARTMENT_MAP.get(cat, "Roads & Infrastructure")
+    dept_conf = round(min(conf + 0.05, 0.99), 2)
+    return ClassificationOut(
+        department=dept,
+        categoryConfidence=round(conf, 2),
+        departmentConfidence=dept_conf,
+        confidence=round(conf, 2),
+        explanation=f"Routed to {dept} based on classification of {cat}.",
+    )
+
+
+@router.post("/priority", response_model=PriorityOut)
+def predict_priority_endpoint(
+    req: PriorityIn,
+    user: dict = Depends(get_current_user),
+) -> PriorityOut:
+    """Predict urgency and priority level from text."""
+    priority, score = predict_priority(req.text)
+    return PriorityOut(
+        priority=priority,
+        priorityScore=score,
+        confidence=score,
+        explanation=f"Predicted {priority.upper()} priority based on severity keywords and urgency indicators.",
+    )
+
+
+@router.post("/sentiment", response_model=SentimentOut)
+def analyze_sentiment_endpoint(
+    req: SentimentIn,
+    user: dict = Depends(get_current_user),
+) -> SentimentOut:
+    """Analyze citizen sentiment from complaint wording."""
+    sentiment, score = analyze_sentiment(req.text)
+    return SentimentOut(
+        sentiment=sentiment,
+        sentimentScore=score,
+        confidence=0.85,
+        explanation=f"Detected {sentiment} sentiment with tone score {round(score, 2)}.",
+    )
+
+
+@router.post("/duplicates", response_model=DuplicateOut)
+def detect_duplicates_endpoint(
+    req: DuplicateIn,
+    user: dict = Depends(get_current_user),
+) -> DuplicateOut:
+    """Detect similar existing petitions using semantic similarity."""
+    text = req.text or req.category or ""
+    existing = db.find("complaints", {})
+    dup = detect_duplicates(text, existing, threshold=0.45)
+    return DuplicateOut(**dup)

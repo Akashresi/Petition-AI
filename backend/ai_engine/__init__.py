@@ -1,2 +1,2 @@
-"""PetitionAI – Phase 1 AI Engine (CLI-only, no DB/API dependency)."""
-
+"""Bridge module: delegates all AI logic to app.ai as single source of truth."""
+from app.ai import *

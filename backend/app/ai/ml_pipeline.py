@@ -225,12 +225,16 @@ def generate_ai_analysis(title: str, description: str, category: str | None = No
     sentiment, sentiment_score = analyze_sentiment(full_text)
     priority, priority_score = predict_priority(full_text)
     keywords = extract_keywords(full_text)
+    conf = round(category_conf, 2)
+    explanation = (
+        f"AI-powered NLP classified this petition as {ai_category} with {round(conf * 100)} % confidence and routed to {department} at {priority.upper()} priority."
+    )
 
     return {
         "category": ai_category,
-        "categoryConfidence": round(category_conf, 2),
+        "categoryConfidence": conf,
         "department": department,
-        "departmentConfidence": round(min(category_conf + 0.04, 0.99), 2),
+        "departmentConfidence": round(min(conf + 0.04, 0.99), 2),
         "priority": priority,
         "priorityScore": priority_score,
         "sentiment": sentiment,
@@ -240,9 +244,12 @@ def generate_ai_analysis(title: str, description: str, category: str | None = No
         "similarComplaints": [],
         "urgencyLevel": priority,
         "keywords": keywords or ["complaint", "repair", "maintenance"],
+        "confidence": conf,
+        "explanation": explanation,
+        "human_review_required": conf < 0.65,
         "summaryNote": (
-            f"AI classified this as {ai_category} with "
-            f"{round(category_conf * 100)}% confidence. Routed to {department}. "
+            f"AI-powered NLP classified this petition as {ai_category} with "
+            f"{round(conf * 100)}% confidence. Routed to {department}. "
             f"Priority: {priority.upper()}. No duplicates detected."
         ),
     }

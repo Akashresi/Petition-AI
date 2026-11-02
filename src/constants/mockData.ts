@@ -1,4 +1,5 @@
 import { User, Complaint, Department, Officer, Notification, AnalyticsData, AIAnalysis } from "@/types";
+import { generateMockAIAnalysis } from "@/lib/ai";
 
 // ── Mock Users ─────────────────────────────────────────────────────────────────
 export const MOCK_USERS: User[] = [
@@ -92,69 +93,8 @@ export const OFFICERS: Officer[] = [
   { id: "o5", name: "Kavitha Raj", email: "kavitha@demo.com", department: "Public Safety", assignedCount: 4, resolvedCount: 19, rating: 4.8, joinedAt: "2024-02-08" },
 ];
 
-// ── AI Classification Engine (Mock) ────────────────────────────────────────────
-export function generateAIAnalysis(title: string, description: string, category: string): AIAnalysis {
-  const text = `${title} ${description}`.toLowerCase();
-
-  // Sentiment detection
-  const angryWords = ["angry", "furious", "unacceptable", "terrible", "worst", "disgusting", "outrageous", "frustrated"];
-  const negativeWords = ["bad", "poor", "issue", "problem", "complaint", "broken", "damaged", "fail", "missing", "blocked"];
-  const positiveWords = ["please", "kindly", "request", "hope", "appreciate", "grateful"];
-  let sentiment: "positive" | "neutral" | "negative" | "angry" = "neutral";
-  let sentimentScore = 0.5;
-  if (angryWords.some(w => text.includes(w))) { sentiment = "angry"; sentimentScore = 0.15; }
-  else if (negativeWords.filter(w => text.includes(w)).length >= 2) { sentiment = "negative"; sentimentScore = 0.3; }
-  else if (positiveWords.some(w => text.includes(w))) { sentiment = "positive"; sentimentScore = 0.75; }
-
-  // Priority detection
-  const criticalWords = ["accident", "emergency", "danger", "death", "flood", "fire", "collapse", "sewage overflow"];
-  const highWords = ["broken", "leaking", "no water", "no electricity", "pothole", "blocked drain"];
-  let priority: "critical" | "high" | "medium" | "low" = "medium";
-  let priorityScore = 0.5;
-  if (criticalWords.some(w => text.includes(w))) { priority = "critical"; priorityScore = 0.95; }
-  else if (highWords.some(w => text.includes(w))) { priority = "high"; priorityScore = 0.75; }
-  else if (text.length < 50) { priority = "low"; priorityScore = 0.25; }
-
-  // Department mapping
-  const deptMap: Record<string, string> = {
-    "Road & Infrastructure": "Roads & Infrastructure",
-    "Building & Construction": "Roads & Infrastructure",
-    "Water Supply": "Water Works",
-    "Sanitation": "Waste Management",
-    "Electricity": "Electricity Board",
-    "Waste Management": "Waste Management",
-    "Parks & Recreation": "Waste Management",
-    "Noise Pollution": "Public Safety",
-    "Public Safety": "Public Safety",
-    "Healthcare": "Health Department",
-    "Education": "Education Department",
-    "Public Transport": "Transport Authority",
-  };
-
-  const keywords = text.split(" ").filter(w => w.length > 5).slice(0, 6);
-
-  const similarComplaints = [
-    { id: "PET-2024-089", title: "Road pothole near market area", similarity: 0.87, status: "in_progress" as const },
-    { id: "PET-2024-045", title: "Similar infrastructure complaint", similarity: 0.72, status: "resolved" as const },
-  ];
-
-  return {
-    category,
-    categoryConfidence: 0.88 + Math.random() * 0.1,
-    department: deptMap[category] || "Roads & Infrastructure",
-    departmentConfidence: 0.82 + Math.random() * 0.12,
-    priority,
-    priorityScore,
-    sentiment,
-    sentimentScore,
-    isDuplicate: Math.random() > 0.75,
-    duplicateCount: Math.floor(Math.random() * 3),
-    similarComplaints: Math.random() > 0.4 ? similarComplaints : [],
-    urgencyLevel: priority,
-    keywords: keywords.length > 0 ? keywords : ["complaint", "repair", "maintenance"],
-    summaryNote: `AI has classified this complaint under ${category} with ${Math.round((0.88 + Math.random() * 0.1) * 100)}% confidence. ${priority === "critical" ? "⚠️ Immediate attention required." : "Routine processing recommended."}`,
-  };
-}
+// ── AI Classification Engine (Mock fallback delegating to single source) ────────
+export const generateAIAnalysis = generateMockAIAnalysis;
 
 // ── Mock Complaints ─────────────────────────────────────────────────────────────
 export const MOCK_COMPLAINTS: Complaint[] = [
