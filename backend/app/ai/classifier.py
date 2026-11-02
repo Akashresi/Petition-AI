@@ -163,6 +163,23 @@ class TFIDFClassifier:
     def _fit(self) -> None:
         texts = [t for _, t in SEED_CORPUS]
         labels = [c for c, _ in SEED_CORPUS]
+
+        csv_path = Path(__file__).resolve().parents[2] / "data" / "labeled_petitions.csv"
+        if csv_path.exists():
+            try:
+                import csv
+                with open(csv_path, "r", encoding="utf-8") as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        text = row.get("text", "").strip()
+                        cat = row.get("category", "").strip()
+                        if text and cat:
+                            texts.append(text)
+                            labels.append(cat)
+                logger.info("Loaded %d training examples from %s", len(texts), csv_path.name)
+            except Exception as exc:
+                logger.warning("Could not load dataset %s: %s", csv_path, exc)
+
         self.pipeline.fit(texts, labels)
         self.classes_ = self.pipeline.classes_.tolist()
 

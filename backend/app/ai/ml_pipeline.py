@@ -10,6 +10,10 @@ import math
 import re
 from collections import Counter
 
+from app.ai.classifier import CATEGORIES, DEPARTMENT_MAP, get_tfidf_classifier, llm_classify
+from app.ai.priority import detect_priority
+from app.config import settings
+
 # ── Categories the classifier can route ─────────────────────────────────────────
 CATEGORIES = [
     "Road & Infrastructure",
@@ -195,14 +199,8 @@ def analyze_sentiment(text: str) -> tuple[str, float]:
 
 
 def predict_priority(text: str) -> tuple[str, float]:
-    lower = text.lower()
-    if any(w in lower for w in CRITICAL_WORDS):
-        return "critical", 0.95
-    if any(w in lower for w in HIGH_WORDS):
-        return "high", 0.75
-    if len(text.strip()) < 40:
-        return "low", 0.3
-    return "medium", 0.55
+    pri = detect_priority(text)
+    return pri["urgency"], pri["priority_confidence"]
 
 
 def extract_keywords(text: str, limit: int = 6) -> list[str]:
@@ -213,22 +211,64 @@ def extract_keywords(text: str, limit: int = 6) -> list[str]:
 
 
 def generate_ai_analysis(title: str, description: str, category: str | None = None) -> dict:
-    full_text = f"{title} {description}"
+    full_text = f"{title} {description}".strip()
 
+    # Baseline TF-IDF + Logistic Regression classification
+    tfidf_clf = get_tfidf_classifier()
     if category and category in CATEGORIES:
         ai_category = category
-        category_conf = 0.9
+        category_conf = 0.90
     else:
-        ai_category, category_conf = classifier.classify(full_text)
+        ai_category, category_conf = tfidf_clf.classify(full_text)
+
+    # Hosted LLM classification step (Gemini backend-only)
+    llm_result = None
+    if settings.GEMINI_API_KEY:
+        try:
+            llm_result = llm_classify(full_text, api_key=settings.GEMINI_API_KEY, model_name="gemini-1.5-flash")
+        except Exception:
+            llm_result = None
+
+    human_review_required = False
+    review_reasons: list[str] = []
+
+    if llm_result and "category" in llm_result:
+        llm_cat = llm_result["category"]
+        llm_conf = float(llm_result.get("confidence", 0.85))
+        if llm_cat != ai_category:
+            human_review_required = True
+            review_reasons.append(f"Model disagreement: Baseline predicted '{ai_category}', LLM predicted '{llm_cat}'.")
+            if llm_conf > category_conf:
+                ai_category = llm_cat
+                category_conf = llm_conf
+        else:
+            category_conf = max(category_conf, llm_conf)
+
+    if category_conf < 0.65:
+        human_review_required = True
+        review_reasons.append(f"Low classification confidence ({round(category_conf * 100)}% < 65%).")
 
     department = DEPARTMENT_MAP.get(ai_category, "Roads & Infrastructure")
     sentiment, sentiment_score = analyze_sentiment(full_text)
-    priority, priority_score = predict_priority(full_text)
+
+    # Priority from negation-aware priority engine
+    pri_info = detect_priority(full_text)
+    priority = pri_info["urgency"]
+    priority_score = pri_info["priority_confidence"]
+
     keywords = extract_keywords(full_text)
     conf = round(category_conf, 2)
-    explanation = (
-        f"AI-powered NLP classified this petition as {ai_category} with {round(conf * 100)} % confidence and routed to {department} at {priority.upper()} priority."
-    )
+
+    if human_review_required:
+        explanation = (
+            f"Classified as {ai_category} ({round(conf * 100)}% confidence). "
+            f"Flagged for human review: {'; '.join(review_reasons)}"
+        )
+    else:
+        explanation = (
+            f"AI hybrid model classified petition as {ai_category} ({round(conf * 100)}% confidence) "
+            f"and routed to {department} at {priority.upper()} priority."
+        )
 
     return {
         "category": ai_category,
@@ -246,7 +286,8 @@ def generate_ai_analysis(title: str, description: str, category: str | None = No
         "keywords": keywords or ["complaint", "repair", "maintenance"],
         "confidence": conf,
         "explanation": explanation,
-        "human_review_required": conf < 0.65,
+        "human_review_required": human_review_required,
+        "review_reasons": review_reasons,
         "summaryNote": (
             f"AI-powered NLP classified this petition as {ai_category} with "
             f"{round(conf * 100)}% confidence. Routed to {department}. "

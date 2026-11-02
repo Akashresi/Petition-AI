@@ -3,11 +3,13 @@ import { getStoredUser } from "@/lib/auth";
 const API_BASE = import.meta.env.VITE_API_URL || "/api";
 
 export interface ClassificationResult {
+  category?: string;
   department: string;
   categoryConfidence: number;
   departmentConfidence: number;
   confidence: number;
   explanation: string;
+  human_review_required?: boolean;
 }
 
 const DEPT_FALLBACK_MAP: Record<string, string> = {

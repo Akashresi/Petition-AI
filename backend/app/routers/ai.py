@@ -167,11 +167,13 @@ class ClassificationIn(BaseModel):
 
 
 class ClassificationOut(BaseModel):
+    category: str = "Road & Infrastructure"
     department: str
     categoryConfidence: float
     departmentConfidence: float
     confidence: float
     explanation: str
+    human_review_required: bool = False
 
 
 class PriorityIn(BaseModel):
@@ -246,19 +248,55 @@ def classify_category_and_dept(
     user: dict = Depends(get_current_user),
 ) -> ClassificationOut:
     """Classify category and resolve responsible municipal department."""
+    from app.ai.classifier import get_tfidf_classifier, llm_classify
+    human_review_required = False
+    review_reasons = []
+
     if req.text:
-        cat, conf = classifier.classify(req.text)
+        tfidf_clf = get_tfidf_classifier()
+        cat, conf = tfidf_clf.classify(req.text)
+        
+        # Hosted LLM step (backend only)
+        if settings.GEMINI_API_KEY:
+            try:
+                llm_res = llm_classify(req.text, api_key=settings.GEMINI_API_KEY, model_name="gemini-1.5-flash")
+                if llm_res and "category" in llm_res:
+                    llm_cat = llm_res["category"]
+                    llm_conf = float(llm_res.get("confidence", 0.85))
+                    if llm_cat != cat:
+                        human_review_required = True
+                        review_reasons.append(f"Model disagreement: Baseline predicted '{cat}', LLM predicted '{llm_cat}'.")
+                        if llm_conf > conf:
+                            cat = llm_cat
+                            conf = llm_conf
+                    else:
+                        conf = max(conf, llm_conf)
+            except Exception:
+                pass
     else:
         cat = req.category or "Road & Infrastructure"
         conf = 0.88
+
+    if conf < 0.65:
+        human_review_required = True
+        review_reasons.append(f"Confidence {round(conf * 100)}% below 65% threshold")
+
     dept = DEPARTMENT_MAP.get(cat, "Roads & Infrastructure")
     dept_conf = round(min(conf + 0.05, 0.99), 2)
+    explanation = (
+        f"Routed to {dept} based on classification of {cat} ({round(conf * 100)}% confidence)."
+    )
+    if human_review_required:
+        explanation += f" Flagged for human review: {'; '.join(review_reasons)}"
+
     return ClassificationOut(
+        category=cat,
         department=dept,
         categoryConfidence=round(conf, 2),
         departmentConfidence=dept_conf,
         confidence=round(conf, 2),
-        explanation=f"Routed to {dept} based on classification of {cat}.",
+        explanation=explanation,
+        human_review_required=human_review_required,
     )
 
 

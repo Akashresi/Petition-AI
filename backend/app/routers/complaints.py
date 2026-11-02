@@ -113,6 +113,7 @@ def create_complaint(req: ComplaintIn, user: dict = Depends(get_current_user)) -
         "status": "under_review",
         "priority": analysis["priority"],
         "assignedDepartment": analysis["department"],
+        "human_review_required": analysis.get("human_review_required", False),
         "aiAnalysis": analysis,
         "statusHistory": [
             {"status": "submitted", "timestamp": now, "note": "Petition submitted by citizen", "updatedBy": "System"},
