@@ -46,6 +46,8 @@ export interface Complaint {
   images?: string[];
   isEscalated?: boolean;
   reopenCount: number;
+  human_review_required?: boolean;
+  review_reasons?: string[];
 }
 
 export interface Department {

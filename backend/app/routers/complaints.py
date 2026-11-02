@@ -26,9 +26,14 @@ def _petition_id() -> str:
     return f"{prefix}{seq:03d}"
 
 
+def _clean_doc(d: dict) -> dict:
+    if isinstance(d, dict):
+        d.pop("_id", None)
+    return d
+
+
 def _public_complaint(c: dict) -> dict:
-    c.pop("_id", None)
-    return c
+    return _clean_doc(c)
 
 
 def _can_access(user: dict, complaint: dict) -> bool:
@@ -61,6 +66,13 @@ class StatusUpdateIn(BaseModel):
     officerName: Optional[str] = None
     assignedDepartment: Optional[str] = None
     resolutionDetails: Optional[str] = None
+
+
+class ComplaintCorrectionIn(BaseModel):
+    category: str
+    department: str
+    priority: str
+    note: Optional[str] = "Corrected via Admin Review Panel"
 
 
 @router.get("")
@@ -152,6 +164,25 @@ def create_complaint(req: ComplaintIn, user: dict = Depends(get_current_user)) -
     return _public_complaint(complaint)
 
 
+@router.get("/reviews")
+def list_review_queue(user: dict = Depends(get_current_user)) -> list[dict]:
+    """List all petitions flagged human_review_required=True for administrative correction."""
+    if user.get("role") not in ("admin", "officer"):
+        raise HTTPException(status_code=403, detail="Admin or officer permission required")
+    complaints = db.find("complaints", {})
+    results = [c for c in complaints if c.get("human_review_required") is True]
+    return [_public_complaint(c) for c in results]
+
+
+@router.get("/audit/all")
+def list_all_audit_logs(user: dict = Depends(get_current_user)) -> list[dict]:
+    """List recent audit logs across complaints."""
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin permission required")
+    logs = db.find("audit_logs", {}, sort=[("timestamp", -1)])
+    return [_clean_doc(d) for d in logs]
+
+
 @router.get("/{complaint_id}")
 def get_complaint(complaint_id: str, user: dict = Depends(get_current_user)) -> dict:
     c = db.find_one("complaints", {"id": complaint_id})
@@ -214,3 +245,120 @@ def update_complaint(
         })
 
     return _public_complaint(updated)
+
+
+@router.post("/{complaint_id}/correct")
+def correct_complaint(
+    complaint_id: str,
+    req: ComplaintCorrectionIn,
+    user: dict = Depends(get_current_user),
+) -> dict:
+    """One-click admin correction of category, department, and priority with audit logging."""
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin permission required to correct petitions")
+
+    c = db.find_one("complaints", {"id": complaint_id}) or db.find_one("complaints", {"petitionId": complaint_id})
+    if not c:
+        raise HTTPException(status_code=404, detail="Complaint not found")
+
+    now = datetime.now().isoformat()
+    before = {
+        "category": c.get("category"),
+        "department": c.get("assignedDepartment"),
+        "priority": c.get("priority"),
+    }
+    after = {
+        "category": req.category,
+        "department": req.department,
+        "priority": req.priority,
+    }
+
+    # 1. Save to corrections collection
+    corr_id = f"corr_{int(datetime.now().timestamp() * 1000)}"
+    correction_record = {
+        "id": corr_id,
+        "complaintId": c["id"],
+        "petitionId": c.get("petitionId"),
+        "correctedBy": user.get("id"),
+        "correctedByName": user.get("name"),
+        "correctedAt": now,
+        "before": before,
+        "after": after,
+        "note": req.note,
+    }
+    db.insert("corrections", correction_record)
+
+    # 2. Save to audit_logs collection
+    audit_id = f"audit_{int(datetime.now().timestamp() * 1000)}"
+    audit_record = {
+        "id": audit_id,
+        "action": "admin_correction",
+        "entityType": "complaint",
+        "entityId": c["id"],
+        "petitionId": c.get("petitionId"),
+        "performedBy": user.get("id"),
+        "performedByName": user.get("name"),
+        "timestamp": now,
+        "details": {
+            "before": before,
+            "after": after,
+            "note": req.note,
+        },
+    }
+    db.insert("audit_logs", audit_record)
+
+    # 3. Update the complaint
+    history = list(c.get("statusHistory", []))
+    history.append({
+        "status": c.get("status", "under_review"),
+        "timestamp": now,
+        "note": f"Admin correction applied: {before['category']} -> {req.category}, {before['department']} -> {req.department}, {before['priority']} -> {req.priority}",
+        "updatedBy": f"Admin ({user.get('name')})",
+    })
+
+    updates = {
+        "category": req.category,
+        "assignedDepartment": req.department,
+        "priority": req.priority,
+        "human_review_required": False,
+        "statusHistory": history,
+    }
+    if "aiAnalysis" in c and isinstance(c["aiAnalysis"], dict):
+        ai_data = dict(c["aiAnalysis"])
+        ai_data["category"] = req.category
+        ai_data["department"] = req.department
+        ai_data["priority"] = req.priority
+        ai_data["human_review_required"] = False
+        updates["aiAnalysis"] = ai_data
+
+    db.update("complaints", {"id": c["id"]}, updates)
+    updated = db.find_one("complaints", {"id": c["id"]})
+
+    return {
+        "message": "Petition successfully corrected and verified",
+        "correction": _clean_doc(correction_record),
+        "auditLog": _clean_doc(audit_record),
+        "complaint": _public_complaint(updated),
+    }
+
+
+@router.get("/{complaint_id}/corrections")
+def get_complaint_corrections(complaint_id: str, user: dict = Depends(get_current_user)) -> list[dict]:
+    """Retrieve corrections history for a given complaint."""
+    if user.get("role") not in ("admin", "officer"):
+        raise HTTPException(status_code=403, detail="Admin or officer permission required")
+    c = db.find_one("complaints", {"id": complaint_id}) or db.find_one("complaints", {"petitionId": complaint_id})
+    if not c:
+        raise HTTPException(status_code=404, detail="Complaint not found")
+    return [_clean_doc(d) for d in db.find("corrections", {"complaintId": c["id"]})]
+
+
+@router.get("/{complaint_id}/audit")
+def get_complaint_audit_trail(complaint_id: str, user: dict = Depends(get_current_user)) -> list[dict]:
+    """Retrieve audit trail entries for a given complaint."""
+    if user.get("role") not in ("admin", "officer"):
+        raise HTTPException(status_code=403, detail="Admin or officer permission required")
+    c = db.find_one("complaints", {"id": complaint_id}) or db.find_one("complaints", {"petitionId": complaint_id})
+    if not c:
+        raise HTTPException(status_code=404, detail="Complaint not found")
+    return [_clean_doc(d) for d in db.find("audit_logs", {"entityId": c["id"]})]

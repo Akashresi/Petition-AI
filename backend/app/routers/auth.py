@@ -10,6 +10,8 @@ from app.config import settings
 from app.database import db
 from app.security import hash_password, needs_rehash, verify_password
 
+import uuid
+
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
@@ -86,7 +88,7 @@ def register(req: RegisterRequest) -> AuthResponse:
         raise HTTPException(status_code=409, detail="Email already registered")
 
     user = {
-        "id": f"u{int(datetime.now().timestamp())}",
+        "id": f"u_{int(datetime.now().timestamp() * 1000)}_{uuid.uuid4().hex[:6]}",
         "name": req.name,
         "email": req.email.lower(),
         "role": "citizen",

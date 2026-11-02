@@ -24,4 +24,12 @@ export interface AIAnalysis {
   urgencyLevel: "critical" | "high" | "medium" | "low";
   keywords: string[];
   summaryNote: string;
+  confidence?: number;
+  explanation?: string;
+  human_review_required?: boolean;
+  review_reasons?: string[];
+  is_spam?: boolean;
+  is_abusive?: boolean;
+  spam_reason?: string;
+  abuse_reason?: string;
 }

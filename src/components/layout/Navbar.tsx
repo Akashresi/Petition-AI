@@ -35,6 +35,7 @@ export default function Navbar() {
     admin: [
       { to: "/admin/dashboard", label: t("nav.dashboard") },
       { to: "/admin/complaints", label: t("nav.complaints") },
+      { to: "/admin/reviews", label: "Review Queue" },
       { to: "/admin/users", label: t("nav.users") },
       { to: "/admin/analytics", label: t("nav.analytics") },
     ],

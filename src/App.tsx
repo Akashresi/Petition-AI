@@ -30,6 +30,7 @@ import AdminComplaints from "@/pages/admin/AdminComplaints";
 import AdminUsers from "@/pages/admin/AdminUsers";
 import AdminAnalytics from "@/pages/admin/AdminAnalytics";
 import AdminComplaintDetail from "@/pages/admin/AdminComplaintDetail";
+import AdminReviewQueue from "@/pages/admin/AdminReviewQueue";
 
 const pageVariants = {
   initial: { opacity: 0 },
@@ -100,6 +101,7 @@ function AppRoutes() {
           {/* Admin Routes */}
           <Route path="/admin/dashboard" element={<ProtectedRoute roles={["admin"]}><AnimatedPage><AdminDashboard /></AnimatedPage></ProtectedRoute>} />
           <Route path="/admin/complaints" element={<ProtectedRoute roles={["admin"]}><AnimatedPage><AdminComplaints /></AnimatedPage></ProtectedRoute>} />
+          <Route path="/admin/reviews" element={<ProtectedRoute roles={["admin"]}><AnimatedPage><AdminReviewQueue /></AnimatedPage></ProtectedRoute>} />
           <Route path="/admin/complaint/:id" element={<ProtectedRoute roles={["admin"]}><AnimatedPage><AdminComplaintDetail /></AnimatedPage></ProtectedRoute>} />
           <Route path="/admin/users" element={<ProtectedRoute roles={["admin"]}><AnimatedPage><AdminUsers /></AnimatedPage></ProtectedRoute>} />
           <Route path="/admin/analytics" element={<ProtectedRoute roles={["admin"]}><AnimatedPage><AdminAnalytics /></AnimatedPage></ProtectedRoute>} />

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { Users, FileText, CheckCircle, AlertTriangle, Building2, TrendingUp, ArrowRight, Clock, Shield } from "lucide-react";
+import { Users, FileText, CheckCircle, AlertTriangle, Building2, TrendingUp, ArrowRight, Clock, Shield, ShieldAlert } from "lucide-react";
 import { useComplaints } from "@/hooks/useComplaints";
 import { DEPARTMENTS, OFFICERS } from "@/constants/mockData";
 import { ANALYTICS_DATA } from "@/constants/mockData";
@@ -44,7 +44,10 @@ export default function AdminDashboard() {
             <h1 className="font-display text-3xl font-extrabold text-foreground">Admin Dashboard</h1>
             <p className="text-muted-foreground text-sm mt-1">System overview and complaint management</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
+            <Link to="/admin/reviews" className="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-semibold flex items-center gap-1.5 transition-colors shadow-sm">
+              <ShieldAlert className="w-4 h-4" /> Review Queue
+            </Link>
             <Link to="/admin/complaints" className="btn-primary text-sm flex items-center gap-2">
               <FileText className="w-4 h-4" /> All Complaints
             </Link>
