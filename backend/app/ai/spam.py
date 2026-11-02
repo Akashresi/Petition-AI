@@ -2,33 +2,72 @@
 Spam & Abuse Detection Module
 ==============================
 Detects:
-  - Spam / gibberish (too short, all caps, no real words, repetitive)
-  - Abusive / offensive content (keyword + regex patterns)
-  - Fake / test submissions
-  - Excessive duplicate submissions by same petitioner
+  - Spam / gibberish (keyboard mash, consonant clusters, repetitive chars/words)
+  - Abusive / offensive content (English, Hindi, Tamil)
+  - Fake / placeholder / test submissions
+  - Repeated identical word flooding
 
-Returns: { is_spam: bool, is_abusive: bool, spam_score: float,
-           abuse_score: float, spam_reason: str | None }
+Returns: {
+    is_spam: bool,
+    is_abusive: bool,
+    spam_score: float,
+    abuse_score: float,
+    spam_reason: str | None,
+    abuse_reason: str | None,
+    real_word_count: int,
+}
 """
 from __future__ import annotations
 
 import re
 from typing import Any
 
+# ── Regex patterns ────────────────────────────────────────────────────────────
 
-# ── Spam detection heuristics ─────────────────────────────────────────────────
+_REPEAT_CHAR_RE = re.compile(r"(.)\1{4,}")  # 5+ repeated chars (e.g. aaaaa, zzzzzz)
+_KEYBOARD_MASH_RE = re.compile(
+    r"\b(asdfgh|qwerty|zxcvbn|dfghjk|hjkl|poiuyt|mnbvc|lkjhgf|qazwsx|edcrfv)\w*\b",
+    re.IGNORECASE,
+)
+_CONSONANT_CLUSTER_RE = re.compile(r"\b[bcdfghjklmnpqrstvwxyz]{6,}\b", re.IGNORECASE)
 
-_GIBBERISH_RE = re.compile(r"^[^a-z\u0B00-\u0BFF\u0900-\u097F]*$", re.IGNORECASE)
-_REPEAT_CHAR_RE = re.compile(r"(.)\1{4,}")  # 5+ repeated chars
 _TEST_PATTERNS = [
-    r"\btest(ing)?\b", r"\bsample\b", r"\bfoo\b", r"\bbar\b",
-    r"hello world", r"\babc\b", r"xxxx", r"1234",
+    r"\btest(ing)?\s*(123|petition|text|data|run)?\b",
+    r"\bsample\s*(petition|text|issue|complaint)?\b",
+    r"\bfoo\s*bar\b",
+    r"\bhello\s+world\b",
+    r"\blorem\s+ipsum\b",
+    r"\bxxxx+\b",
+    r"\b1234+\b",
+    r"\basdf\b",
 ]
+
 _ABUSIVE_PATTERNS = [
-    r"\bfuck\b", r"\bshit\b", r"\bbastard\b", r"\bkill\b",
-    r"\bdie\b", r"\bhate\b", r"\bterrorist\b", r"\bbomb\b",
-    # Transliterated Tamil/Hindi abusive terms (light coverage)
-    r"\bmairu\b", r"\bkoothi\b", r"\bsaala\b", r"\bbhenchod\b",
+    # English profanity & threats
+    r"\bfuck\w*\b",
+    r"\bshit\w*\b",
+    r"\bbastard\w*\b",
+    r"\basshole\w*\b",
+    r"\bbitch\w*\b",
+    r"\bcunt\w*\b",
+    r"\bkill\s+(you|them|all|officer)\b",
+    r"\bbomb\s+(the|government|office|building)\b",
+    r"\bterrorist\b",
+    # Hindi profanity
+    r"\bmadarchod\b",
+    r"\bbhenchod\b",
+    r"\bchutiya\w*\b",
+    r"\bsaala\b",
+    r"\bharami\b",
+    r"\bkutte\s+ke\s+bacche\b",
+    r"\bkamina\b",
+    # Tamil profanity
+    r"\bmairu\b",
+    r"\bkoothi\b",
+    r"\bpunda\w*\b",
+    r"\bsunni\b",
+    r"\bthevidya\w*\b",
+    r"\bkena\b",
 ]
 
 
@@ -37,7 +76,7 @@ def _count_real_words(text: str) -> int:
     return len(re.findall(r"[a-zA-Z\u0B00-\u0BFF\u0900-\u097F]{3,}", text))
 
 
-def detect_spam(text: str, *, min_length: int = 20, threshold: float = 0.60) -> dict[str, Any]:
+def detect_spam(text: str, *, min_length: int = 15, threshold: float = 0.50) -> dict[str, Any]:
     """
     Score a petition text for spam / abuse.
 
@@ -49,47 +88,59 @@ def detect_spam(text: str, *, min_length: int = 20, threshold: float = 0.60) -> 
 
     stripped = text.strip()
     lower = stripped.lower()
+    words = re.findall(r"\w+", lower)
 
     # 1. Length check
     if len(stripped) < min_length:
         score += 0.5
-        reasons.append(f"Too short ({len(stripped)} chars)")
+        reasons.append(f"Too short ({len(stripped)} chars < {min_length})")
 
     # 2. Real word count
     real_words = _count_real_words(stripped)
     if real_words < 3:
-        score += 0.4
+        score += 0.45
         reasons.append("Too few real words")
 
-    # 3. All uppercase (shouting / bot)
-    alpha_chars = [c for c in stripped if c.isalpha()]
-    if alpha_chars and sum(c.isupper() for c in alpha_chars) / len(alpha_chars) > 0.85:
-        score += 0.2
-        reasons.append("Excessive uppercase")
+    # 3. Repeated word spam (e.g. "help help help help help")
+    if len(words) >= 5:
+        unique_words = set(words)
+        unique_ratio = len(unique_words) / len(words)
+        if unique_ratio < 0.30:
+            score += 0.55
+            most_repeated = max(unique_words, key=words.count)
+            reasons.append(f"Repetitive word flooding ('{most_repeated}' repeated {words.count(most_repeated)} times)")
 
-    # 4. Repetitive characters
+    # 4. Keyboard mash & consonant clusters (e.g. asdfghjkl, bcdfghjkl)
+    if _KEYBOARD_MASH_RE.search(lower):
+        score += 0.60
+        reasons.append("Keyboard mash sequence detected")
+    elif _CONSONANT_CLUSTER_RE.search(lower):
+        score += 0.50
+        reasons.append("Gibberish consonant clusters detected")
+
+    # 5. Repetitive character sequences (e.g. aaaaaa, !!!!!)
     if _REPEAT_CHAR_RE.search(lower):
-        score += 0.25
-        reasons.append("Repetitive character sequences")
+        score += 0.40
+        reasons.append("Repetitive character sequence detected")
 
-    # 5. Test/fake pattern
-    test_hit = False
+    # 6. Test / fake / placeholder patterns
     for pat in _TEST_PATTERNS:
         if re.search(pat, lower):
-            test_hit = True
-            reasons.append("Test/fake submission pattern")
+            score += 0.65
+            reasons.append("Test or placeholder submission pattern")
             break
-    if test_hit:
-        score += 0.45  # weighted higher so test strings cross threshold
-        # Extra penalty when real content words are few
-        if real_words < 8:
-            score += 0.2
 
-    # 6. Gibberish: too many non-alpha characters
+    # 7. Non-alphabetic ratio (e.g. only punctuation / symbols)
+    alpha_chars = [c for c in stripped if c.isalpha()]
     alpha_ratio = len(alpha_chars) / max(len(stripped), 1)
-    if alpha_ratio < 0.4 and real_words < 5:
-        score += 0.3
-        reasons.append("High non-alphabetic character ratio")
+    if alpha_ratio < 0.35 and len(stripped) > 5:
+        score += 0.50
+        reasons.append("High non-alphabetic character ratio (mostly punctuation/symbols)")
+
+    # 8. Excessive uppercase (SHOUTING / automated bot)
+    if alpha_chars and len(alpha_chars) > 15 and sum(c.isupper() for c in stripped if c.isalpha()) / len(alpha_chars) > 0.90:
+        score += 0.25
+        reasons.append("Excessive uppercase shouting")
 
     spam_score = min(score, 1.0)
     is_spam = spam_score >= threshold
@@ -98,9 +149,10 @@ def detect_spam(text: str, *, min_length: int = 20, threshold: float = 0.60) -> 
     abuse_score = 0.0
     abuse_reasons: list[str] = []
     for pat in _ABUSIVE_PATTERNS:
-        if re.search(pat, lower):
-            abuse_score = min(abuse_score + 0.5, 1.0)
-            abuse_reasons.append(f"Abusive keyword: {pat}")
+        match = re.search(pat, lower)
+        if match:
+            abuse_score = min(abuse_score + 0.6, 1.0)
+            abuse_reasons.append(f"Abusive keyword/phrase: '{match.group()}'")
 
     is_abusive = abuse_score >= 0.5
 

@@ -12,6 +12,7 @@ from collections import Counter
 
 from app.ai.classifier import CATEGORIES, DEPARTMENT_MAP, get_tfidf_classifier, llm_classify
 from app.ai.priority import detect_priority
+from app.ai.spam import detect_spam
 from app.config import settings
 
 # ── Categories the classifier can route ─────────────────────────────────────────
@@ -248,6 +249,15 @@ def generate_ai_analysis(title: str, description: str, category: str | None = No
         human_review_required = True
         review_reasons.append(f"Low classification confidence ({round(category_conf * 100)}% < 65%).")
 
+    # Spam & Abuse quality check
+    spam_info = detect_spam(full_text)
+    if spam_info["is_spam"]:
+        human_review_required = True
+        review_reasons.append(f"Spam detected: {spam_info['spam_reason']}")
+    if spam_info["is_abusive"]:
+        human_review_required = True
+        review_reasons.append(f"Abuse detected: {spam_info['abuse_reason']}")
+
     department = DEPARTMENT_MAP.get(ai_category, "Roads & Infrastructure")
     sentiment, sentiment_score = analyze_sentiment(full_text)
 
@@ -288,6 +298,11 @@ def generate_ai_analysis(title: str, description: str, category: str | None = No
         "explanation": explanation,
         "human_review_required": human_review_required,
         "review_reasons": review_reasons,
+        "is_spam": spam_info["is_spam"],
+        "is_abusive": spam_info["is_abusive"],
+        "spam_score": spam_info["spam_score"],
+        "spam_reason": spam_info["spam_reason"],
+        "abuse_reason": spam_info["abuse_reason"],
         "summaryNote": (
             f"AI-powered NLP classified this petition as {ai_category} with "
             f"{round(conf * 100)}% confidence. Routed to {department}. "

@@ -120,7 +120,11 @@ def create_complaint(req: ComplaintIn, user: dict = Depends(get_current_user)) -
             {
                 "status": "under_review",
                 "timestamp": (datetime.fromisoformat(now) + timedelta(minutes=1)).isoformat(),
-                "note": f"AI analysis complete. Classified as {analysis['category']} ({round(analysis['categoryConfidence'] * 100)}% confidence). Routed to {analysis['department']}.",
+                "note": (
+                    f"AI analysis flagged petition for human review: {'; '.join(analysis.get('review_reasons', []))}. Held from officer dispatch."
+                    if analysis.get("human_review_required")
+                    else f"AI analysis complete. Classified as {analysis['category']} ({round(analysis['categoryConfidence'] * 100)}% confidence). Routed to {analysis['department']}."
+                ),
                 "updatedBy": "AI System",
             },
         ],
