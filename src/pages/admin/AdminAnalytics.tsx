@@ -1,12 +1,55 @@
+import { useState, useEffect } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Legend } from "recharts";
-import { TrendingUp, Brain, Copy, Clock, CheckCircle, AlertTriangle } from "lucide-react";
+import { TrendingUp, Brain, Copy, Clock, CheckCircle, AlertTriangle, FileCode2, Globe } from "lucide-react";
 import { ANALYTICS_DATA } from "@/constants/mockData";
+import { getStoredUser } from "@/lib/auth";
 
 const COLORS = ["#5c6ef7", "#2d4b8e", "#5c6ef7", "#8098fb", "#a5bcfd", "#c7d7fe", "#e0e9ff"];
 const PIE_COLORS = ["#dc2626", "#ea580c", "#d97706", "#16a34a"];
 
+interface EvaluationSummary {
+  accuracy: number;
+  f1_weighted: number;
+  f1_macro: number;
+  precision_weighted: number;
+  recall_weighted: number;
+  total_dataset_samples: number;
+  test_samples: number;
+  per_language_accuracy: Record<string, number>;
+}
+
 export default function AdminAnalytics() {
   const d = ANALYTICS_DATA;
+  const [evalSummary, setEvalSummary] = useState<EvaluationSummary>({
+    accuracy: 0.528,
+    f1_weighted: 0.523,
+    f1_macro: 0.510,
+    precision_weighted: 0.551,
+    recall_weighted: 0.528,
+    total_dataset_samples: 431,
+    test_samples: 108,
+    per_language_accuracy: { en: 0.70, hi: 0.389, ta: 0.469 },
+  });
+
+  useEffect(() => {
+    async function fetchEvalMetrics() {
+      try {
+        const user = getStoredUser();
+        const headers: Record<string, string> = {};
+        if (user?.token) headers["Authorization"] = `Bearer ${user.token}`;
+        const res = await fetch("/api/analytics/evaluation", { headers });
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.summary) {
+            setEvalSummary(data.summary);
+          }
+        }
+      } catch (err) {
+        console.warn("Could not load dynamic evaluation report:", err);
+      }
+    }
+    fetchEvalMetrics();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background py-8 px-4">
@@ -115,24 +158,101 @@ export default function AdminAnalytics() {
         </div>
 
         {/* AI Stats */}
-        <div className="card-base p-5 bg-gradient-to-r from-navy-800 to-navy-700 text-white">
+        <div className="card-base p-5 bg-gradient-to-r from-navy-800 to-navy-700 text-white mb-6">
           <div className="flex items-center gap-2 mb-5">
             <Brain className="w-5 h-5 text-gold-400" />
-            <h3 className="font-semibold text-sm">AI Engine Statistics</h3>
+            <h3 className="font-semibold text-sm">AI Engine Production Pipeline</h3>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
             {[
-              { label: "Classification Accuracy", value: "94.2%", sub: "NLP Model" },
+              { label: "Classification Pipeline", value: "Hybrid", sub: "TF-IDF + LLM" },
               { label: "Duplicates Detected", value: d.duplicateComplaints, sub: "Semantic Similarity" },
               { label: "Auto-routed", value: "100%", sub: "Dept. Prediction" },
-              { label: "Avg. AI Analysis", value: "1.8s", sub: "Processing Time" },
+              { label: "Negation Awareness", value: "Active", sub: "Priority Engine" },
             ].map(s => (
               <div key={s.label} className="text-center">
-                <p className="text-3xl font-bold text-gold-300">{s.value}</p>
+                <p className="text-2xl font-bold text-gold-300">{s.value}</p>
                 <p className="text-xs text-white mt-1 font-medium">{s.label}</p>
                 <p className="text-[10px] text-navy-300 mt-0.5">{s.sub}</p>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Evaluation Metrics Card (from backend/scripts/evaluate.py) */}
+        <div className="card-base p-6 border-l-4 border-l-navy-600 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-border gap-2 mb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <FileCode2 className="w-5 h-5 text-navy-600" />
+                <h3 className="font-semibold text-base text-foreground">Offline Evaluation Benchmark (/reports)</h3>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Computed via <code className="bg-muted px-1 py-0.5 rounded text-[11px]">backend/scripts/evaluate.py</code> on {evalSummary.total_dataset_samples} labeled petitions (stratified {evalSummary.test_samples} sample test holdout).
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300 w-fit">
+              <CheckCircle className="w-3.5 h-3.5" /> Benchmarked
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="p-3 bg-muted/50 rounded-lg text-center">
+              <p className="text-xs text-muted-foreground">Test Accuracy</p>
+              <p className="text-2xl font-bold text-navy-700 dark:text-navy-300 mt-1">
+                {(evalSummary.accuracy * 100).toFixed(1)}%
+              </p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">Top-1 Category</p>
+            </div>
+            <div className="p-3 bg-muted/50 rounded-lg text-center">
+              <p className="text-xs text-muted-foreground">Weighted F1 Score</p>
+              <p className="text-2xl font-bold text-navy-700 dark:text-navy-300 mt-1">
+                {(evalSummary.f1_weighted * 100).toFixed(1)}%
+              </p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">Harmonic Mean</p>
+            </div>
+            <div className="p-3 bg-muted/50 rounded-lg text-center">
+              <p className="text-xs text-muted-foreground">Weighted Precision</p>
+              <p className="text-2xl font-bold text-navy-700 dark:text-navy-300 mt-1">
+                {(evalSummary.precision_weighted * 100).toFixed(1)}%
+              </p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">True Positives</p>
+            </div>
+            <div className="p-3 bg-muted/50 rounded-lg text-center">
+              <p className="text-xs text-muted-foreground">Weighted Recall</p>
+              <p className="text-2xl font-bold text-navy-700 dark:text-navy-300 mt-1">
+                {(evalSummary.recall_weighted * 100).toFixed(1)}%
+              </p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">Sensitivity</p>
+            </div>
+          </div>
+
+          {/* Multilingual Accuracy Breakdown */}
+          <div className="bg-muted/30 p-4 rounded-lg">
+            <div className="flex items-center gap-1.5 mb-3">
+              <Globe className="w-4 h-4 text-muted-foreground" />
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Per-Language Accuracy Breakdown</h4>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[
+                { code: "en", label: "English", acc: evalSummary.per_language_accuracy.en ?? 0.70 },
+                { code: "hi", label: "Hindi (हिंदी)", acc: evalSummary.per_language_accuracy.hi ?? 0.389 },
+                { code: "ta", label: "Tamil (தமிழ்)", acc: evalSummary.per_language_accuracy.ta ?? 0.469 },
+              ].map(item => (
+                <div key={item.code} className="space-y-1.5">
+                  <div className="flex justify-between text-xs">
+                    <span className="font-medium text-foreground">{item.label}</span>
+                    <span className="font-bold text-navy-700 dark:text-navy-300">{(item.acc * 100).toFixed(1)}%</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-navy-600 h-2 rounded-full transition-all duration-500"
+                      style={{ width: `${Math.min(item.acc * 100, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
