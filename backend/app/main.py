@@ -32,7 +32,9 @@ app.include_router(analytics.router)
 
 @app.on_event("startup")
 def on_startup() -> None:
-    seed_all()
+    # Demo credentials and seed complaints are only populated in local development
+    if settings.ENV == "development" or settings.DEBUG:
+        seed_all()
 
 
 @app.get("/")

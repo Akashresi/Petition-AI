@@ -8,6 +8,7 @@ class Settings:
     APP_NAME: str = "PetitionAI API"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = os.getenv("DEBUG", "true").lower() == "true"
+    ENV: str = os.getenv("ENV", "development").lower()
 
     # MongoDB
     MONGODB_URI: str = os.getenv(
