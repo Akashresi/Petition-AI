@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { 
   ShieldAlert, 
@@ -12,7 +12,8 @@ import {
   Flame, 
   Check, 
   Clock,
-  Filter
+  Filter,
+  Search
 } from "lucide-react";
 import { toast } from "sonner";
 import { useComplaints } from "@/hooks/useComplaints";
@@ -55,9 +56,20 @@ interface AuditLog {
   petitionId: string;
   performedByName: string;
   timestamp: string;
-  details: {
-    before: { category: string; department: string; priority: string };
-    after: { category: string; department: string; priority: string };
+  details?: {
+    before?: { category?: string; department?: string; priority?: string };
+    after?: { category?: string; department?: string; priority?: string };
+    beforeStatus?: string;
+    newStatus?: string;
+    assignedDepartment?: string;
+    officerRemarks?: string;
+    resolutionDetails?: string;
+    category?: string;
+    department?: string;
+    priority?: string;
+    confidence?: number;
+    explanation?: string;
+    human_review_required?: boolean;
     note?: string;
   };
 }
@@ -69,10 +81,27 @@ export default function AdminReviewQueue() {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"pending" | "audit">("pending");
+  const [filterPetitionId, setFilterPetitionId] = useState("");
+  const [filterAction, setFilterAction] = useState<string>("all");
 
   // Form state per petition: petitionId -> { category, department, priority, note }
   const [editStates, setEditStates] = useState<Record<string, { category: string; department: string; priority: Priority; note: string }>>({});
   const [submittingId, setSubmittingId] = useState<string | null>(null);
+
+  const filteredAuditLogs = useMemo(() => {
+    return auditLogs.filter(log => {
+      if (filterPetitionId.trim()) {
+        const q = filterPetitionId.trim().toLowerCase();
+        const matchesPid = log.petitionId?.toLowerCase().includes(q);
+        const matchesEid = log.entityId?.toLowerCase().includes(q);
+        if (!matchesPid && !matchesEid) return false;
+      }
+      if (filterAction !== "all") {
+        if (log.action?.toLowerCase() !== filterAction.toLowerCase()) return false;
+      }
+      return true;
+    });
+  }, [auditLogs, filterPetitionId, filterAction]);
 
   // Load review queue & audit logs from backend
   useEffect(() => {
@@ -424,22 +453,46 @@ export default function AdminReviewQueue() {
         ) : (
           /* Audit Log Tab */
           <div className="card-base p-6">
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-border">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-border">
               <div>
-                <h3 className="font-semibold text-base text-foreground">Administrative Correction Audit Trail</h3>
+                <h3 className="font-semibold text-base text-foreground">System & Administrative Audit Trail</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Immutable log of every human override, timestamp, before/after values, and administrator ID.
+                  Immutable record of every AI decision, officer override, and administrative correction with exact timestamps.
                 </p>
               </div>
-              <span className="text-xs font-mono text-muted-foreground bg-muted px-2 py-1 rounded">
+              <span className="text-xs font-mono text-muted-foreground bg-muted px-2 py-1 rounded w-fit">
                 collection: audit_logs & corrections
               </span>
             </div>
 
-            {auditLogs.length === 0 && correctionsLog.length === 0 ? (
+            {/* Filter controls */}
+            <div className="flex flex-col sm:flex-row items-center gap-3 mb-4">
+              <div className="relative flex-1 w-full">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Filter by Petition ID (e.g. PET-2026-001)..."
+                  value={filterPetitionId}
+                  onChange={e => setFilterPetitionId(e.target.value)}
+                  className="w-full text-xs pl-9 pr-3 py-2 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground"
+                />
+              </div>
+              <select
+                value={filterAction}
+                onChange={e => setFilterAction(e.target.value)}
+                className="w-full sm:w-auto text-xs bg-background border border-border rounded-lg px-3 py-2 text-foreground font-medium"
+              >
+                <option value="all">All Actions ({auditLogs.length})</option>
+                <option value="ai_decision">AI Decision</option>
+                <option value="human_override">Human Override</option>
+                <option value="admin_correction">Admin Correction</option>
+              </select>
+            </div>
+
+            {filteredAuditLogs.length === 0 ? (
               <div className="py-12 text-center text-muted-foreground">
                 <History className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                <p>No administrative corrections logged yet.</p>
+                <p>No audit trail records matching filters.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -447,37 +500,84 @@ export default function AdminReviewQueue() {
                   <thead>
                     <tr className="border-b border-border text-muted-foreground">
                       <th className="py-2.5 px-3">Timestamp</th>
+                      <th className="py-2.5 px-3">Action</th>
                       <th className="py-2.5 px-3">Petition ID</th>
-                      <th className="py-2.5 px-3">Admin</th>
-                      <th className="py-2.5 px-3">Before</th>
-                      <th className="py-2.5 px-3">After</th>
-                      <th className="py-2.5 px-3">Note</th>
+                      <th className="py-2.5 px-3">Actor</th>
+                      <th className="py-2.5 px-3">Details / Changes</th>
+                      <th className="py-2.5 px-3">Note / Explanation</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    {auditLogs.map(log => (
+                    {filteredAuditLogs.map(log => (
                       <tr key={log.id} className="hover:bg-muted/30">
                         <td className="py-3 px-3 whitespace-nowrap text-muted-foreground">
                           {formatDate(log.timestamp)}
                         </td>
-                        <td className="py-3 px-3 font-mono font-medium text-navy-600 dark:text-navy-300">
-                          {log.petitionId}
+                        <td className="py-3 px-3 whitespace-nowrap">
+                          {log.action === "ai_decision" ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                              <Sparkles className="w-3 h-3" />
+                              AI Decision
+                            </span>
+                          ) : log.action === "human_override" ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300">
+                              <ShieldAlert className="w-3 h-3" />
+                              Human Override
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">
+                              <Check className="w-3 h-3" />
+                              Admin Correction
+                            </span>
+                          )}
                         </td>
-                        <td className="py-3 px-3 font-medium text-foreground">
-                          {log.performedByName || "Admin"}
+                        <td className="py-3 px-3 font-mono font-medium text-navy-600 dark:text-navy-300 whitespace-nowrap">
+                          {log.petitionId || log.entityId}
+                        </td>
+                        <td className="py-3 px-3 font-medium text-foreground whitespace-nowrap">
+                          {log.performedByName || "System"}
                         </td>
                         <td className="py-3 px-3">
-                          <span className="px-2 py-0.5 rounded bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 text-[11px]">
-                            {log.details?.before?.category} • {log.details?.before?.department} • {log.details?.before?.priority}
-                          </span>
+                          {log.action === "admin_correction" && log.details?.before && log.details?.after ? (
+                            <div className="flex items-center gap-1 text-[11px]">
+                              <span className="px-1.5 py-0.5 rounded bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300">
+                                {log.details.before.category} • {log.details.before.department} • {log.details.before.priority}
+                              </span>
+                              <span className="text-muted-foreground">→</span>
+                              <span className="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-medium">
+                                {log.details.after.category} • {log.details.after.department} • {log.details.after.priority}
+                              </span>
+                            </div>
+                          ) : log.action === "human_override" ? (
+                            <div className="text-[11px] text-foreground">
+                              <span>
+                                Status: <strong className="capitalize">{log.details?.beforeStatus?.replace("_", " ") || "original"}</strong> → <strong className="capitalize text-navy-600 dark:text-navy-300">{log.details?.newStatus?.replace("_", " ")}</strong>
+                              </span>
+                              {log.details?.assignedDepartment && (
+                                <span className="ml-2 text-muted-foreground">({log.details.assignedDepartment})</span>
+                              )}
+                            </div>
+                          ) : log.action === "ai_decision" ? (
+                            <div className="text-[11px] text-foreground flex items-center gap-1.5 flex-wrap">
+                              <span className="font-medium">{log.details?.category}</span>
+                              <span className="text-muted-foreground">•</span>
+                              <span className="text-muted-foreground">{log.details?.department}</span>
+                              <span className="text-muted-foreground">•</span>
+                              <span className={priorityClass((log.details?.priority || "medium") as Priority)}>
+                                {(log.details?.priority || "").toUpperCase()}
+                              </span>
+                              {typeof log.details?.confidence === "number" && (
+                                <span className="text-muted-foreground text-[10px]">
+                                  ({roundPercentage(log.details.confidence)}%)
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
                         </td>
-                        <td className="py-3 px-3">
-                          <span className="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-[11px] font-medium">
-                            {log.details?.after?.category} • {log.details?.after?.department} • {log.details?.after?.priority}
-                          </span>
-                        </td>
-                        <td className="py-3 px-3 text-muted-foreground italic">
-                          {log.details?.note || "Admin override"}
+                        <td className="py-3 px-3 text-muted-foreground italic max-w-xs truncate">
+                          {log.details?.note || log.details?.officerRemarks || log.details?.resolutionDetails || log.details?.explanation || "—"}
                         </td>
                       </tr>
                     ))}

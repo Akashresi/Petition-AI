@@ -155,6 +155,27 @@ def create_complaint(req: ComplaintIn, user: dict = Depends(get_current_user)) -
     }
     db.insert("complaints", complaint)
 
+    # Log AI decision to audit trail
+    db.insert("audit_logs", {
+        "id": f"audit_ai_{int(datetime.now().timestamp() * 1000)}",
+        "action": "ai_decision",
+        "entityType": "complaint",
+        "entityId": complaint["id"],
+        "petitionId": complaint["petitionId"],
+        "performedBy": "ai_engine",
+        "performedByName": "PetitionAI Hybrid Engine",
+        "timestamp": now,
+        "details": {
+            "category": analysis["category"],
+            "categoryConfidence": analysis.get("categoryConfidence"),
+            "department": analysis["department"],
+            "priority": analysis["priority"],
+            "confidence": analysis.get("confidence", 0.9),
+            "explanation": analysis.get("explanation", ""),
+            "human_review_required": analysis.get("human_review_required", False),
+        },
+    })
+
     # Notify user via email + SMS (best-effort)
     send_complaint_notification(user.get("email", ""), complaint["petitionId"], complaint["title"], complaint["status"])
     send_complaint_sms(user.get("phone", ""), complaint["petitionId"], complaint["status"])
@@ -184,12 +205,26 @@ def list_review_queue(user: dict = Depends(get_current_user)) -> list[dict]:
 
 
 @router.get("/audit/all")
-def list_all_audit_logs(user: dict = Depends(get_current_user)) -> list[dict]:
-    """List recent audit logs across complaints."""
+def list_all_audit_logs(
+    petition_id: Optional[str] = None,
+    action: Optional[str] = None,
+    user: dict = Depends(get_current_user),
+) -> list[dict]:
+    """List recent audit logs across complaints, optionally filtered by petitionId or action."""
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin permission required")
     logs = db.find("audit_logs", {}, sort=[("timestamp", -1)])
-    return [_clean_doc(d) for d in logs]
+    cleaned = [_clean_doc(d) for d in logs]
+    if petition_id:
+        pid = petition_id.strip().lower()
+        cleaned = [
+            d for d in cleaned
+            if str(d.get("petitionId", "")).lower() == pid or str(d.get("entityId", "")).lower() == pid
+        ]
+    if action:
+        act = action.strip().lower()
+        cleaned = [d for d in cleaned if str(d.get("action", "")).lower() == act]
+    return cleaned
 
 
 @router.post("/check-sla")
@@ -243,6 +278,25 @@ def update_complaint(
 
     db.update("complaints", {"id": complaint_id}, updates)
     updated = db.find_one("complaints", {"id": complaint_id})
+
+    # Log human override to audit trail
+    db.insert("audit_logs", {
+        "id": f"audit_override_{int(datetime.now().timestamp() * 1000)}",
+        "action": "human_override",
+        "entityType": "complaint",
+        "entityId": updated["id"],
+        "petitionId": updated.get("petitionId"),
+        "performedBy": user.get("id"),
+        "performedByName": user.get("name", "Officer"),
+        "timestamp": now,
+        "details": {
+            "beforeStatus": c.get("status"),
+            "newStatus": req.status,
+            "assignedDepartment": req.assignedDepartment or c.get("assignedDepartment"),
+            "officerRemarks": req.note,
+            "resolutionDetails": req.resolutionDetails,
+        },
+    })
 
     # Notify petitioner
     petitioner = db.find_one("users", {"id": updated.get("submittedBy")})
