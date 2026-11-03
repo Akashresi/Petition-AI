@@ -66,6 +66,9 @@ export default function Navbar() {
                   {l.label}
                 </Link>
               ))}
+              <Link to="/transparency" className="nav-link px-3.5 py-2 rounded-full hover:bg-white/10 text-gold-300">
+                Transparency
+              </Link>
             </div>
           )}
 
@@ -165,6 +168,9 @@ export default function Navbar() {
             </div>
           ) : (
             <div className="flex items-center gap-2.5">
+              <Link to="/transparency" className="text-white/80 hover:text-white text-sm font-medium transition-colors px-3 py-2">
+                Transparency
+              </Link>
               <LanguageToggle />
               <DarkModeToggle />
               <Link to="/login" className="text-white/80 hover:text-white text-sm font-medium transition-colors px-3 py-2">

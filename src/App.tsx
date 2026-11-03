@@ -11,6 +11,7 @@ import AIChatbot from "@/components/features/AIChatbot";
 import LandingPage from "@/pages/LandingPage";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
+import TransparencyPortal from "@/pages/public/TransparencyPortal";
 import NotFound from "@/pages/NotFound";
 
 // Citizen
@@ -83,6 +84,7 @@ function AppRoutes() {
           <Route path="/" element={
             user ? <Navigate to={`/${user.role}/dashboard`} replace /> : <AnimatedPage><LandingPage /></AnimatedPage>
           } />
+          <Route path="/transparency" element={<AnimatedPage><TransparencyPortal /></AnimatedPage>} />
           <Route path="/login" element={<AnimatedPage><LoginPage /></AnimatedPage>} />
           <Route path="/register" element={<AnimatedPage><RegisterPage /></AnimatedPage>} />
 
