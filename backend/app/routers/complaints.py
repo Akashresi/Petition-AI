@@ -58,6 +58,8 @@ class ComplaintIn(BaseModel):
     category: str = ""
     location: str
     district: str = "Coimbatore"
+    lat: Optional[float] = None
+    lon: Optional[float] = None
     images: list[str] = []
 
 
@@ -124,14 +126,33 @@ def create_complaint(req: ComplaintIn, user: dict = Depends(get_current_user)) -
 
     existing = db.find("complaints", {})
     dup = detect_duplicates(
-        lang_info["normalized_text"], existing, threshold=0.5
+        lang_info["normalized_text"],
+        existing,
+        threshold=0.60,
+        radius_km=10.0,
+        window_days=30,
+        new_lat=req.lat,
+        new_lon=req.lon,
     )
+
+    # If this is a duplicate of a master petition, increment master supporter count
+    if dup.get("isDuplicate") and dup.get("masterPetitionId"):
+        master_pid = dup["masterPetitionId"]
+        master = db.find_one("complaints", {"id": master_pid}) or db.find_one("complaints", {"petitionId": master_pid})
+        if master:
+            m_supporters = master.get("supporterCount", 1) + 1
+            m_users = list(master.get("supportedBy", []))
+            if user["id"] not in m_users:
+                m_users.append(user["id"])
+            db.update("complaints", {"id": master["id"]}, {"supporterCount": m_supporters, "supportedBy": m_users})
 
     analysis = generate_ai_analysis(req.title, req.description, req.category or None)
     analysis["detected_language"] = lang_info["detected_language"]
     analysis["language_name"] = lang_info["language_name"]
     analysis["isDuplicate"] = dup["isDuplicate"]
     analysis["duplicateCount"] = dup["duplicateCount"]
+    analysis["masterPetitionId"] = dup.get("masterPetitionId")
+    analysis["masterPetitionTitle"] = dup.get("masterPetitionTitle")
     analysis["similarComplaints"] = dup["similarComplaints"]
 
     from app.services.scheduler import calculate_sla_deadline, SLA_DEADLINES
@@ -151,6 +172,8 @@ def create_complaint(req: ComplaintIn, user: dict = Depends(get_current_user)) -
         "category": analysis["category"],
         "location": req.location,
         "district": req.district,
+        "lat": req.lat,
+        "lon": req.lon,
         "submittedBy": user["id"],
         "submittedByName": user["name"],
         "submittedAt": now,
@@ -161,6 +184,12 @@ def create_complaint(req: ComplaintIn, user: dict = Depends(get_current_user)) -
         "slaHours": sla_hours,
         "reminderSent": False,
         "isEscalated": False,
+        "isDuplicate": dup["isDuplicate"],
+        "duplicateCount": dup["duplicateCount"],
+        "masterPetitionId": dup.get("masterPetitionId"),
+        "masterPetitionTitle": dup.get("masterPetitionTitle"),
+        "supporterCount": 1,
+        "supportedBy": [user["id"]],
         "human_review_required": analysis.get("human_review_required", False),
         "aiAnalysis": analysis,
         "statusHistory": [
@@ -344,6 +373,47 @@ def update_complaint(
     return _public_complaint(updated)
 
 
+@router.post("/{complaint_id}/support")
+def support_complaint(complaint_id: str, user: dict = Depends(get_current_user)) -> dict:
+    """Citizen clicks 'I have this issue too' to support a petition."""
+    c = db.find_one("complaints", {"id": complaint_id}) or db.find_one("complaints", {"petitionId": complaint_id})
+    if not c:
+        raise HTTPException(status_code=404, detail="Complaint not found")
+
+    supporters = list(c.get("supporters", []))
+    if user["id"] in supporters:
+        return {
+            "message": "Already supported",
+            "supporterCount": c.get("supporterCount", len(supporters) or 1),
+            "complaint": _public_complaint(c),
+        }
+
+    supporters.append(user["id"])
+    new_count = c.get("supporterCount", 1) + 1
+    db.update("complaints", {"id": c["id"]}, {
+        "supporterCount": new_count,
+        "supporters": supporters,
+    })
+
+    if c.get("masterPetitionId"):
+        master = db.find_one("complaints", {"id": c["masterPetitionId"]}) or db.find_one("complaints", {"petitionId": c["masterPetitionId"]})
+        if master and master["id"] != c["id"]:
+            m_supporters = list(master.get("supporters", []))
+            if user["id"] not in m_supporters:
+                m_supporters.append(user["id"])
+                db.update("complaints", {"id": master["id"]}, {
+                    "supporterCount": master.get("supporterCount", 1) + 1,
+                    "supporters": m_supporters,
+                })
+
+    updated = db.find_one("complaints", {"id": c["id"]})
+    return {
+        "message": "Support recorded successfully",
+        "supporterCount": new_count,
+        "complaint": _public_complaint(updated),
+    }
+
+
 @router.post("/{complaint_id}/correct")
 def correct_complaint(
     complaint_id: str,
@@ -459,3 +529,48 @@ def get_complaint_audit_trail(complaint_id: str, user: dict = Depends(get_curren
     if not c:
         raise HTTPException(status_code=404, detail="Complaint not found")
     return [_clean_doc(d) for d in db.find("audit_logs", {"entityId": c["id"]})]
+
+
+@router.post("/{complaint_id}/support")
+def support_complaint(complaint_id: str, user: dict = Depends(get_current_user)) -> dict:
+    """'I have this issue too' - citizen endorsement increments supporter count."""
+    c = db.find_one("complaints", {"id": complaint_id}) or db.find_one("complaints", {"petitionId": complaint_id})
+    if not c:
+        raise HTTPException(status_code=404, detail="Complaint not found")
+
+    supported_by = list(c.get("supportedBy", []))
+    user_id = user["id"]
+
+    if user_id in supported_by:
+        return {
+            "message": "You have already supported this petition.",
+            "supporterCount": c.get("supporterCount", 1),
+            "supported": True,
+            "petitionId": c.get("petitionId"),
+        }
+
+    supported_by.append(user_id)
+    new_count = c.get("supporterCount", 1) + 1
+    now = datetime.now().isoformat()
+
+    history = list(c.get("statusHistory", []))
+    history.append({
+        "status": c.get("status", "submitted"),
+        "timestamp": now,
+        "note": f"Supporter count increased to {new_count} ('I have this issue too' citizen endorsement)",
+        "updatedBy": user.get("name", "Citizen"),
+    })
+
+    updates = {
+        "supporterCount": new_count,
+        "supportedBy": supported_by,
+        "statusHistory": history,
+    }
+    db.update("complaints", {"id": c["id"]}, updates)
+
+    return {
+        "message": "Thank you! Your endorsement ('I have this issue too') has been recorded.",
+        "supporterCount": new_count,
+        "supported": True,
+        "petitionId": c.get("petitionId"),
+    }

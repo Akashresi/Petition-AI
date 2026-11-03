@@ -48,6 +48,13 @@ export interface Complaint {
   reopenCount: number;
   human_review_required?: boolean;
   review_reasons?: string[];
+  supporterCount?: number;
+  supporters?: string[];
+  masterPetitionId?: string;
+  isDuplicate?: boolean;
+  original_text?: string;
+  detected_language?: string;
+  normalized_text?: string;
 }
 
 export interface Department {

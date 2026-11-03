@@ -1,7 +1,22 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, MapPin, Calendar, Building2, User, Star, RotateCcw, AlertTriangle, Download, FileSpreadsheet, Clock } from "lucide-react";
+import { 
+  ArrowLeft, 
+  MapPin, 
+  Calendar, 
+  Building2, 
+  User, 
+  Star, 
+  RotateCcw, 
+  AlertTriangle, 
+  Download, 
+  FileSpreadsheet, 
+  Clock,
+  ThumbsUp,
+  Link2
+} from "lucide-react";
+import { toast } from "sonner";
 import { useComplaints } from "@/hooks/useComplaints";
 import { useAuth } from "@/lib/auth";
 import AIAnalysisCard from "@/components/features/AIAnalysisCard";
@@ -24,6 +39,45 @@ export default function PetitionDetail() {
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   const complaint = complaints.find(c => c.id === id);
+  const [supporterCount, setSupporterCount] = useState(complaint?.supporterCount || 1);
+  const [hasSupported, setHasSupported] = useState(
+    Boolean(user?.id && complaint?.supporters?.includes(user.id))
+  );
+  const [isSupporting, setIsSupporting] = useState(false);
+
+  async function handleSupport() {
+    if (!complaint || hasSupported || isSupporting) return;
+    setIsSupporting(true);
+    try {
+      const res = await fetch(`/api/complaints/${complaint.id}/support`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(user?.token ? { Authorization: `Bearer ${user.token}` } : {}),
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSupporterCount(data.supporterCount);
+        setHasSupported(true);
+        toast.success("Support recorded!", {
+          description: "You have been registered as a supporter of this grievance.",
+        });
+        updateComplaint(complaint.id, {
+          supporterCount: data.supporterCount,
+          supporters: [...(complaint.supporters || []), user?.id || ""],
+        });
+      } else {
+        throw new Error("Failed to record support");
+      }
+    } catch {
+      setSupporterCount(prev => prev + 1);
+      setHasSupported(true);
+      toast.success("Support recorded locally!");
+    } finally {
+      setIsSupporting(false);
+    }
+  }
 
   if (!complaint) {
     return (
@@ -92,6 +146,32 @@ export default function PetitionDetail() {
               {/* SLA Badge */}
               <div className="mb-4">
                 <SLABadge complaint={complaint} />
+              </div>
+
+              {/* Supporter Count & Issue Too Action */}
+              <div className="flex flex-wrap items-center gap-3 mb-4 p-3 bg-muted/40 rounded-xl border border-border">
+                <button
+                  type="button"
+                  onClick={handleSupport}
+                  disabled={hasSupported || isSupporting}
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+                    hasSupported
+                      ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800"
+                      : "bg-navy-600 text-white hover:bg-navy-700 active:scale-95 shadow-sm"
+                  }`}
+                >
+                  <ThumbsUp className="w-3.5 h-3.5" />
+                  {hasSupported ? "I Have This Issue Too (Supported)" : "I Have This Issue Too"}
+                  <span className="ml-1 px-1.5 py-0.5 rounded-full bg-black/10 dark:bg-white/10 text-[10px] font-bold">
+                    {supporterCount}
+                  </span>
+                </button>
+                {complaint.masterPetitionId && (
+                  <span className="text-xs text-muted-foreground flex items-center gap-1 font-medium">
+                    <Link2 className="w-3.5 h-3.5 text-navy-600 dark:text-navy-300" />
+                    Cluster Master Petition: <strong className="font-mono text-foreground">{complaint.masterPetitionId}</strong>
+                  </span>
+                )}
               </div>
 
               {/* Export Buttons */}
