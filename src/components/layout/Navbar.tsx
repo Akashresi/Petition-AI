@@ -8,6 +8,7 @@ import { useNotifications } from "@/hooks/useNotifications";
 import NotificationPanel from "@/components/features/NotificationPanel";
 import DarkModeToggle from "@/components/features/DarkModeToggle";
 import LanguageToggle from "@/components/features/LanguageToggle";
+import AccessibilityMenu from "@/components/features/AccessibilityMenu";
 
 export default function Navbar() {
   const { t } = useTranslation();
@@ -77,6 +78,7 @@ export default function Navbar() {
             <div className="flex items-center gap-2">
               <LanguageToggle />
               <DarkModeToggle />
+              <AccessibilityMenu />
 
               {/* Notification Bell */}
               <div className="relative">
@@ -173,6 +175,7 @@ export default function Navbar() {
               </Link>
               <LanguageToggle />
               <DarkModeToggle />
+              <AccessibilityMenu />
               <Link to="/login" className="text-white/80 hover:text-white text-sm font-medium transition-colors px-3 py-2">
                 {t("nav.signIn")}
               </Link>

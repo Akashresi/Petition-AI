@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import { Toaster } from "sonner";
 import { AnimatePresence, motion } from "framer-motion";
 import { AuthProvider } from "@/hooks/useAuthProvider";
+import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
 import { useAuth } from "@/lib/auth";
 import "@/lib/i18n";
 
@@ -78,40 +79,48 @@ function AppRoutes() {
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-200">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-amber-400 focus:text-slate-900 focus:font-bold focus:rounded-lg focus:shadow-xl focus:outline-none"
+      >
+        Skip to main content
+      </a>
       <Navbar />
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={
-            user ? <Navigate to={`/${user.role}/dashboard`} replace /> : <AnimatedPage><LandingPage /></AnimatedPage>
-          } />
-          <Route path="/transparency" element={<AnimatedPage><TransparencyPortal /></AnimatedPage>} />
-          <Route path="/login" element={<AnimatedPage><LoginPage /></AnimatedPage>} />
-          <Route path="/register" element={<AnimatedPage><RegisterPage /></AnimatedPage>} />
+      <main id="main-content" tabIndex={-1} className="focus:outline-none">
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={
+              user ? <Navigate to={`/${user.role}/dashboard`} replace /> : <AnimatedPage><LandingPage /></AnimatedPage>
+            } />
+            <Route path="/transparency" element={<AnimatedPage><TransparencyPortal /></AnimatedPage>} />
+            <Route path="/login" element={<AnimatedPage><LoginPage /></AnimatedPage>} />
+            <Route path="/register" element={<AnimatedPage><RegisterPage /></AnimatedPage>} />
 
-          {/* Citizen Routes */}
-          <Route path="/citizen/dashboard" element={<ProtectedRoute roles={["citizen"]}><AnimatedPage><CitizenDashboard /></AnimatedPage></ProtectedRoute>} />
-          <Route path="/citizen/submit" element={<ProtectedRoute roles={["citizen"]}><AnimatedPage><SubmitPetition /></AnimatedPage></ProtectedRoute>} />
-          <Route path="/citizen/petitions" element={<ProtectedRoute roles={["citizen"]}><AnimatedPage><MyPetitions /></AnimatedPage></ProtectedRoute>} />
-          <Route path="/citizen/petition/:id" element={<ProtectedRoute roles={["citizen"]}><AnimatedPage><PetitionDetail /></AnimatedPage></ProtectedRoute>} />
-          <Route path="/citizen/profile" element={<ProtectedRoute roles={["citizen"]}><AnimatedPage><CitizenProfile /></AnimatedPage></ProtectedRoute>} />
+            {/* Citizen Routes */}
+            <Route path="/citizen/dashboard" element={<ProtectedRoute roles={["citizen"]}><AnimatedPage><CitizenDashboard /></AnimatedPage></ProtectedRoute>} />
+            <Route path="/citizen/submit" element={<ProtectedRoute roles={["citizen"]}><AnimatedPage><SubmitPetition /></AnimatedPage></ProtectedRoute>} />
+            <Route path="/citizen/petitions" element={<ProtectedRoute roles={["citizen"]}><AnimatedPage><MyPetitions /></AnimatedPage></ProtectedRoute>} />
+            <Route path="/citizen/petition/:id" element={<ProtectedRoute roles={["citizen"]}><AnimatedPage><PetitionDetail /></AnimatedPage></ProtectedRoute>} />
+            <Route path="/citizen/profile" element={<ProtectedRoute roles={["citizen"]}><AnimatedPage><CitizenProfile /></AnimatedPage></ProtectedRoute>} />
 
-          {/* Officer Routes */}
-          <Route path="/officer/dashboard" element={<ProtectedRoute roles={["officer"]}><AnimatedPage><OfficerDashboard /></AnimatedPage></ProtectedRoute>} />
-          <Route path="/officer/petition/:id" element={<ProtectedRoute roles={["officer"]}><AnimatedPage><OfficerPetitionDetail /></AnimatedPage></ProtectedRoute>} />
-          <Route path="/officer/profile" element={<ProtectedRoute roles={["officer"]}><AnimatedPage><CitizenProfile /></AnimatedPage></ProtectedRoute>} />
+            {/* Officer Routes */}
+            <Route path="/officer/dashboard" element={<ProtectedRoute roles={["officer"]}><AnimatedPage><OfficerDashboard /></AnimatedPage></ProtectedRoute>} />
+            <Route path="/officer/petition/:id" element={<ProtectedRoute roles={["officer"]}><AnimatedPage><OfficerPetitionDetail /></AnimatedPage></ProtectedRoute>} />
+            <Route path="/officer/profile" element={<ProtectedRoute roles={["officer"]}><AnimatedPage><CitizenProfile /></AnimatedPage></ProtectedRoute>} />
 
-          {/* Admin Routes */}
-          <Route path="/admin/dashboard" element={<ProtectedRoute roles={["admin"]}><AnimatedPage><AdminDashboard /></AnimatedPage></ProtectedRoute>} />
-          <Route path="/admin/complaints" element={<ProtectedRoute roles={["admin"]}><AnimatedPage><AdminComplaints /></AnimatedPage></ProtectedRoute>} />
-          <Route path="/admin/reviews" element={<ProtectedRoute roles={["admin"]}><AnimatedPage><AdminReviewQueue /></AnimatedPage></ProtectedRoute>} />
-          <Route path="/admin/complaint/:id" element={<ProtectedRoute roles={["admin"]}><AnimatedPage><AdminComplaintDetail /></AnimatedPage></ProtectedRoute>} />
-          <Route path="/admin/users" element={<ProtectedRoute roles={["admin"]}><AnimatedPage><AdminUsers /></AnimatedPage></ProtectedRoute>} />
-          <Route path="/admin/analytics" element={<ProtectedRoute roles={["admin"]}><AnimatedPage><AdminAnalytics /></AnimatedPage></ProtectedRoute>} />
-          <Route path="/admin/profile" element={<ProtectedRoute roles={["admin"]}><AnimatedPage><CitizenProfile /></AnimatedPage></ProtectedRoute>} />
+            {/* Admin Routes */}
+            <Route path="/admin/dashboard" element={<ProtectedRoute roles={["admin"]}><AnimatedPage><AdminDashboard /></AnimatedPage></ProtectedRoute>} />
+            <Route path="/admin/complaints" element={<ProtectedRoute roles={["admin"]}><AnimatedPage><AdminComplaints /></AnimatedPage></ProtectedRoute>} />
+            <Route path="/admin/reviews" element={<ProtectedRoute roles={["admin"]}><AnimatedPage><AdminReviewQueue /></AnimatedPage></ProtectedRoute>} />
+            <Route path="/admin/complaint/:id" element={<ProtectedRoute roles={["admin"]}><AnimatedPage><AdminComplaintDetail /></AnimatedPage></ProtectedRoute>} />
+            <Route path="/admin/users" element={<ProtectedRoute roles={["admin"]}><AnimatedPage><AdminUsers /></AnimatedPage></ProtectedRoute>} />
+            <Route path="/admin/analytics" element={<ProtectedRoute roles={["admin"]}><AnimatedPage><AdminAnalytics /></AnimatedPage></ProtectedRoute>} />
+            <Route path="/admin/profile" element={<ProtectedRoute roles={["admin"]}><AnimatedPage><CitizenProfile /></AnimatedPage></ProtectedRoute>} />
 
-          <Route path="*" element={<AnimatedPage><NotFound /></AnimatedPage>} />
-        </Routes>
-      </AnimatePresence>
+            <Route path="*" element={<AnimatedPage><NotFound /></AnimatedPage>} />
+          </Routes>
+        </AnimatePresence>
+      </main>
       <AIChatbot />
       <Toaster position="top-right" richColors />
     </div>
@@ -121,9 +130,11 @@ function AppRoutes() {
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
+      <AccessibilityProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </AccessibilityProvider>
     </AuthProvider>
   );
 }
