@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from app.ai.duplicates import detect_duplicates
+from app.ai.language import process_language
 from app.ai.ml_pipeline import generate_ai_analysis
 from app.database import db
 from app.routers.auth import get_current_user
@@ -118,13 +119,17 @@ def create_complaint(req: ComplaintIn, user: dict = Depends(get_current_user)) -
             validate_upload_content(img)
 
     now = datetime.now().isoformat()
+    raw_text = f"{req.title} {req.description}".strip()
+    lang_info = process_language(raw_text)
 
     existing = db.find("complaints", {})
     dup = detect_duplicates(
-        f"{req.title} {req.description}", existing, threshold=0.5
+        lang_info["normalized_text"], existing, threshold=0.5
     )
 
     analysis = generate_ai_analysis(req.title, req.description, req.category or None)
+    analysis["detected_language"] = lang_info["detected_language"]
+    analysis["language_name"] = lang_info["language_name"]
     analysis["isDuplicate"] = dup["isDuplicate"]
     analysis["duplicateCount"] = dup["duplicateCount"]
     analysis["similarComplaints"] = dup["similarComplaints"]
@@ -139,6 +144,10 @@ def create_complaint(req: ComplaintIn, user: dict = Depends(get_current_user)) -
         "petitionId": _petition_id(),
         "title": req.title,
         "description": req.description,
+        "original_text": lang_info["original_text"],
+        "detected_language": lang_info["detected_language"],
+        "language_name": lang_info["language_name"],
+        "normalized_text": lang_info["normalized_text"],
         "category": analysis["category"],
         "location": req.location,
         "district": req.district,
