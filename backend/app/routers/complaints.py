@@ -591,3 +591,83 @@ def get_complaint_resolution_suggestions(complaint_id: str, user: dict = Depends
         "totalSuggestions": len(suggestions),
         "suggestions": suggestions,
     }
+
+
+@router.get("/{complaint_id}/draft-response")
+def get_draft_response(complaint_id: str, user: dict = Depends(get_current_user)) -> dict:
+    """Generate official administrative reply and RTI draft for officer review."""
+    c = db.find_one("complaints", {"id": complaint_id}) or db.find_one("complaints", {"petitionId": complaint_id})
+    if not c:
+        raise HTTPException(status_code=404, detail="Complaint not found")
+
+    from app.services.draft_service import generate_official_draft
+    return generate_official_draft(c)
+
+
+@router.post("/{complaint_id}/send-official-response")
+def send_official_response(
+    complaint_id: str,
+    payload: dict,
+    user: dict = Depends(get_current_user),
+) -> dict:
+    """Manually dispatch approved official government response / RTI letter to citizen."""
+    if user.get("role") not in ["officer", "admin"]:
+        raise HTTPException(status_code=403, detail="Officer or Admin credentials required to dispatch official communication.")
+
+    c = db.find_one("complaints", {"id": complaint_id}) or db.find_one("complaints", {"petitionId": complaint_id})
+    if not c:
+        raise HTTPException(status_code=404, detail="Complaint not found")
+
+    letter_text = payload.get("letterText", "")
+    letter_type = payload.get("letterType", "citizen_letter")
+    now = datetime.now().isoformat()
+
+    # Append to status history
+    history = list(c.get("statusHistory", []))
+    history.append({
+        "status": c.get("status", "in_progress"),
+        "timestamp": now,
+        "note": f"Official {letter_type.replace('_', ' ').title()} dispatched by {user.get('name', 'Officer')}.",
+        "updatedBy": user.get("name", "Officer"),
+    })
+
+    db.update("complaints", {"id": c["id"]}, {"statusHistory": history, "lastOfficialLetter": letter_text})
+
+    # Log to audit trail
+    db.insert("audit_logs", {
+        "id": f"audit_letter_{int(datetime.now().timestamp() * 1000)}",
+        "action": "official_response_sent",
+        "entityType": "complaint",
+        "entityId": c["id"],
+        "petitionId": c.get("petitionId"),
+        "performedBy": user.get("id"),
+        "performedByName": user.get("name", "Officer"),
+        "timestamp": now,
+        "details": {
+            "letterType": letter_type,
+            "recipient": c.get("submittedByName"),
+            "letterLength": len(letter_text),
+        },
+    })
+
+    # Notify petitioner
+    petitioner = db.find_one("users", {"id": c.get("submittedBy")})
+    if petitioner:
+        db.insert("notifications", {
+            "id": f"n_letter_{int(datetime.now().timestamp() * 1000)}",
+            "userId": petitioner["id"],
+            "title": f"Official Communication: {c.get('petitionId')}",
+            "message": f"An official formal response has been dispatched regarding your petition {c.get('petitionId')}.",
+            "type": "info",
+            "isRead": False,
+            "timestamp": now,
+            "petitionId": c.get("petitionId"),
+        })
+
+    return {
+        "status": "dispatched",
+        "petitionId": c.get("petitionId"),
+        "letterType": letter_type,
+        "dispatchedAt": now,
+        "dispatchedBy": user.get("name", "Officer"),
+    }
