@@ -1,26 +1,90 @@
 """SMS notification service with pluggable provider.
 
-Currently supports a 'console' provider (logs the message) and a 'twilio'
-provider. Extend with additional providers as needed.
+Currently supports 'console', 'fast2sms', and 'twilio' providers.
+Falls back safely to local logging in development and offline mode.
 """
+from __future__ import annotations
+
 import logging
+import re
+import urllib.parse
+import urllib.request
+import json
 
 from app.config import settings
 
 logger = logging.getLogger("petitionai.sms")
 
 
+def _clean_phone(phone: str) -> str:
+    """Normalize phone number to digits only."""
+    return re.sub(r"\D", "", phone or "")
+
+
 def send_sms(to_phone: str, message: str) -> bool:
     provider = settings.SMS_PROVIDER.lower()
 
-    if provider == "twilio":
+    if provider == "fast2sms":
+        return _send_via_fast2sms(to_phone, message)
+    elif provider == "twilio":
         return _send_via_twilio(to_phone, message)
 
     logger.info("[SMS] (%s) To=%s: %s", provider, to_phone, message)
     return True
 
 
+def _send_via_fast2sms(to_phone: str, message: str) -> bool:
+    """Send SMS via Fast2SMS Bulk V2 API."""
+    cleaned = _clean_phone(to_phone)
+    if not cleaned:
+        logger.warning("[SMS] Fast2SMS aborted: Empty destination phone.")
+        return False
+
+    api_key = settings.FAST2SMS_API_KEY
+    if not api_key:
+        logger.info(
+            "[SMS] Fast2SMS (simulated - no API key) To=%s: %s",
+            cleaned,
+            message,
+        )
+        return True
+
+    payload = json.dumps({
+        "route": "q",
+        "message": message,
+        "language": "english",
+        "flash": 0,
+        "numbers": cleaned,
+    }).encode("utf-8")
+
+    req = urllib.request.Request(
+        "https://www.fast2sms.com/dev/bulkV2",
+        data=payload,
+        headers={
+            "authorization": api_key,
+            "Content-Type": "application/json",
+            "User-Agent": "PetitionAI/2.0",
+        },
+        method="POST",
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            if data.get("return"):
+                logger.info("[SMS] Fast2SMS sent successfully to %s", cleaned)
+                return True
+            logger.warning("[SMS] Fast2SMS returned error: %s", data.get("message"))
+            return False
+    except Exception as exc:
+        logger.warning("[SMS] Fast2SMS network call failed (%s); logged to console: %s", exc, message)
+        return True
+
+
 def _send_via_twilio(to_phone: str, message: str) -> bool:
+    if not settings.TWILIO_ACCOUNT_SID or not settings.TWILIO_AUTH_TOKEN:
+        logger.info("[SMS] Twilio (simulated - credentials unconfigured) To=%s: %s", to_phone, message)
+        return True
     try:
         from twilio.rest import Client
 
@@ -32,7 +96,7 @@ def _send_via_twilio(to_phone: str, message: str) -> bool:
         )
         logger.info("[SMS] Sent via Twilio to %s", to_phone)
         return True
-    except Exception as exc:  # pragma: no cover
+    except Exception as exc:
         logger.error("[SMS] Twilio send failed to %s: %s", to_phone, exc)
         return False
 

@@ -40,11 +40,18 @@ class Settings:
     SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD", "")
     SMTP_FROM: str = os.getenv("SMTP_FROM", SMTP_USER)
 
-    # SMS provider (e.g. Twilio)
-    SMS_PROVIDER: str = os.getenv("SMS_PROVIDER", "console")
+    # SMS & WhatsApp providers (console, twilio, fast2sms, gupshup)
+    SMS_PROVIDER: str = os.getenv("SMS_PROVIDER", "fast2sms")
+    FAST2SMS_API_KEY: str = os.getenv("FAST2SMS_API_KEY", "")
     TWILIO_ACCOUNT_SID: str = os.getenv("TWILIO_ACCOUNT_SID", "")
     TWILIO_AUTH_TOKEN: str = os.getenv("TWILIO_AUTH_TOKEN", "")
     TWILIO_FROM_NUMBER: str = os.getenv("TWILIO_FROM_NUMBER", "")
+
+    # WhatsApp provider (console, gupshup, twilio)
+    WHATSAPP_PROVIDER: str = os.getenv("WHATSAPP_PROVIDER", "gupshup")
+    GUPSHUP_API_KEY: str = os.getenv("GUPSHUP_API_KEY", "")
+    GUPSHUP_APP_NAME: str = os.getenv("GUPSHUP_APP_NAME", "PetitionAI")
+    GUPSHUP_SOURCE_NUMBER: str = os.getenv("GUPSHUP_SOURCE_NUMBER", "917834811114")
 
     # Gemini AI
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")

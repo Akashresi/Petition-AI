@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import ai, analytics, auth, complaints, notifications
+from app.routers import ai, analytics, auth, complaints, notifications, webhooks
 from app.seed import seed_all
 
 app = FastAPI(
@@ -28,6 +28,7 @@ app.include_router(ai.router)
 app.include_router(complaints.router)
 app.include_router(notifications.router)
 app.include_router(analytics.router)
+app.include_router(webhooks.router)
 
 
 @app.on_event("startup")
