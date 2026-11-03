@@ -137,3 +137,10 @@ def trigger_retrain(user: dict = Depends(get_current_user)) -> dict:
         raise HTTPException(status_code=403, detail="Admin or officer authorization required to retrain model")
     from scripts.retrain import retrain_model
     return retrain_model()
+
+
+@router.get("/fairness")
+def get_fairness_audit(user: dict = Depends(get_current_user)) -> dict:
+    """Return demographic and geographic fairness audit report."""
+    from scripts.fairness_audit import run_fairness_audit
+    return run_fairness_audit()

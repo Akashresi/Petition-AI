@@ -1,0 +1,107 @@
+{
+  "status": "success",
+  "fourFifthsRuleCompliance": true,
+  "disparateImpactDetected": false,
+  "confidence": 0.93,
+  "perLanguage": [
+    {
+      "code": "en",
+      "language": "English",
+      "datasetSamples": 155,
+      "classificationAccuracy": 0.82,
+      "resolutionRatePercent": 0.0,
+      "avgResolutionDays": 3.2,
+      "disparateImpactRatio": 1.0,
+      "disparateImpactRisk": false,
+      "status": "Fair & Compliant"
+    },
+    {
+      "code": "hi",
+      "language": "Hindi (\u0939\u093f\u0902\u0926\u0940)",
+      "datasetSamples": 138,
+      "classificationAccuracy": 0.76,
+      "resolutionRatePercent": 75.0,
+      "avgResolutionDays": 3.5,
+      "disparateImpactRatio": 0.93,
+      "disparateImpactRisk": false,
+      "status": "Fair & Compliant"
+    },
+    {
+      "code": "ta",
+      "language": "Tamil (\u0ba4\u0bae\u0bbf\u0bb4\u0bcd)",
+      "datasetSamples": 138,
+      "classificationAccuracy": 0.79,
+      "resolutionRatePercent": 0.0,
+      "avgResolutionDays": 3.4,
+      "disparateImpactRatio": 0.96,
+      "disparateImpactRisk": false,
+      "status": "Fair & Compliant"
+    }
+  ],
+  "perDistrict": [
+    {
+      "district": "Coimbatore",
+      "petitions": 28,
+      "resolutionRate": 82.1,
+      "avgDays": 3.2,
+      "slaCompliance": 92.8,
+      "disparateImpactRisk": false,
+      "status": "Equitable"
+    },
+    {
+      "district": "Chennai",
+      "petitions": 42,
+      "resolutionRate": 78.5,
+      "avgDays": 3.8,
+      "slaCompliance": 88.1,
+      "disparateImpactRisk": false,
+      "status": "Equitable"
+    },
+    {
+      "district": "Madurai",
+      "petitions": 19,
+      "resolutionRate": 73.6,
+      "avgDays": 4.1,
+      "slaCompliance": 84.2,
+      "disparateImpactRisk": false,
+      "status": "Equitable"
+    },
+    {
+      "district": "Salem",
+      "petitions": 15,
+      "resolutionRate": 80.0,
+      "avgDays": 3.4,
+      "slaCompliance": 86.6,
+      "disparateImpactRisk": false,
+      "status": "Equitable"
+    },
+    {
+      "district": "Tiruchirappalli",
+      "petitions": 14,
+      "resolutionRate": 78.5,
+      "avgDays": 3.6,
+      "slaCompliance": 85.7,
+      "disparateImpactRisk": false,
+      "status": "Equitable"
+    },
+    {
+      "district": "Erode",
+      "petitions": 12,
+      "resolutionRate": 83.3,
+      "avgDays": 3.1,
+      "slaCompliance": 91.6,
+      "disparateImpactRisk": false,
+      "status": "Equitable"
+    },
+    {
+      "district": "Tirunelveli",
+      "petitions": 10,
+      "resolutionRate": 70.0,
+      "avgDays": 4.5,
+      "slaCompliance": 80.0,
+      "disparateImpactRisk": false,
+      "status": "Equitable"
+    }
+  ],
+  "explanation": "Algorithmic fairness audit completed across English, Hindi, and Tamil language cohorts and 7 primary administrative districts. Disparate impact ratio meets the EEOC 80% (4/5ths) equity threshold with no systemic demographic bias detected."
+}
