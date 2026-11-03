@@ -2,7 +2,7 @@
 from collections import Counter
 from datetime import datetime, timedelta
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.ai.ml_pipeline import CATEGORIES
 from app.database import db
@@ -128,3 +128,12 @@ def get_hotspot_alerts(user: dict = Depends(get_current_user)) -> dict:
         "totalHotspots": len(hotspots),
         "hotspots": hotspots,
     }
+
+
+@router.post("/retrain")
+def trigger_retrain(user: dict = Depends(get_current_user)) -> dict:
+    """Trigger active learning retraining using seed dataset + verified corrections."""
+    if user.get("role") not in ["admin", "officer"]:
+        raise HTTPException(status_code=403, detail="Admin or officer authorization required to retrain model")
+    from scripts.retrain import retrain_model
+    return retrain_model()

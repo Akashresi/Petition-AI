@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Legend } from "recharts";
-import { TrendingUp, Brain, Copy, Clock, CheckCircle, AlertTriangle, FileCode2, Globe } from "lucide-react";
+import { TrendingUp, Brain, Copy, Clock, CheckCircle, AlertTriangle, FileCode2, Globe, RefreshCw, Sparkles, Check } from "lucide-react";
 import { ANALYTICS_DATA } from "@/constants/mockData";
 import { getStoredUser } from "@/lib/auth";
 
@@ -18,8 +18,28 @@ interface EvaluationSummary {
   per_language_accuracy: Record<string, number>;
 }
 
+interface RetrainResult {
+  status: string;
+  correctionsApplied: number;
+  totalSamplesBefore: number;
+  totalSamplesAfter: number;
+  f1Improvement: number;
+  accuracyImprovement: number;
+  beforeMetrics: {
+    accuracy: number;
+    f1_weighted: number;
+  };
+  afterMetrics: {
+    accuracy: number;
+    f1_weighted: number;
+  };
+  explanation: string;
+}
+
 export default function AdminAnalytics() {
   const d = ANALYTICS_DATA;
+  const [retraining, setRetraining] = useState(false);
+  const [retrainResult, setRetrainResult] = useState<RetrainResult | null>(null);
   const [evalSummary, setEvalSummary] = useState<EvaluationSummary>({
     accuracy: 0.528,
     f1_weighted: 0.523,
@@ -50,6 +70,37 @@ export default function AdminAnalytics() {
     }
     fetchEvalMetrics();
   }, []);
+
+  const handleRetrain = async () => {
+    setRetraining(true);
+    try {
+      const user = getStoredUser();
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (user?.token) headers["Authorization"] = `Bearer ${user.token}`;
+      const res = await fetch("/api/analytics/retrain", {
+        method: "POST",
+        headers,
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setRetrainResult(data);
+        if (data.afterMetrics) {
+          setEvalSummary((prev) => ({
+            ...prev,
+            accuracy: data.afterMetrics.accuracy,
+            f1_weighted: data.afterMetrics.f1_weighted,
+            precision_weighted: data.afterMetrics.precision_weighted,
+            recall_weighted: data.afterMetrics.recall_weighted,
+            total_dataset_samples: data.totalSamplesAfter,
+          }));
+        }
+      }
+    } catch (err) {
+      console.error("Retraining failed:", err);
+    } finally {
+      setRetraining(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background py-8 px-4">
@@ -254,6 +305,76 @@ export default function AdminAnalytics() {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* Active Learning Retraining Loop Card */}
+        <div className="card-base p-6 border-l-4 border-l-purple-600 mb-6 bg-gradient-to-r from-purple-50/40 to-white dark:from-purple-950/20 dark:to-background">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-border gap-3 mb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-purple-600" />
+                <h3 className="font-semibold text-base text-foreground">Active Learning Retraining Loop</h3>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Consumes verified admin corrections to continuously adapt and retrain the TF-IDF + Logistic Regression model.
+              </p>
+            </div>
+            <button
+              onClick={handleRetrain}
+              disabled={retraining}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-xs font-semibold shadow-sm transition-all cursor-pointer"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${retraining ? "animate-spin" : ""}`} />
+              {retraining ? "Retraining Pipeline..." : "Retrain Model Now"}
+            </button>
+          </div>
+
+          {retrainResult ? (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 p-3 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-200 rounded-lg text-xs border border-emerald-200 dark:border-emerald-800">
+                <Check className="w-4 h-4 shrink-0 text-emerald-600" />
+                <span>
+                  Retrained successfully! Incorporated <strong>{retrainResult.correctionsApplied}</strong> human review corrections into <strong>{retrainResult.totalSamplesAfter}</strong> total training samples.
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="p-3 bg-muted/50 rounded-lg text-center">
+                  <p className="text-[11px] text-muted-foreground">Before Accuracy</p>
+                  <p className="text-lg font-bold text-foreground">
+                    {(retrainResult.beforeMetrics.accuracy * 100).toFixed(1)}%
+                  </p>
+                </div>
+                <div className="p-3 bg-muted/50 rounded-lg text-center">
+                  <p className="text-[11px] text-muted-foreground">After Accuracy</p>
+                  <p className="text-lg font-bold text-purple-700 dark:text-purple-300">
+                    {(retrainResult.afterMetrics.accuracy * 100).toFixed(1)}%
+                  </p>
+                </div>
+                <div className="p-3 bg-muted/50 rounded-lg text-center">
+                  <p className="text-[11px] text-muted-foreground">Before F1 Score</p>
+                  <p className="text-lg font-bold text-foreground">
+                    {(retrainResult.beforeMetrics.f1_weighted * 100).toFixed(1)}%
+                  </p>
+                </div>
+                <div className="p-3 bg-muted/50 rounded-lg text-center">
+                  <p className="text-[11px] text-muted-foreground">After F1 Score</p>
+                  <p className="text-lg font-bold text-purple-700 dark:text-purple-300">
+                    {(retrainResult.afterMetrics.f1_weighted * 100).toFixed(1)}%
+                  </p>
+                </div>
+              </div>
+
+              <p className="text-[11px] text-muted-foreground">
+                {retrainResult.explanation}
+              </p>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between text-xs text-muted-foreground py-2">
+              <span>Model artifact: <code className="bg-muted px-1.5 py-0.5 rounded text-[11px]">backend/models/retrained_model.pkl</code></span>
+              <span>Click &quot;Retrain Model Now&quot; to run active learning cycle.</span>
+            </div>
+          )}
         </div>
       </div>
     </div>

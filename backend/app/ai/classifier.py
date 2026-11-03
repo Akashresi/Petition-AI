@@ -161,6 +161,18 @@ class TFIDFClassifier:
         self._fit()
 
     def _fit(self) -> None:
+        model_artifact = Path(__file__).resolve().parents[2] / "models" / "retrained_model.pkl"
+        if model_artifact.exists():
+            try:
+                import pickle
+                with open(model_artifact, "rb") as f:
+                    self.pipeline = pickle.load(f)
+                self.classes_ = self.pipeline.classes_.tolist()
+                logger.info("Loaded retrained active learning model artifact from %s", model_artifact.name)
+                return
+            except Exception as exc:
+                logger.warning("Could not load model artifact: %s", exc)
+
         texts = [t for _, t in SEED_CORPUS]
         labels = [c for c, _ in SEED_CORPUS]
 
