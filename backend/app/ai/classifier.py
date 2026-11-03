@@ -275,13 +275,16 @@ def llm_classify(text: str, api_key: str, model_name: str) -> dict[str, Any] | N
     if not api_key:
         return None
     try:
+        from app.security.pii import mask_pii
+        sanitized_text = mask_pii(text[:3000])
+
         import google.generativeai as genai  # type: ignore
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel(model_name)
         cats_str = "\n".join(f"- {c}" for c in CATEGORIES)
         prompt = _LLM_CLASSIFY_PROMPT.format(
             categories=cats_str,
-            text=text[:3000],  # token safety cap
+            text=sanitized_text,
         )
         response = model.generate_content(prompt)
         raw = response.text.strip()

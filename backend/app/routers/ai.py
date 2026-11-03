@@ -18,61 +18,27 @@ from app.ai.ml_pipeline import (
 from app.config import settings
 from app.database import db
 from app.routers.auth import get_current_user
+from app.security import (
+    MAX_UPLOAD_SIZE_BYTES,
+    image_analysis_limiter,
+    mask_pii,
+    validate_upload_content,
+)
 
 router = APIRouter(prefix="/api/ai", tags=["ai"])
 
-# ── In-memory Rate Limiting ───────────────────────────────────────────────────
-# user_id -> list of unix timestamps
-_rate_limit_records: dict[str, list[float]] = defaultdict(list)
-RATE_LIMIT_WINDOW_SECONDS = 60
-RATE_LIMIT_MAX_REQUESTS = 10
-MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024  # 5 MB
+# ── In-memory Rate Limiting & Upload Validation ──────────────────────────────
+MAX_FILE_SIZE_BYTES = MAX_UPLOAD_SIZE_BYTES
+_rate_limit_records = image_analysis_limiter._records
 
 
 def check_rate_limit(user_id: str) -> None:
-    now = time.time()
-    timestamps = _rate_limit_records[user_id]
-    valid_timestamps = [t for t in timestamps if now - t < RATE_LIMIT_WINDOW_SECONDS]
-    if len(valid_timestamps) >= RATE_LIMIT_MAX_REQUESTS:
-        raise HTTPException(
-            status_code=429,
-            detail=f"Rate limit exceeded. Maximum {RATE_LIMIT_MAX_REQUESTS} image analysis requests per minute.",
-        )
-    valid_timestamps.append(now)
-    _rate_limit_records[user_id] = valid_timestamps
+    image_analysis_limiter.check(user_id)
 
 
 def validate_image_payload(base64_str: str) -> tuple[bytes, str]:
     """Validate base64 string, enforce 5MB limit, and verify magic bytes for JPEG/PNG/PDF."""
-    raw_base64 = base64_str
-    if "," in base64_str:
-        raw_base64 = base64_str.split(",", 1)[1]
-
-    try:
-        decoded = base64.b64decode(raw_base64)
-    except Exception as exc:
-        raise HTTPException(status_code=400, detail="Invalid base64-encoded image data.") from exc
-
-    if len(decoded) > MAX_FILE_SIZE_BYTES:
-        raise HTTPException(
-            status_code=400,
-            detail=f"File exceeds maximum allowed size of 5 MB ({len(decoded)} bytes).",
-        )
-
-    # Magic byte inspection
-    if decoded.startswith(b"\xff\xd8\xff"):
-        detected_mime = "image/jpeg"
-    elif decoded.startswith(b"\x89PNG\r\n\x1a\n"):
-        detected_mime = "image/png"
-    elif decoded.startswith(b"%PDF-"):
-        detected_mime = "application/pdf"
-    else:
-        raise HTTPException(
-            status_code=400,
-            detail="Unsupported file type. Only JPEG, PNG, and PDF files are allowed.",
-        )
-
-    return decoded, detected_mime
+    return validate_upload_content(base64_str)
 
 
 def analyze_with_gemini(decoded_bytes: bytes, mime_type: str) -> dict:

@@ -6,7 +6,6 @@ existing seeded accounts keep working; such hashes are transparently upgraded
 to bcrypt on the next successful login.
 """
 import hashlib
-
 import bcrypt
 
 _LEGACY_PREFIX = "petitionai:"

@@ -24,10 +24,14 @@ class Settings:
     )
 
     # CORS
-    CORS_ORIGINS: list[str] = os.getenv(
-        "CORS_ORIGINS",
-        "http://localhost:8080,http://localhost:5173,http://localhost:3000",
-    ).split(",")
+    CORS_ORIGINS: list[str] = [
+        origin.strip()
+        for origin in os.getenv(
+            "CORS_ORIGINS",
+            "http://localhost:8080,http://localhost:5173,http://localhost:3000",
+        ).split(",")
+        if origin.strip()
+    ]
 
     # Email (SMTP)
     SMTP_HOST: str = os.getenv("SMTP_HOST", "smtp.gmail.com")

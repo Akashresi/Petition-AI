@@ -9,6 +9,7 @@ from app.ai.duplicates import detect_duplicates
 from app.ai.ml_pipeline import generate_ai_analysis
 from app.database import db
 from app.routers.auth import get_current_user
+from app.security import mask_pii, submission_limiter, validate_upload_content
 from app.services.email_service import send_complaint_notification
 from app.services.sms_service import send_complaint_sms
 
@@ -99,6 +100,23 @@ def list_complaints(
 
 @router.post("")
 def create_complaint(req: ComplaintIn, user: dict = Depends(get_current_user)) -> dict:
+    submission_limiter.check(user.get("id", "anonymous"))
+
+    # Strict input validation
+    if not req.title or len(req.title.strip()) < 3:
+        raise HTTPException(status_code=400, detail="Title must be at least 3 characters long.")
+    if len(req.title) > 200:
+        raise HTTPException(status_code=400, detail="Title exceeds maximum length of 200 characters.")
+    if not req.description or len(req.description.strip()) < 5:
+        raise HTTPException(status_code=400, detail="Description must be at least 5 characters long.")
+    if len(req.description) > 5000:
+        raise HTTPException(status_code=400, detail="Description exceeds maximum length of 5000 characters.")
+
+    # Validate uploaded images for type and 5MB size limit
+    if req.images:
+        for img in req.images:
+            validate_upload_content(img)
+
     now = datetime.now().isoformat()
 
     existing = db.find("complaints", {})
@@ -171,7 +189,7 @@ def create_complaint(req: ComplaintIn, user: dict = Depends(get_current_user)) -
             "department": analysis["department"],
             "priority": analysis["priority"],
             "confidence": analysis.get("confidence", 0.9),
-            "explanation": analysis.get("explanation", ""),
+            "explanation": mask_pii(analysis.get("explanation", "")),
             "human_review_required": analysis.get("human_review_required", False),
         },
     })
@@ -293,8 +311,8 @@ def update_complaint(
             "beforeStatus": c.get("status"),
             "newStatus": req.status,
             "assignedDepartment": req.assignedDepartment or c.get("assignedDepartment"),
-            "officerRemarks": req.note,
-            "resolutionDetails": req.resolutionDetails,
+            "officerRemarks": mask_pii(req.note or ""),
+            "resolutionDetails": mask_pii(req.resolutionDetails or ""),
         },
     })
 
@@ -372,7 +390,7 @@ def correct_complaint(
         "details": {
             "before": before,
             "after": after,
-            "note": req.note,
+            "note": mask_pii(req.note or ""),
         },
     }
     db.insert("audit_logs", audit_record)

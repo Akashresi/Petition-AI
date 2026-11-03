@@ -79,11 +79,11 @@ def _embed(texts: list[str], model_name: str) -> np.ndarray:
     global _embed_model
     if _embed_model is None:
         import os
-        os.environ.setdefault("HF_HUB_OFFLINE", "1")
-        os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+        os.environ["HF_HUB_OFFLINE"] = "1"
+        os.environ["TRANSFORMERS_OFFLINE"] = "1"
         try:
             from sentence_transformers import SentenceTransformer  # type: ignore
-            _embed_model = SentenceTransformer(model_name)
+            _embed_model = SentenceTransformer(model_name, local_files_only=True)
         except Exception as exc:
             logger.warning("SentenceTransformer offline load failed (%s); using fallback TF-IDF.", exc)
             _embed_model = "fallback"
