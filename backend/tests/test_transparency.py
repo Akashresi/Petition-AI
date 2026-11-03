@@ -90,3 +90,4 @@ def test_public_transparency_departments_metrics():
         assert "avgResolutionHours" in dept
         assert "slaCompliancePct" in dept
         assert 0.0 <= dept["resolutionRatePct"] <= 100.0
+

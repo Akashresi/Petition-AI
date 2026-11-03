@@ -113,3 +113,4 @@ def send_complaint_whatsapp(to_phone: str, petition_id: str, status: str) -> boo
         f"You can track this anytime by replying `STATUS {petition_id}`."
     )
     return send_whatsapp(to_phone, message)
+

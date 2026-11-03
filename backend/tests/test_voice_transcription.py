@@ -59,3 +59,4 @@ def test_transcribe_audio_endpoint_and_rule5(client):
 def test_transcribe_unauthenticated_rejected(client):
     res = client.post("/api/ai/transcribe", json={"audioBase64": "dummy"})
     assert res.status_code == 401
+

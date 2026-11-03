@@ -13,3 +13,4 @@ htmlcov
 .gitignore
 .env
 reports/*.png
+

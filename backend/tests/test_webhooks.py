@@ -155,3 +155,4 @@ def test_sms_service_fallback_and_helpers():
 def test_whatsapp_service_fallback_and_helpers():
     assert send_whatsapp("9876543210", "Test WhatsApp fallback message") is True
     assert send_complaint_whatsapp("9876543210", "PET-2026-001", "resolved") is True
+
