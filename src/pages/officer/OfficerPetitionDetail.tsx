@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Save, AlertTriangle, CheckCircle, Upload, Download, FileSpreadsheet } from "lucide-react";
+import { ArrowLeft, Save, AlertTriangle, CheckCircle, Upload, Download, FileSpreadsheet, Lightbulb, Sparkles, CopyCheck } from "lucide-react";
 import { useComplaints } from "@/hooks/useComplaints";
 import { useAuth } from "@/lib/auth";
 import AIAnalysisCard from "@/components/features/AIAnalysisCard";
@@ -13,6 +13,18 @@ import { exportSingleComplaintToExcel } from "@/lib/excelExport";
 import { cn, statusClass, statusLabel, priorityClass, formatDateTime } from "@/lib/utils";
 import { ComplaintStatus } from "@/types";
 import { toast } from "sonner";
+
+interface ResolutionSuggestion {
+  petitionId: string;
+  title: string;
+  category: string;
+  department: string;
+  actionTaken: string;
+  daysToResolve: number;
+  similarity: number;
+  confidence: number;
+  explanation: string;
+}
 
 const STATUS_OPTIONS: { value: ComplaintStatus; label: string }[] = [
   { value: "under_review", label: "Under Review" },
@@ -33,6 +45,37 @@ export default function OfficerPetitionDetail() {
   const [resolutionDetails, setResolutionDetails] = useState(complaint?.resolutionDetails || "");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [suggestions, setSuggestions] = useState<ResolutionSuggestion[]>([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+
+  useEffect(() => {
+    if (!complaint?.id) return;
+    const fetchSuggestions = async () => {
+      setLoadingSuggestions(true);
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`/api/complaints/${complaint.id}/resolution-suggestions`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setSuggestions(data.suggestions || []);
+        }
+      } catch (err) {
+        console.warn("Could not load resolution suggestions:", err);
+      } finally {
+        setLoadingSuggestions(false);
+      }
+    };
+    fetchSuggestions();
+  }, [complaint?.id]);
+
+  function applySuggestion(s: ResolutionSuggestion) {
+    setResolutionDetails(s.actionTaken);
+    setRemarks(`Applied historical remediation standard from ${s.petitionId}: ${s.actionTaken}`);
+    setNewStatus("resolved");
+    toast.success(`Applied solution template from ${s.petitionId}`);
+  }
 
   if (!complaint) {
     return (
@@ -166,6 +209,74 @@ export default function OfficerPetitionDetail() {
             {/* Status Timeline */}
             <div className="lg:col-span-3">
               <StatusTimeline currentStatus={complaint.status} history={complaint.statusHistory} />
+            </div>
+          </div>
+
+          {/* AI RAG Resolution Suggestions Card */}
+          <div className="card-base mb-5 overflow-hidden border border-indigo-200 dark:border-indigo-900/60 shadow-sm">
+            <div className="bg-gradient-to-r from-indigo-700 to-indigo-900 text-white px-5 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Lightbulb className="w-4 h-4 text-amber-300" />
+                <span className="font-semibold text-sm">AI Resolution Suggestions (RAG)</span>
+                <span className="text-[11px] bg-indigo-600/80 text-indigo-100 px-2 py-0.5 rounded-full font-medium">
+                  Past Precedents
+                </span>
+              </div>
+              <span className="text-xs text-indigo-200">
+                {suggestions.length} matching resolution{suggestions.length === 1 ? "" : "s"} found
+              </span>
+            </div>
+
+            <div className="p-5 bg-indigo-50/20 dark:bg-indigo-950/20 divide-y divide-border/60">
+              {loadingSuggestions ? (
+                <div className="text-center py-4 text-xs text-muted-foreground animate-pulse">
+                  Retrieving similar resolved petition solutions...
+                </div>
+              ) : suggestions.length === 0 ? (
+                <div className="text-center py-4 text-xs text-muted-foreground">
+                  No similar past resolutions found in archive.
+                </div>
+              ) : (
+                suggestions.map((s, idx) => (
+                  <div key={idx} className={idx > 0 ? "pt-4 mt-4" : ""}>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-xs text-indigo-800 dark:text-indigo-300">{s.petitionId}</span>
+                        <span className="text-xs font-semibold text-foreground truncate max-w-md">{s.title}</span>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
+                          {Math.round(s.similarity * 100)}% Match
+                        </span>
+                        <span className="text-[11px] px-2 py-0.5 rounded bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300">
+                          ⚡ ~{s.daysToResolve}d turnaround
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-white dark:bg-gray-900 border border-border/80 rounded-lg text-xs space-y-2">
+                      <div>
+                        <strong className="text-foreground font-semibold">Remediation Action Taken:</strong>
+                        <p className="text-muted-foreground mt-0.5 font-mono text-[11px] bg-muted/40 p-2 rounded">
+                          {s.actionTaken}
+                        </p>
+                      </div>
+                      <div className="flex items-center justify-between pt-1">
+                        <p className="text-[10px] text-muted-foreground">
+                          {s.explanation}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => applySuggestion(s)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-semibold transition-colors cursor-pointer shrink-0"
+                        >
+                          <CopyCheck className="w-3.5 h-3.5" /> Use as Solution Template
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 

@@ -574,3 +574,20 @@ def support_complaint(complaint_id: str, user: dict = Depends(get_current_user))
         "supported": True,
         "petitionId": c.get("petitionId"),
     }
+
+
+@router.get("/{complaint_id}/resolution-suggestions")
+def get_complaint_resolution_suggestions(complaint_id: str, user: dict = Depends(get_current_user)) -> dict:
+    """Retrieve RAG resolution suggestions and templates from past similar resolved petitions."""
+    c = db.find_one("complaints", {"id": complaint_id}) or db.find_one("complaints", {"petitionId": complaint_id})
+    if not c:
+        raise HTTPException(status_code=404, detail="Complaint not found")
+
+    from app.services.rag_service import get_resolution_suggestions
+    suggestions = get_resolution_suggestions(c, top_k=3)
+    return {
+        "complaintId": c["id"],
+        "petitionId": c.get("petitionId"),
+        "totalSuggestions": len(suggestions),
+        "suggestions": suggestions,
+    }

@@ -140,6 +140,38 @@ def seed_complaints() -> None:
                 {"status": "submitted", "timestamp": "2024-08-12T14:30:00Z", "note": "Complaint submitted by citizen", "updatedBy": "System"},
             ],
         },
+        {
+            "id": "c7", "petitionId": "PET-2024-007",
+            "title": "Severe road craters and pothole hazards on Mettupalayam Road",
+            "description": "Deep asphalt depression and potholes repaired using cold-mix bituminous patching.",
+            "category": "Road & Infrastructure", "location": "Mettupalayam Road, Near Junction 2",
+            "district": "Coimbatore", "submittedBy": "u1", "submittedByName": "Akash Rajan",
+            "status": "resolved", "priority": "high",
+            "assignedDepartment": "Roads & Infrastructure", "assignedOfficer": "o1",
+            "assignedOfficerName": "Priya Suresh",
+            "resolutionDetails": "Asphalt leveling and cold-mix bituminous resurfacing completed. Inspection cleared by Assistant Executive Engineer.",
+            "submittedAt": "2024-07-20T10:00:00Z",
+            "statusHistory": [
+                {"status": "submitted", "timestamp": "2024-07-20T10:00:00Z", "note": "Complaint submitted", "updatedBy": "System"},
+                {"status": "resolved", "timestamp": "2024-07-23T15:00:00Z", "note": "Road patch completed", "updatedBy": "Priya Suresh"},
+            ],
+        },
+        {
+            "id": "c8", "petitionId": "PET-2024-008",
+            "title": "Overflowing corporation garbage bins and unattended waste pile",
+            "description": "Garbage bins at Raja Street were overflowing for 5 days attracting stray dogs and flies.",
+            "category": "Waste Management", "location": "Raja Street Market",
+            "district": "Coimbatore", "submittedBy": "u4", "submittedByName": "Bala Murugan",
+            "status": "resolved", "priority": "medium",
+            "assignedDepartment": "Waste Management", "assignedOfficer": "o3",
+            "assignedOfficerName": "Rekha Devi",
+            "resolutionDetails": "Special sanitation compactor deployed; waste cleared and bleaching powder disinfectant sprayed across market perimeter.",
+            "submittedAt": "2024-07-25T08:00:00Z",
+            "statusHistory": [
+                {"status": "submitted", "timestamp": "2024-07-25T08:00:00Z", "note": "Complaint submitted", "updatedBy": "System"},
+                {"status": "resolved", "timestamp": "2024-07-26T14:00:00Z", "note": "Waste cleared and sanitized", "updatedBy": "Rekha Devi"},
+            ],
+        },
     ]
 
     for s in samples:
