@@ -55,6 +55,19 @@ export interface Complaint {
   original_text?: string;
   detected_language?: string;
   normalized_text?: string;
+  predictedResolution?: PredictedResolution;
+}
+
+export interface PredictedResolution {
+  predictedDaysMin: number;
+  predictedDaysMax: number;
+  confidenceInterval: string;
+  confidence: number;
+  slaDays: number;
+  backlogRisk: boolean;
+  departmentPendingCount: number;
+  department: string;
+  explanation: string;
 }
 
 export interface HotspotAlert {

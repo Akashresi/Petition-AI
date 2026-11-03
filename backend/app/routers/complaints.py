@@ -35,6 +35,13 @@ def _clean_doc(d: dict) -> dict:
 
 
 def _public_complaint(c: dict) -> dict:
+    if isinstance(c, dict):
+        if not c.get("predictedResolution"):
+            try:
+                from app.services.resolution_time import predict_resolution_time
+                c["predictedResolution"] = predict_resolution_time(c)
+            except Exception:
+                pass
     return _clean_doc(c)
 
 
@@ -209,6 +216,8 @@ def create_complaint(req: ComplaintIn, user: dict = Depends(get_current_user)) -
         "isEscalated": False,
         "images": req.images,
     }
+    from app.services.resolution_time import predict_resolution_time
+    complaint["predictedResolution"] = predict_resolution_time(complaint)
     db.insert("complaints", complaint)
 
     # Log AI decision to audit trail
@@ -671,3 +680,14 @@ def send_official_response(
         "dispatchedAt": now,
         "dispatchedBy": user.get("name", "Officer"),
     }
+
+
+@router.get("/{complaint_id}/resolution-prediction")
+def get_resolution_prediction(complaint_id: str, user: dict = Depends(get_current_user)) -> dict:
+    """Predict resolution duration interval, confidence, and backlog risk."""
+    c = db.find_one("complaints", {"id": complaint_id}) or db.find_one("complaints", {"petitionId": complaint_id})
+    if not c:
+        raise HTTPException(status_code=404, detail="Complaint not found")
+
+    from app.services.resolution_time import predict_resolution_time
+    return predict_resolution_time(c)
