@@ -114,6 +114,32 @@ def seed_complaints() -> None:
                 {"status": "submitted", "timestamp": "2024-08-09T19:00:00Z", "note": "Complaint submitted by citizen", "updatedBy": "System"},
             ],
         },
+        {
+            "id": "c5", "petitionId": "PET-2024-005",
+            "title": "Damaged speed breaker causing accidents on Anna Salai",
+            "description": "Unmarked broken speed breaker on Anna Salai near signal causing vehicle damages and frequent accidents.",
+            "category": "Road & Infrastructure", "location": "Anna Salai, Near Signal No. 4",
+            "district": "Coimbatore", "submittedBy": "u6", "submittedByName": "Aathi Selvan",
+            "status": "under_review", "priority": "high",
+            "assignedDepartment": "Roads & Infrastructure",
+            "submittedAt": "2024-08-11T12:00:00Z",
+            "statusHistory": [
+                {"status": "submitted", "timestamp": "2024-08-11T12:00:00Z", "note": "Complaint submitted by citizen", "updatedBy": "System"},
+            ],
+        },
+        {
+            "id": "c6", "petitionId": "PET-2024-006",
+            "title": "Cracked road surface and water-filled pothole cluster on Anna Salai",
+            "description": "Multiple connected deep potholes on Anna Salai creating hazardous driving conditions for two-wheelers.",
+            "category": "Road & Infrastructure", "location": "Anna Salai, Junction 7",
+            "district": "Coimbatore", "submittedBy": "u1", "submittedByName": "Akash Rajan",
+            "status": "submitted", "priority": "critical",
+            "assignedDepartment": "Roads & Infrastructure",
+            "submittedAt": "2024-08-12T14:30:00Z",
+            "statusHistory": [
+                {"status": "submitted", "timestamp": "2024-08-12T14:30:00Z", "note": "Complaint submitted by citizen", "updatedBy": "System"},
+            ],
+        },
     ]
 
     for s in samples:
@@ -129,6 +155,7 @@ def seed_notifications() -> None:
         {"id": "n1", "userId": "u1", "title": "Petition Submitted", "message": "Your petition PET-2024-001 has been submitted and AI analysis is complete.", "type": "success", "isRead": False, "timestamp": "2024-08-10T09:35:00Z", "petitionId": "PET-2024-001"},
         {"id": "n2", "userId": "u4", "title": "Petition Submitted", "message": "Your petition PET-2024-003 has been submitted and AI analysis is complete.", "type": "success", "isRead": False, "timestamp": "2024-08-12T16:50:00Z", "petitionId": "PET-2024-003"},
         {"id": "n3", "userId": "u5", "title": "Petition Submitted", "message": "Your petition PET-2024-004 has been submitted and AI analysis is complete.", "type": "success", "isRead": False, "timestamp": "2024-08-09T19:05:00Z", "petitionId": "PET-2024-004"},
+        {"id": "n4", "userId": "u3", "title": "Civic Hotspot Alert", "message": "3 Road & Infrastructure petitions clustered in Coimbatore (Anna Salai). Departmental inspection recommended.", "type": "warning", "isRead": False, "timestamp": "2024-08-12T14:35:00Z", "petitionId": "PET-2024-006"},
     ]
     for n in notifications:
         db.insert("notifications", n)

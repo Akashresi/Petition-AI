@@ -1,11 +1,12 @@
 import { useEffect, useRef } from "react";
 import type { Map as LeafletMap } from "leaflet";
-import { Complaint } from "@/types";
+import { Complaint, HotspotAlert } from "@/types";
 import { statusLabel } from "@/lib/utils";
 import "leaflet/dist/leaflet.css";
 
 interface Props {
   complaints: Complaint[];
+  hotspots?: HotspotAlert[];
   height?: string;
 }
 
@@ -78,12 +79,12 @@ function getLocationCoords(complaint: Complaint): [number, number] | null {
   return [20.5937 + (Math.random() - 0.5) * 8, 78.9629 + (Math.random() - 0.5) * 8];
 }
 
-export default function ComplaintMap({ complaints, height = "400px" }: Props) {
+export default function ComplaintMap({ complaints, hotspots = [], height = "400px" }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<LeafletMap | null>(null);
 
   useEffect(() => {
-    if (!mapRef.current || complaints.length === 0) return;
+    if (!mapRef.current || (complaints.length === 0 && hotspots.length === 0)) return;
 
     import("leaflet").then((L) => {
       if (!mapRef.current) return;
@@ -110,6 +111,54 @@ export default function ComplaintMap({ complaints, height = "400px" }: Props) {
         low: "#22c55e",
       };
 
+      // 1. Render Hotspot Halos
+      if (hotspots && hotspots.length > 0) {
+        hotspots.forEach((h: HotspotAlert) => {
+          if (!h.coordinates || h.coordinates.length < 2) return;
+          const [hLat, hLng] = h.coordinates;
+          bounds.push([hLat, hLng]);
+
+          // Broad halo circle
+          L.circle([hLat, hLng], {
+            radius: 3500,
+            color: h.severity === "critical" ? "#dc2626" : "#f59e0b",
+            dashArray: "6, 6",
+            fillColor: h.severity === "critical" ? "#ef4444" : "#f97316",
+            fillOpacity: 0.22,
+            weight: 2,
+          }).addTo(map);
+
+          // Hotspot pulse icon marker
+          const haloMarker = L.circleMarker([hLat, hLng], {
+            radius: 12,
+            fillColor: h.severity === "critical" ? "#b91c1c" : "#d97706",
+            color: "#ffffff",
+            weight: 3,
+            fillOpacity: 0.95,
+          }).addTo(map);
+
+          haloMarker.bindPopup(`
+            <div style="min-width:220px;font-family:system-ui;font-size:13px;padding:4px">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+                <span style="font-size:16px">🔥</span>
+                <strong style="color:#b91c1c;font-size:14px">${h.title}</strong>
+              </div>
+              <p style="margin:4px 0;font-size:12px;color:#333;line-height:1.4">${h.alertMessage}</p>
+              <div style="margin:6px 0;padding:6px;background:#fef2f2;border-radius:6px;font-size:11px">
+                <div><strong>Category:</strong> ${h.category}</div>
+                <div><strong>Department:</strong> ${h.department || "Public Works"}</div>
+                <div><strong>Clustered Petitions:</strong> ${h.count}</div>
+                <div><strong>Confidence:</strong> ${Math.round((h.confidence || 0.85) * 100)}%</div>
+              </div>
+              <div style="font-size:10px;color:#666">
+                ${h.explanation || "Geographic clustering threshold exceeded."}
+              </div>
+            </div>
+          `);
+        });
+      }
+
+      // 2. Render Complaint Pins
       complaints.forEach((c) => {
         const coords = getLocationCoords(c);
         if (!coords) return;
@@ -159,12 +208,19 @@ export default function ComplaintMap({ complaints, height = "400px" }: Props) {
         mapInstanceRef.current = null;
       }
     };
-  }, [complaints]);
+  }, [complaints, hotspots]);
 
   return (
     <div className="card-base overflow-hidden">
       <div className="p-3 border-b border-border flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-foreground">Complaint Locations</h3>
+        <div className="flex items-center gap-3">
+          <h3 className="text-sm font-semibold text-foreground">Complaint & Hotspot Geographic Map</h3>
+          {hotspots && hotspots.length > 0 && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-400 border border-red-200 dark:border-red-800">
+              🔥 {hotspots.length} Civic Hotspot{hotspots.length > 1 ? "s" : ""} Active
+            </span>
+          )}
+        </div>
         <div className="flex gap-3 text-[10px] text-muted-foreground">
           <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-500"></span>Critical</span>
           <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-orange-500"></span>High</span>

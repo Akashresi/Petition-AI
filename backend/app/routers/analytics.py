@@ -116,3 +116,15 @@ def get_evaluation_metrics(user: dict = Depends(get_current_user)) -> dict:
 
     from scripts.evaluate import run_evaluation
     return run_evaluation()
+
+
+@router.get("/hotspots")
+def get_hotspot_alerts(user: dict = Depends(get_current_user)) -> dict:
+    """Return active geographic and categorical hotspot early warnings."""
+    from app.services.hotspot_service import detect_hotspots
+    complaints = db.find("complaints", {})
+    hotspots = detect_hotspots(complaints)
+    return {
+        "totalHotspots": len(hotspots),
+        "hotspots": hotspots,
+    }

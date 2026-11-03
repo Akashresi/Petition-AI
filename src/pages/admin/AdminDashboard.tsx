@@ -1,12 +1,14 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { Users, FileText, CheckCircle, AlertTriangle, Building2, TrendingUp, ArrowRight, Clock, Shield, ShieldAlert } from "lucide-react";
+import { Users, FileText, CheckCircle, AlertTriangle, Building2, TrendingUp, ArrowRight, Clock, Shield, ShieldAlert, Flame, MapPin } from "lucide-react";
 import { useComplaints } from "@/hooks/useComplaints";
 import { DEPARTMENTS, OFFICERS } from "@/constants/mockData";
 import { ANALYTICS_DATA } from "@/constants/mockData";
 import { cn, statusClass, statusLabel, priorityClass, formatDate } from "@/lib/utils";
 import ComplaintMap from "@/components/features/ComplaintMap";
+import { HotspotAlert } from "@/types";
 
 const fadeInUp = {
   hidden: { opacity: 0 },
@@ -21,9 +23,28 @@ const staggerContainer = {
 export default function AdminDashboard() {
   const { t } = useTranslation();
   const { complaints } = useComplaints();
+  const [hotspots, setHotspots] = useState<HotspotAlert[]>([]);
   const critical = complaints.filter(c => c.priority === "critical" && c.status !== "resolved");
   const pending = complaints.filter(c => !["resolved", "closed"].includes(c.status));
   const resolved = complaints.filter(c => ["resolved", "closed"].includes(c.status));
+
+  useEffect(() => {
+    const fetchHotspots = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch("/api/analytics/hotspots", {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setHotspots(data.hotspots || []);
+        }
+      } catch (err) {
+        console.warn("Hotspots fetch fallback:", err);
+      }
+    };
+    fetchHotspots();
+  }, [complaints]);
 
   const stats = [
     { label: "Total Complaints", value: ANALYTICS_DATA.totalComplaints, icon: FileText, gradient: "from-navy-600 to-navy-700", sub: "All time" },
@@ -82,6 +103,50 @@ export default function AdminDashboard() {
           ))}
         </motion.div>
 
+        {/* Hotspot Alert Banner */}
+        {hotspots.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 p-4 rounded-xl border border-red-200 bg-red-50/90 dark:bg-red-950/40 dark:border-red-900/60 shadow-sm"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-red-100 dark:bg-red-900/60 text-red-600 dark:text-red-300 rounded-lg shrink-0">
+                  <Flame className="w-5 h-5 animate-pulse" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-red-900 dark:text-red-200">
+                      Civic Hotspot Early Warning Active ({hotspots.length} Detected)
+                    </h3>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-red-200 text-red-800 dark:bg-red-900 dark:text-red-200">
+                      Spike Alert
+                    </span>
+                  </div>
+                  <p className="text-xs text-red-700 dark:text-red-300/90 mt-1">
+                    AI geographic clustering detected multiple correlated petitions surging in specific jurisdictions.
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {hotspots.map((h) => (
+                      <div
+                        key={h.id}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white dark:bg-gray-900 text-xs text-gray-800 dark:text-gray-200 border border-red-200 dark:border-red-800/80 shadow-xs"
+                      >
+                        <MapPin className="w-3.5 h-3.5 text-red-500" />
+                        <span className="font-semibold">{h.district}</span>: {h.category}
+                        <span className="ml-1 px-1.5 py-0.2 bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-300 rounded font-bold">
+                          {h.count} petitions
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* Map */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -89,7 +154,7 @@ export default function AdminDashboard() {
           transition={{ delay: 0.15 }}
           className="mb-8"
         >
-          <ComplaintMap complaints={complaints} height="350px" />
+          <ComplaintMap complaints={complaints} hotspots={hotspots} height="350px" />
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">

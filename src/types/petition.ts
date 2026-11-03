@@ -57,6 +57,23 @@ export interface Complaint {
   normalized_text?: string;
 }
 
+export interface HotspotAlert {
+  id: string;
+  district: string;
+  location: string;
+  category: string;
+  department: string;
+  count: number;
+  criticalCount: number;
+  severity: "critical" | "high";
+  coordinates: [number, number];
+  petitions: string[];
+  title: string;
+  alertMessage: string;
+  confidence: number;
+  explanation: string;
+}
+
 export interface Department {
   id: string;
   name: string;
