@@ -11,8 +11,14 @@ import json
 import logging
 import os
 import pickle
+import sys
 from pathlib import Path
 from typing import Any
+
+# Ensure backend root is on sys.path
+backend_dir = str(Path(__file__).resolve().parents[1])
+if backend_dir not in sys.path:
+    sys.path.insert(0, backend_dir)
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -43,6 +49,17 @@ def retrain_model(
 
     # 1. Load base dataset
     rows: list[dict[str, str]] = []
+    try:
+        from app.ai.classifier import SEED_CORPUS
+        for cat, text in SEED_CORPUS:
+            rows.append({
+                "text": text,
+                "category": cat,
+                "language": "en",
+            })
+    except Exception as exc:
+        logger.warning("Could not load SEED_CORPUS: %s", exc)
+
     if data_path.exists():
         with open(data_path, "r", encoding="utf-8") as f:
             reader = csv.DictReader(f)
@@ -126,16 +143,22 @@ def retrain_model(
         "samples": len(augmented_rows),
     }
 
-    # 6. Save model artifact
+    # 6. Fit final production pipeline on 100% of data and save artifact
+    final_pipeline = Pipeline([
+        ("tfidf", TfidfVectorizer(ngram_range=(1, 2), max_features=8000, sublinear_tf=True)),
+        ("clf", LogisticRegression(max_iter=2000, C=5.0)),
+    ])
+    final_pipeline.fit(aug_texts, aug_cats)
+
     with open(output_model_path, "wb") as f:
-        pickle.dump(retrained_pipeline, f)
+        pickle.dump(final_pipeline, f)
 
     # 7. Hot-reload the in-memory classifier if available
     try:
         from app.ai.classifier import get_tfidf_classifier
         clf = get_tfidf_classifier()
-        clf.pipeline = retrained_pipeline
-        clf.classes_ = retrained_pipeline.classes_.tolist()
+        clf.pipeline = final_pipeline
+        clf.classes_ = final_pipeline.classes_.tolist()
         logger.info("Hot-reloaded live TF-IDF classifier in app.ai.classifier")
     except Exception as exc:
         logger.debug("Could not hot-reload classifier: %s", exc)

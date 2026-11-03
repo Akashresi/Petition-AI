@@ -9,9 +9,15 @@ from __future__ import annotations
 import csv
 import json
 import logging
+import sys
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
+
+# Ensure backend root is on sys.path
+backend_dir = str(Path(__file__).resolve().parents[1])
+if backend_dir not in sys.path:
+    sys.path.insert(0, backend_dir)
 
 logger = logging.getLogger("fairness_audit")
 

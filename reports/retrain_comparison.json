@@ -2,25 +2,25 @@
   "status": "success",
   "retrained": true,
   "correctionsApplied": 0,
-  "totalSamplesBefore": 431,
-  "totalSamplesAfter": 431,
+  "totalSamplesBefore": 479,
+  "totalSamplesAfter": 479,
   "modelPath": "D:\\projects\\DT\\project\\PetitionAI\\backend\\models\\retrained_model.pkl",
   "beforeMetrics": {
-    "accuracy": 0.4537,
-    "f1_weighted": 0.4512,
-    "precision_weighted": 0.4596,
-    "recall_weighted": 0.4537,
-    "samples": 431
+    "accuracy": 0.5417,
+    "f1_weighted": 0.5318,
+    "precision_weighted": 0.5425,
+    "recall_weighted": 0.5417,
+    "samples": 479
   },
   "afterMetrics": {
-    "accuracy": 0.4537,
-    "f1_weighted": 0.4512,
-    "precision_weighted": 0.4596,
-    "recall_weighted": 0.4537,
-    "samples": 431
+    "accuracy": 0.5417,
+    "f1_weighted": 0.5318,
+    "precision_weighted": 0.5425,
+    "recall_weighted": 0.5417,
+    "samples": 479
   },
   "f1Improvement": 0.0,
   "accuracyImprovement": 0.0,
   "confidence": 0.95,
-  "explanation": "Active learning pipeline incorporated 0 human feedback corrections into training corpus (431 total samples). Model artifact saved and live classifier reloaded."
+  "explanation": "Active learning pipeline incorporated 0 human feedback corrections into training corpus (479 total samples). Model artifact saved and live classifier reloaded."
 }
