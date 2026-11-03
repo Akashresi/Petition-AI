@@ -223,9 +223,16 @@ _embedding_label_vecs: list[tuple[str, np.ndarray]] | None = None
 def _get_embedding_model(model_name: str):
     global _embedding_model
     if _embedding_model is None:
-        from sentence_transformers import SentenceTransformer  # type: ignore
-        logger.info("Loading embedding model %s (first run may download)…", model_name)
-        _embedding_model = SentenceTransformer(model_name)
+        import os
+        os.environ["HF_HUB_OFFLINE"] = "1"
+        os.environ["TRANSFORMERS_OFFLINE"] = "1"
+        try:
+            from sentence_transformers import SentenceTransformer  # type: ignore
+            logger.info("Loading embedding model %s…", model_name)
+            _embedding_model = SentenceTransformer(model_name, local_files_only=True)
+        except Exception as exc:
+            logger.warning("Could not load embedding model (%s); using fallback.", exc)
+            _embedding_model = "fallback"
     return _embedding_model
 
 
@@ -233,6 +240,9 @@ def _get_label_vecs(model_name: str) -> list[tuple[str, np.ndarray]]:
     global _embedding_label_vecs
     if _embedding_label_vecs is None:
         model = _get_embedding_model(model_name)
+        if model == "fallback":
+            _embedding_label_vecs = []
+            return _embedding_label_vecs
         labels = list({c for c, _ in SEED_CORPUS})
         # Embed each category name as anchor
         vecs = model.encode(labels, normalize_embeddings=True)
@@ -243,6 +253,8 @@ def _get_label_vecs(model_name: str) -> list[tuple[str, np.ndarray]]:
 def embedding_classify(text: str, model_name: str) -> tuple[str, float]:
     """Embed text and find nearest category centroid."""
     model = _get_embedding_model(model_name)
+    if model == "fallback":
+        return get_tfidf_classifier().classify(text)
     text_vec = model.encode([text], normalize_embeddings=True)[0]
     label_vecs = _get_label_vecs(model_name)
     best_label, best_sim = "", 0.0
