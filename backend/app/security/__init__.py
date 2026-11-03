@@ -12,7 +12,7 @@ from app.security.rate_limiter import (
     image_analysis_limiter,
     submission_limiter,
 )
-from app.security.uploads import MAX_UPLOAD_SIZE_BYTES, validate_upload_content
+from app.security.uploads import MAX_UPLOAD_SIZE_BYTES, validate_audio_upload_content, validate_upload_content
 
 __all__ = [
     "hash_password",
@@ -22,6 +22,7 @@ __all__ = [
     "contains_pii",
     "mask_pii",
     "validate_upload_content",
+    "validate_audio_upload_content",
     "MAX_UPLOAD_SIZE_BYTES",
     "InMemoryRateLimiter",
     "auth_limiter",

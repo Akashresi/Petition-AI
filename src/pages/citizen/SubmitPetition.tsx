@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { FileText, MapPin, Tag, Brain, Upload, CheckCircle, Loader2, AlertTriangle, X, Image, FileIcon } from "lucide-react";
+import { FileText, MapPin, Tag, Brain, Upload, CheckCircle, Loader2, AlertTriangle, X, Image, FileIcon, Mic, MicOff, Volume2, Globe } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useComplaints } from "@/hooks/useComplaints";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -9,6 +9,7 @@ import { generateAIAnalysis, generatePetitionId } from "@/lib/utils";
 import { Complaint, StatusUpdate } from "@/types";
 import AIAnalysisCard from "@/components/features/AIAnalysisCard";
 import { analyzeImagesWithAI } from "@/lib/ai/imageAnalysis";
+import { toast } from "sonner";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "application/pdf"];
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -45,6 +46,93 @@ export default function SubmitPetition() {
   function update(field: string, value: string) {
     setForm(prev => ({ ...prev, [field]: value }));
   }
+
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [transcribing, setTranscribing] = useState(false);
+  const [voiceNotice, setVoiceNotice] = useState<string | null>(null);
+
+  const startVoiceRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const chunks: Blob[] = [];
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      recorder.onstop = async () => {
+        const audioBlob = new Blob(chunks, { type: "audio/webm" });
+        stream.getTracks().forEach((track) => track.stop());
+
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          const base64Audio = reader.result as string;
+          await sendAudioForTranscription(base64Audio, "audio/webm");
+        };
+        reader.readAsDataURL(audioBlob);
+      };
+
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+      setVoiceNotice("Listening... speak your grievance in English, Hindi, or Tamil.");
+    } catch (err) {
+      console.warn("Microphone access error, using file fallback:", err);
+      setVoiceNotice("Microphone unavailable. You can upload an audio recording below.");
+    }
+  };
+
+  const stopVoiceRecording = () => {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const sendAudioForTranscription = async (base64Audio: string, mimeType: string) => {
+    setTranscribing(true);
+    setVoiceNotice("Transcribing voice petition with multilingual AI...");
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch("/api/ai/transcribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          audioBase64: base64Audio,
+          mimeType,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        update("description", (form.description ? form.description + "\n" : "") + data.transcript);
+        setVoiceNotice(`Transcribed in ${data.languageName} (${Math.round(data.confidence * 100)}% confidence)`);
+        toast.success(`Voice transcribed (${data.languageName} detected)!`);
+      } else {
+        setVoiceNotice("Transcription failed. Please type manually.");
+      }
+    } catch (err) {
+      setVoiceNotice("Transcription service unreachable. Please type manually.");
+    } finally {
+      setTranscribing(false);
+    }
+  };
+
+  const handleAudioFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64Audio = reader.result as string;
+      await sendAudioForTranscription(base64Audio, file.type || "audio/webm");
+    };
+    reader.readAsDataURL(file);
+  };
 
   const validateFile = useCallback((file: File): string | null => {
     if (!ALLOWED_TYPES.includes(file.type)) {
@@ -324,18 +412,67 @@ export default function SubmitPetition() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">
-              Complaint Description <span className="text-red-500">*</span>
-            </label>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-1.5">
+              <label className="block text-sm font-medium text-foreground">
+                Complaint Description <span className="text-red-500">*</span>
+              </label>
+              <div className="flex items-center gap-2">
+                {isRecording ? (
+                  <button
+                    type="button"
+                    onClick={stopVoiceRecording}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-600 text-white text-xs font-semibold animate-pulse hover:bg-red-700 transition-colors cursor-pointer"
+                  >
+                    <MicOff className="w-3.5 h-3.5" /> Stop & Transcribe
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={startVoiceRecording}
+                    disabled={transcribing}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-xs font-semibold hover:bg-blue-100 transition-colors cursor-pointer"
+                  >
+                    <Mic className="w-3.5 h-3.5 text-blue-600" />
+                    {transcribing ? "Transcribing Voice..." : "Voice Input (Record)"}
+                  </button>
+                )}
+                <label className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted text-muted-foreground text-xs font-medium cursor-pointer hover:bg-muted/80 transition-colors">
+                  <Volume2 className="w-3.5 h-3.5" />
+                  <span>Upload Audio</span>
+                  <input
+                    type="file"
+                    accept="audio/*"
+                    onChange={handleAudioFileUpload}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            </div>
+
+            {voiceNotice && (
+              <div className="mb-2 p-2 rounded-md bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-xs text-blue-800 dark:text-blue-200 flex items-center justify-between">
+                <span>{voiceNotice}</span>
+                <button
+                  type="button"
+                  onClick={() => setVoiceNotice(null)}
+                  className="text-muted-foreground hover:text-foreground text-[10px]"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+
             <textarea
               value={form.description}
               onChange={e => update("description", e.target.value)}
               required
               rows={5}
-              placeholder="Describe the issue in detail. Include what happened, when it started, and how it is affecting you and others..."
+              placeholder="Describe the issue in detail, or use Voice Input above in English, Hindi, or Tamil..."
               className="w-full border border-border rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy-400 resize-none"
             />
-            <p className="text-xs text-muted-foreground mt-1">More detail helps the AI analyse more accurately. Min 50 characters recommended.</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Supports voice recording in English, Hindi, and Tamil. Min 50 characters recommended.
+            </p>
           </div>
 
           <div>

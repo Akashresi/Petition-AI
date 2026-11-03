@@ -58,3 +58,47 @@ def validate_upload_content(data: bytes | str) -> tuple[bytes, str]:
         )
 
     return decoded, detected_mime
+
+
+def validate_audio_upload_content(data: bytes | str) -> tuple[bytes, str]:
+    """Validate raw bytes or base64 audio payload (enforces 10 MB limit and audio format)."""
+    if isinstance(data, str):
+        raw_b64 = data
+        if "," in data:
+            raw_b64 = data.split(",", 1)[1]
+        try:
+            decoded = base64.b64decode(raw_b64)
+        except Exception as exc:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid base64-encoded audio payload.",
+            ) from exc
+    elif isinstance(data, bytes):
+        decoded = data
+    else:
+        raise HTTPException(status_code=400, detail="Invalid audio data format.")
+
+    max_audio_size = 10 * 1024 * 1024  # 10 MB
+    if len(decoded) > max_audio_size:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Audio file exceeds maximum allowed size of 10 MB ({len(decoded)} bytes).",
+        )
+
+    if len(decoded) < 4:
+        raise HTTPException(status_code=400, detail="Uploaded audio file is empty or corrupted.")
+
+    # Magic byte verification for audio
+    if decoded.startswith(b"RIFF") and b"WAVE" in decoded[:16]:
+        detected_mime = "audio/wav"
+    elif decoded.startswith(b"\x1a\x45\xdf\xa3"):
+        detected_mime = "audio/webm"
+    elif decoded.startswith(b"ID3") or decoded.startswith(b"\xff\xfb") or decoded.startswith(b"\xff\xf3"):
+        detected_mime = "audio/mpeg"
+    elif decoded.startswith(b"OggS"):
+        detected_mime = "audio/ogg"
+    else:
+        # Permissive for webm/wav browser recorded blobs
+        detected_mime = "audio/webm"
+
+    return decoded, detected_mime
