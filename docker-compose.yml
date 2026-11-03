@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: petitionai-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: petition_ai
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: petitionai-backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - ENV=development
+      - DEBUG=true
+      - USE_MONGODB=true
+      - MONGODB_URI=mongodb://mongodb:27017/petition_ai
+      - SECRET_KEY=dev-secret-petitionai-secure-jwt-key
+      - CORS_ORIGINS=http://localhost:8080,http://localhost:5173,http://localhost:3000
+      - SMS_PROVIDER=fast2sms
+      - WHATSAPP_PROVIDER=gupshup
+      - FAST2SMS_API_KEY=${FAST2SMS_API_KEY:-}
+      - GUPSHUP_API_KEY=${GUPSHUP_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: petitionai-frontend
+    restart: always
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:

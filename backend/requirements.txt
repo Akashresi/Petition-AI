@@ -14,8 +14,8 @@ bcrypt==4.2.1
 asyncpg==0.30.0
 sqlalchemy[asyncio]==2.0.41
 alembic==1.16.1
-# Legacy MongoDB (kept for migration)
-# pymongo==4.10.1
+# MongoDB database driver
+pymongo>=4.6.0
 
 # ── AI / ML ──────────────────────────────────────────────────────────────────
 scikit-learn>=1.4.0
