@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { MapPin, Calendar, Building2, ChevronRight, Copy } from "lucide-react";
 import { Complaint } from "@/types";
-import { cn, statusClass, statusLabel, priorityClass, formatDate } from "@/lib/utils";
+import { cn, priorityClass, formatDate } from "@/lib/utils";
+import StatusBadge from "@/components/ui/accessible/StatusBadge";
 
 interface Props {
   complaint: Complaint;
@@ -18,9 +19,7 @@ export default function ComplaintCard({ complaint, linkTo, showAI = true }: Prop
             <span className="text-[11px] font-mono font-semibold text-navy-600 bg-navy-50 px-2 py-0.5 rounded dark:bg-navy-900/60 dark:text-navy-200">
               {complaint.petitionId}
             </span>
-            <span className={cn("text-[11px] font-semibold px-2 py-0.5 rounded border", statusClass(complaint.status))}>
-              {statusLabel(complaint.status)}
-            </span>
+            <StatusBadge status={complaint.status} />
             <span className={cn("text-[11px] font-semibold px-2 py-0.5 rounded border", priorityClass(complaint.priority))}>
               {complaint.priority.toUpperCase()}
             </span>

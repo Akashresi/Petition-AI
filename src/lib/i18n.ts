@@ -1,251 +1,24 @@
 import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
+import { initReactI18next, useTranslation } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 
+import enTranslations from "../locales/en.json";
+import taTranslations from "../locales/ta.json";
+import hiTranslations from "../locales/hi.json";
+
+// Dynamic resources registry - extensible for Telugu, Kannada, Malayalam, Bengali, Marathi
+export const SUPPORTED_LANGUAGES = [
+  { code: "ta", label: "தமிழ்", name: "Tamil", script: "தமிழ்" },
+  { code: "hi", label: "हिन्दी", name: "Hindi", script: "हिन्दी" },
+  { code: "en", label: "English", name: "English", script: "English" },
+] as const;
+
+export type SupportedLanguageCode = (typeof SUPPORTED_LANGUAGES)[number]["code"];
+
 const resources = {
-  en: {
-    translation: {
-      nav: {
-        dashboard: "Dashboard",
-        submitPetition: "Submit Petition",
-        myPetitions: "My Petitions",
-        complaints: "Complaints",
-        users: "Users",
-        analytics: "Analytics",
-        signIn: "Sign In",
-        register: "Register",
-        profile: "My Profile",
-        signOut: "Sign Out",
-      },
-      landing: {
-        badge: "AI-Powered Grievance Platform",
-        heroTitle: "Intelligent Petition Classification & Resolution",
-        heroDesc: "An AI-driven civic grievance portal that automates complaint classification, duplicate detection, priority prediction, and department routing — delivering faster resolution for every citizen.",
-        cta: "Submit a Petition",
-        stats: {
-          petitions: "Petitions Filed",
-          accuracy: "AI Accuracy",
-          resolution: "Avg. Resolution",
-          departments: "Departments",
-        },
-        featuresTitle: "Platform Features",
-        featuresDesc: "Combining AI intelligence with government accountability for smarter grievance management.",
-        howItWorks: "How It Works",
-        howItWorksDesc: "From submission to resolution — powered by AI every step.",
-        tryDemo: "Try the Demo",
-        tryDemoDesc: "Use these credentials to explore each role in the system.",
-        rolesTitle: "Role-Based Access",
-      },
-      citizen: {
-        dashboard: "Citizen Dashboard",
-        submitPetition: "Submit Petition",
-        myPetitions: "My Petitions",
-        trackStatus: "Track Status",
-        feedback: "Feedback",
-      },
-      common: {
-        search: "Search",
-        filter: "Filter",
-        export: "Export",
-        save: "Save",
-        cancel: "Cancel",
-        delete: "Delete",
-        edit: "Edit",
-        view: "View",
-        loading: "Loading...",
-        noResults: "No results found",
-        submit: "Submit",
-        back: "Back",
-        next: "Next",
-        comments: "Comments",
-        addComment: "Add a comment...",
-        postComment: "Post",
-      },
-      status: {
-        submitted: "Submitted",
-        under_review: "Under Review",
-        assigned: "Assigned",
-        in_progress: "In Progress",
-        resolved: "Resolved",
-        closed: "Closed",
-      },
-      priority: {
-        critical: "Critical",
-        high: "High",
-        medium: "Medium",
-        low: "Low",
-      },
-      escalation: {
-        title: "Priority Escalation",
-        autoEscalate: "Auto-Escalate",
-        escalateTo: "Escalate to",
-        escalated: "Escalated",
-        escalationHistory: "Escalation History",
-      },
-    },
-  },
-  hi: {
-    translation: {
-      nav: {
-        dashboard: "डैशबोर्ड",
-        submitPetition: "याचिका दायर करें",
-        myPetitions: "मेरी याचिकाएँ",
-        complaints: "शिकायतें",
-        users: "उपयोगकर्ता",
-        analytics: "विश्लेषण",
-        signIn: "लॉग इन",
-        register: "रजिस्टर",
-        profile: "मेरी प्रोफ़ाइल",
-        signOut: "लॉग आउट",
-      },
-      landing: {
-        badge: "AI-संचालित शिकायत प्लेटफ़ॉर्म",
-        heroTitle: "बुद्धिमान याचिका वर्गीकरण और समाधान",
-        heroDesc: "एक AI-संचालित नागरिक शिकायत पोर्टल जो शिकायत वर्गीकरण, डुप्लिकेट पहचान, प्राथमिकता भविष्यवाणी और विभाग रूटिंग को स्वचालित करता है — हर नागरिक के लिए तेज़ समाधान प्रदान करता है।",
-        cta: "याचिका दायर करें",
-        stats: {
-          petitions: "दायर याचिकाएँ",
-          accuracy: "AI सटीकता",
-          resolution: "औसत समाधान",
-          departments: "विभाग",
-        },
-        featuresTitle: "प्लेटफ़ॉर्म सुविधाएँ",
-        featuresDesc: "स्मार्ट शिकायत प्रबंधन के लिए AI बुद्धिमत्ता और सरकारी जवाबदेही का संयोजन।",
-        howItWorks: "यह कैसे काम करता है",
-        howItWorksDesc: "दायर करने से समाधान तक — हर कदम पर AI द्वारा संचालित।",
-        tryDemo: "डेमो आज़माएँ",
-        tryDemoDesc: "सिस्टम में प्रत्येक भूमिका का पता लगाने के लिए इन क्रेडेंशियल्स का उपयोग करें।",
-        rolesTitle: "भूमिका-आधारित पहुँच",
-      },
-      citizen: {
-        dashboard: "नागरिक डैशबोर्ड",
-        submitPetition: "याचिका दायर करें",
-        myPetitions: "मेरी याचिकाएँ",
-        trackStatus: "स्थिति ट्रैक करें",
-        feedback: "प्रतिक्रिया",
-      },
-      common: {
-        search: "खोजें",
-        filter: "फ़िल्टर",
-        export: "निर्यात",
-        save: "सहेजें",
-        cancel: "रद्द करें",
-        delete: "हटाएँ",
-        edit: "संपादित करें",
-        view: "देखें",
-        loading: "लोड हो रहा है...",
-        noResults: "कोई परिणाम नहीं मिला",
-        submit: "जमा करें",
-        back: "वापस",
-        next: "अगला",
-        comments: "टिप्पणियाँ",
-        addComment: "टिप्पणी जोड़ें...",
-        postComment: "पोस्ट",
-      },
-      status: {
-        submitted: "दायर",
-        under_review: "समीक्षा में",
-        assigned: "सौंपा गया",
-        in_progress: "प्रगति में",
-        resolved: "समाधान",
-        closed: "बंद",
-      },
-      priority: {
-        critical: "गंभीर",
-        high: "उच्च",
-        medium: "मध्यम",
-        low: "निम्न",
-      },
-      escalation: {
-        title: "प्राथमिकता एस्केलेशन",
-        autoEscalate: "स्वतः एस्केलेट",
-        escalateTo: "एस्केलेट करें",
-        escalated: "एस्केलेटेड",
-        escalationHistory: "एस्केलेशन इतिहास",
-      },
-    },
-  },
-  ta: {
-    translation: {
-      nav: {
-        dashboard: "டாஷ்போர்டு",
-        submitPetition: "மனு தாக்கல் செய்க",
-        myPetitions: "எனது மனுக்கள்",
-        complaints: "புகார்கள்",
-        users: "பயனர்கள்",
-        analytics: "பகுப்பாய்வு",
-        signIn: "உள்நுழைக",
-        register: "பதிவு செய்க",
-        profile: "எனது சுயவிவரம்",
-        signOut: "வெளியேறுக",
-      },
-      landing: {
-        badge: "AI-இயங்கும் குறைதீர்ப்பு தளம்",
-        heroTitle: "அறிவுசார் மனு வகைப்பாடு & தீர்வு",
-        heroDesc: "குறைதீர்ப்பு மனுக்களைத் தானாக வகைப்படுத்தி, நகல்களைக் கண்டறிந்து, முன்னுரிமை கணித்து சம்பந்தப்பட்ட துறைக்கு அனுப்பும் AI தளம் — ஒவ்வொரு குடிமகனுக்கும் விரைவான தீர்வு.",
-        cta: "மனு தாக்கல் செய்க",
-        stats: {
-          petitions: "தாக்கல் செய்யப்பட்ட மனுக்கள்",
-          accuracy: "AI துல்லியம்",
-          resolution: "சராசரி தீர்வு நேரம்",
-          departments: "துறைகள்",
-        },
-        featuresTitle: "தளத்தின் சிறப்பம்சங்கள்",
-        featuresDesc: "குடிமக்கள் குறைதீர்ப்பை வேகப்படுத்த AI தொழில்நுட்பம் மற்றும் அரசு பொறுப்புணர்வின் ஒருங்கிணைப்பு.",
-        howItWorks: "இது எவ்வாறு செயல்படுகிறது",
-        howItWorksDesc: "மனு சமர்ப்பிப்பதிலிருந்து தீர்வு காண்பது வரை — ஒவ்வொரு கட்டத்திலும் AI ஆதரவு.",
-        tryDemo: "டெமோவை முயற்சிக்கவும்",
-        tryDemoDesc: "கணினியின் ஒவ்வொரு பாத்திரத்தையும் ஆராய இந்த உள்நுழைவு விவரங்களைப் பயன்படுத்தவும்.",
-        rolesTitle: "பணி அடிப்படையிலான அணுகல்",
-      },
-      citizen: {
-        dashboard: "குடிமக்கள் டாஷ்போர்டு",
-        submitPetition: "மனு தாக்கல் செய்க",
-        myPetitions: "எனது மனுக்கள்",
-        trackStatus: "நிலையைக் கண்காணிக்கவும்",
-        feedback: "கருத்து",
-      },
-      common: {
-        search: "தேடுக",
-        filter: "வடிகட்டுக",
-        export: "ஏற்றுமதி செய்க",
-        save: "சேமி",
-        cancel: "ரத்து செய்",
-        delete: "நீக்குக",
-        edit: "திருத்துக",
-        view: "பார்க்க",
-        loading: "ஏற்றப்படுகிறது...",
-        noResults: "முடிவுகள் எதுவும் இல்லை",
-        submit: "சமர்ப்பிக்கவும்",
-        back: "பின்செல்",
-        next: "அடுத்து",
-        comments: "கருத்துகள்",
-        addComment: "கருத்து சேர்க்க...",
-        postComment: "பதிவு செய்",
-      },
-      status: {
-        submitted: "சமர்ப்பிக்கப்பட்டது",
-        under_review: "ஆய்வில் உள்ளது",
-        assigned: "ஒதுக்கப்பட்டது",
-        in_progress: "செயல்பாட்டில் உள்ளது",
-        resolved: "தீர்க்கப்பட்டது",
-        closed: "முடிக்கப்பட்டது",
-      },
-      priority: {
-        critical: "மிக முக்கியம்",
-        high: "உயர்",
-        medium: "நடுத்தரம்",
-        low: "குறைந்த",
-      },
-      escalation: {
-        title: "முன்னுரிமை தீவிரப்படுத்துதல்",
-        autoEscalate: "தானியங்கி தீவிரப்படுத்துதல்",
-        escalateTo: "தீவிரப்படுத்து",
-        escalated: "தீவிரப்படுத்தப்பட்டது",
-        escalationHistory: "தீவிரப்படுத்தல் வரலாறு",
-      },
-    },
-  },
+  en: { translation: enTranslations },
+  ta: { translation: taTranslations },
+  hi: { translation: hiTranslations },
 };
 
 i18n
@@ -253,14 +26,34 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: "en",
+    fallbackLng: "ta", // Tamil first!
+    lng: localStorage.getItem("petitionai_lang_chosen") || undefined,
     interpolation: {
       escapeValue: false,
     },
     detection: {
       order: ["localStorage", "navigator"],
+      lookupLocalStorage: "petitionai_lang_chosen",
       caches: ["localStorage"],
     },
   });
+
+export function useLanguage() {
+  const { i18n: i18nInstance, t } = useTranslation();
+  const currentCode = (i18nInstance.language?.slice(0, 2) as SupportedLanguageCode) || "ta";
+
+  const setLanguage = (lang: string) => {
+    localStorage.setItem("petitionai_lang_chosen", lang);
+    return i18nInstance.changeLanguage(lang);
+  };
+
+  return {
+    language: currentCode,
+    setLanguage,
+    t,
+    i18n: i18nInstance,
+    supportedLanguages: SUPPORTED_LANGUAGES,
+  };
+}
 
 export default i18n;

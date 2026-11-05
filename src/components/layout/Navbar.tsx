@@ -9,6 +9,7 @@ import NotificationPanel from "@/components/features/NotificationPanel";
 import DarkModeToggle from "@/components/features/DarkModeToggle";
 import LanguageToggle from "@/components/features/LanguageToggle";
 import AccessibilityMenu from "@/components/features/AccessibilityMenu";
+import TextSizeControl from "@/components/ui/accessible/TextSizeControl";
 
 export default function Navbar() {
   const { t } = useTranslation();
@@ -76,6 +77,7 @@ export default function Navbar() {
           {/* Right Actions */}
           {user ? (
             <div className="flex items-center gap-2">
+              <TextSizeControl size="compact" />
               <LanguageToggle />
               <DarkModeToggle />
               <AccessibilityMenu />

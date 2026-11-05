@@ -20,6 +20,7 @@ import CitizenDashboard from "@/pages/citizen/CitizenDashboard";
 import SubmitPetition from "@/pages/citizen/SubmitPetition";
 import MyPetitions from "@/pages/citizen/MyPetitions";
 import PetitionDetail from "@/pages/citizen/PetitionDetail";
+import TrackComplaint from "@/pages/citizen/TrackComplaint";
 import CitizenProfile from "@/pages/citizen/CitizenProfile";
 
 // Officer
@@ -97,10 +98,13 @@ function AppRoutes() {
             <Route path="/register" element={<AnimatedPage><RegisterPage /></AnimatedPage>} />
 
             {/* Citizen Routes */}
+            <Route path="/citizen" element={<Navigate to="/citizen/dashboard" replace />} />
             <Route path="/citizen/dashboard" element={<ProtectedRoute roles={["citizen"]}><AnimatedPage><CitizenDashboard /></AnimatedPage></ProtectedRoute>} />
             <Route path="/citizen/submit" element={<ProtectedRoute roles={["citizen"]}><AnimatedPage><SubmitPetition /></AnimatedPage></ProtectedRoute>} />
+            <Route path="/citizen/track" element={<ProtectedRoute roles={["citizen"]}><AnimatedPage><TrackComplaint /></AnimatedPage></ProtectedRoute>} />
             <Route path="/citizen/petitions" element={<ProtectedRoute roles={["citizen"]}><AnimatedPage><MyPetitions /></AnimatedPage></ProtectedRoute>} />
             <Route path="/citizen/petition/:id" element={<ProtectedRoute roles={["citizen"]}><AnimatedPage><PetitionDetail /></AnimatedPage></ProtectedRoute>} />
+            <Route path="/citizen/petitions/:id" element={<ProtectedRoute roles={["citizen"]}><AnimatedPage><PetitionDetail /></AnimatedPage></ProtectedRoute>} />
             <Route path="/citizen/profile" element={<ProtectedRoute roles={["citizen"]}><AnimatedPage><CitizenProfile /></AnimatedPage></ProtectedRoute>} />
 
             {/* Officer Routes */}

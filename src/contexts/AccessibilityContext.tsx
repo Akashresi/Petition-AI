@@ -5,9 +5,13 @@ export interface AccessibilitySettings {
   largeText: boolean;
   reducedData: boolean;
   highContrast: boolean;
+  textSizeLevel?: number; // 1 (100%), 2 (115% / ~18px), 3 (130%), 4 (155%), 5 (180%), 6 (200%)
 }
 
 interface AccessibilityContextType extends AccessibilitySettings {
+  textSizeLevel: number;
+  increaseTextSize: () => void;
+  decreaseTextSize: () => void;
   toggleLargeText: () => void;
   toggleReducedData: () => void;
   toggleHighContrast: () => void;
@@ -22,6 +26,7 @@ const DEFAULT_SETTINGS: AccessibilitySettings = {
   largeText: false,
   reducedData: false,
   highContrast: false,
+  textSizeLevel: 2, // Default to 18px body equivalent
 };
 
 export const AccessibilityContext = createContext<AccessibilityContextType | undefined>(undefined);
@@ -42,7 +47,15 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
   // Sync DOM classes
   useEffect(() => {
     const root = document.documentElement;
-    if (settings.largeText) {
+    const level = settings.textSizeLevel ?? (settings.largeText ? 4 : 2);
+
+    // Clean up any existing text-size classes
+    for (let i = 1; i <= 6; i++) {
+      root.classList.remove(`text-size-${i}`);
+    }
+    root.classList.add(`text-size-${level}`);
+
+    if (settings.largeText || level >= 3) {
       root.classList.add("large-text");
     } else {
       root.classList.remove("large-text");
@@ -93,8 +106,29 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isKeyboardHelpOpen]);
 
+  const currentLevel = settings.textSizeLevel ?? (settings.largeText ? 4 : 2);
+
+  const increaseTextSize = () =>
+    setSettings((s) => {
+      const next = Math.min((s.textSizeLevel ?? 2) + 1, 6);
+      return { ...s, textSizeLevel: next, largeText: next >= 3 };
+    });
+
+  const decreaseTextSize = () =>
+    setSettings((s) => {
+      const next = Math.max((s.textSizeLevel ?? 2) - 1, 1);
+      return { ...s, textSizeLevel: next, largeText: next >= 3 };
+    });
+
   const toggleLargeText = () =>
-    setSettings((s) => ({ ...s, largeText: !s.largeText }));
+    setSettings((s) => {
+      const nextLarge = !s.largeText;
+      return {
+        ...s,
+        largeText: nextLarge,
+        textSizeLevel: nextLarge ? 4 : 2,
+      };
+    });
 
   const toggleReducedData = () =>
     setSettings((s) => ({ ...s, reducedData: !s.reducedData }));
@@ -108,6 +142,9 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
     <AccessibilityContext.Provider
       value={{
         ...settings,
+        textSizeLevel: currentLevel,
+        increaseTextSize,
+        decreaseTextSize,
         toggleLargeText,
         toggleReducedData,
         toggleHighContrast,

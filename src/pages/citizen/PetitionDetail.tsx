@@ -14,11 +14,17 @@ import {
   FileSpreadsheet, 
   Clock,
   ThumbsUp,
-  Link2
+  Link2,
+  Volume2
 } from "lucide-react";
 import { toast } from "sonner";
 import { useComplaints } from "@/hooks/useComplaints";
 import { useAuth } from "@/lib/auth";
+import { useLanguage } from "@/lib/i18n";
+import { speakText, isSpeaking, stopSpeaking } from "@/lib/tts";
+import CitizenHeader from "@/components/ui/accessible/CitizenHeader";
+import StatusBadge from "@/components/ui/accessible/StatusBadge";
+import AccessibleButton from "@/components/ui/accessible/AccessibleButton";
 import AIAnalysisCard from "@/components/features/AIAnalysisCard";
 import StatusTimeline from "@/components/features/StatusTimeline";
 import QRCode from "@/components/features/QRCode";
@@ -34,11 +40,30 @@ export default function PetitionDetail() {
   const { id } = useParams<{ id: string }>();
   const { complaints, updateComplaint } = useComplaints();
   const { user } = useAuth();
+  const { t, language } = useLanguage();
   const [rating, setRating] = useState(0);
   const [feedbackText, setFeedbackText] = useState("");
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const [isReading, setIsReading] = useState(false);
 
   const complaint = complaints.find(c => c.id === id);
+
+  const handleReadAloud = () => {
+    if (!complaint) return;
+    if (isSpeaking()) {
+      stopSpeaking();
+      setIsReading(false);
+      return;
+    }
+    const plainText = language === "ta"
+      ? `மனு எண் ${complaint.petitionId}. ${complaint.title}. நிலை: ${complaint.status}. துறை: ${complaint.assignedDepartment}.`
+      : language === "hi"
+      ? `शिकायत संख्या ${complaint.petitionId}। ${complaint.title}। स्थिति: ${complaint.status}। विभाग: ${complaint.assignedDepartment}।`
+      : `Petition number ${complaint.petitionId}. ${complaint.title}. Status: ${complaint.status}. Department: ${complaint.assignedDepartment}.`;
+
+    setIsReading(true);
+    speakText(plainText, language, () => setIsReading(false), () => setIsReading(false));
+  };
   const [supporterCount, setSupporterCount] = useState(complaint?.supporterCount || 1);
   const [hasSupported, setHasSupported] = useState(
     Boolean(user?.id && complaint?.supporters?.includes(user.id))
@@ -135,11 +160,22 @@ export default function PetitionDetail() {
                 <div>
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
                     <span className="text-sm font-mono font-bold text-navy-700 bg-navy-50 dark:bg-navy-900/60 dark:text-navy-200 px-3 py-1 rounded-lg">{complaint.petitionId}</span>
-                    <span className={cn("text-xs font-semibold px-2.5 py-1 rounded-full border", statusClass(complaint.status))}>{statusLabel(complaint.status)}</span>
+                    <StatusBadge status={complaint.status} />
                     <span className={cn("text-xs font-semibold px-2.5 py-1 rounded-full border", priorityClass(complaint.priority))}>{complaint.priority.toUpperCase()} PRIORITY</span>
                     <EscalationBadge complaint={complaint} />
                   </div>
                   <h1 className="font-display text-xl font-extrabold text-foreground">{complaint.title}</h1>
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    onClick={handleReadAloud}
+                    className="min-h-[48px] px-4 py-2 border-2 border-blue-900 bg-blue-50 text-blue-900 hover:bg-blue-100 rounded-xl font-bold flex items-center gap-2 dark:bg-blue-950/60 dark:text-blue-200 dark:border-blue-400"
+                    aria-label="Read petition details aloud"
+                  >
+                    <Volume2 className="w-5 h-5 text-blue-800 dark:text-blue-300" />
+                    <span>{isReading ? "Reading aloud..." : "Read this aloud"}</span>
+                  </button>
                 </div>
               </div>
 
