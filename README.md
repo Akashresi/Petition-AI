@@ -70,12 +70,62 @@ flowchart TD
 
 ## 2. Core Capabilities & Methodology
 
-### 2.1 Multilingual & Omnichannel Ingestion
-- **Web App**: Built with React 18, Vite, and Tailwind CSS. Full support for **English**, **Hindi (हिंदी)**, and **Tamil (தமிழ்)** with real-time language switching.
-- **Voice Submission**: In-browser microphone recorder and audio file uploader (`WAV`, `MP3`, `WebM`, `OGG` up to $10\text{ MB}$) transcribed via `POST /api/ai/transcribe`.
+### 2.1 Multilingual & Omnichannel Ingestion (Tamil First)
+- **Supported Languages**:
+  - **Tamil (தமிழ், Default / Primary)**: Complete UI translation, speech recognition (`ta-IN`), speech synthesis, native script detection and classification.
+  - **Hindi (हिन्दी)**: Complete UI translation, speech recognition (`hi-IN`), speech synthesis, native script detection and classification.
+  - **English**: International standard English (`en-IN`).
+  - **Extensible Architecture**: Modular language dictionary files located in `src/locales/` (`ta.json`, `hi.json`, `en.json`). Additional languages (Telugu, Kannada, Malayalam, Bengali, Marathi) can be added without modifying application code.
+- **First-Launch Experience**: Modal prompts first-time visitors with large buttons showing each language NAME IN ITS OWN SCRIPT (தமிழ், हिन्दी, English) and remembers their choice.
+- **Voice Submission**: In-browser microphone recorder (`AccessibleVoiceInput`) powered by Web Speech API with real-time transcript, fallback text entry, and backend `POST /api/ai/transcribe`.
+- **Text-to-Speech (TTS)**: Dedicated "Read Aloud" button on Confirmation and Tracking screens using browser `SpeechSynthesis` configured for Tamil, Hindi, and English.
 - **SMS & WhatsApp Gateways**: Integrated with Fast2SMS and Gupshup WhatsApp APIs (`POST /api/webhooks/sms` and `POST /api/webhooks/whatsapp`):
   - File grievance: `FILE <Grievance description>`
   - Check status: `STATUS <PetitionID>`
+
+### 2.2 Accessible Citizen UI Design System (Low-Literacy Friendly)
+- **Plain, Calm Aesthetic**: Clean white/slate background, high contrast ($\ge 4.5:1$), and a single muted neutral accent.
+- **No Color Alone for Meaning**: Every status badge and priority tag uses an **Icon + Text Label + Color** (e.g. tick + "Resolved").
+- **Large Tap Targets**: All buttons and controls $\ge 48\text{px} \times 48\text{px}$, body text $\ge 18\text{px}$.
+- **Text Scaling**: A+ / A- font size control available on every screen supporting up to $200\%$ scaling.
+- **4-Step Submission Wizard**:
+  1. *What is the problem?* (Voice input or typing)
+  2. *Where?* (One-click GPS auto-location or landmark)
+  3. *Add a photo* (Optional camera / file picker)
+  4. *Check and send* (Clear summary with exactly 1 primary button)
+- **Confirmation & Tracking**: Extra-large petition ID digits, TTS audio read-aloud, and ability to track by **10-digit mobile number** or Petition ID.
+
+### 2.3 Fake & Spam Detection Guard
+- Multi-vector quality filter detecting:
+  - Keyboard mash / gibberish (`asdfghjkl`, character ratio)
+  - Copy-pasted / repetitive content and token flooding
+  - Abusive / threatening language across English, Hindi, and Tamil
+  - Submission rate limiting to prevent flood attacks
+- **Safe Routing**: Suspicious petitions are **never deleted** and **never sent to officer queues**; they are held for human review in the Admin Review Queue.
+- **Neutral Citizen Experience**: Citizens see a calm, neutral message: *"Your complaint is being checked"*, never "spam". If the spam check fails or errors, the petition proceeds normally.
+
+### 2.4 Human Review & Correction Queue
+- Petitions automatically enter the Admin Review Queue if:
+  1. Flagged as suspicious / spam / abuse, OR
+  2. AI classification confidence is below threshold ($< 65\%$).
+- **4 One-Click Actions**:
+  1. **Approve as is**: Immediately dispatches petition to officer queue and notifies citizen in their language.
+  2. **Correct**: One-click correction of Category, Department, and Priority level with retraining logging.
+  3. **Mark as spam**: Archives petition with audit justification.
+  4. **Ask citizen for more details**: Sends an automated SMS / status notification to the citizen requesting extra information.
+- **Immutable Audit Trail & Active Learning**: Every administrative action is saved to `audit_logs` and every correction is recorded in `corrections` for model retraining.
+
+### 2.5 Automated SLA Monitoring & Escalation
+- Priority-based SLA deadlines (strictly matching `src/lib/sla.ts`):
+  - **Critical**: 24 hours (1 day)
+  - **High**: 72 hours (3 days)
+  - **Medium**: 168 hours (7 days)
+  - **Low**: 336 hours (14 days)
+- **APScheduler Service**: Periodically evaluates open petitions.
+  - Sends pre-breach alerts to assigned officers at $25\%$ remaining time.
+  - Auto-escalates overdue petitions to department heads, updating status to `escalated` and logging audit entries.
+- **Officer Dashboard Triage**: Dedicated **"Due today / Overdue"** alert section with icons, remaining breach countdowns, and quick-action links.
+- **Plain-Words Citizen SLA**: Tracking view presents expected resolution date in plain words (e.g., *"Expected resolution: Monday, 9 Nov 2026"*).
 
 ### 2.2 Hybrid AI Classification (Single Source of Truth)
 - Combines a sublinear TF-IDF + Logistic Regression baseline trained on 300+ balanced regional civic examples with a backend-only hosted Gemini LLM stage.
