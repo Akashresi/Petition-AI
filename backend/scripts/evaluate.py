@@ -42,6 +42,85 @@ from sklearn.pipeline import Pipeline
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger("evaluate")
 
+# Benchmark spam and abuse suite across English, Hindi, Tamil, and Tanglish
+SPAM_BENCHMARK_SAMPLES = [
+    # English Keyboard Mash & Gibberish
+    "asdfghjkl zxcvbnm qwertyuiop lkjhgfds",
+    "bcdfghjklmnpqrstvwxyz bcdfghjklmn",
+    "poiuytrewq mnbvcxz lkjhgfdsa qazwsxedc",
+    # English Repetitive Chars & Flooding
+    "aaaaabbbbbcccccdddddeeeee testing repeated characters",
+    "help help help help help help help help help help",
+    "water water water water water water water water water",
+    # Fake / Test / Placeholder Submissions
+    "test 123 testing petition text sample data run",
+    "sample petition issue complaint for testing",
+    "lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod",
+    "foo bar hello world testing 123",
+    "1234567890 1234567890 1234567890",
+    # English Abuse & Threats
+    "fuck this government bastard officer will pay",
+    "kill all the corrupt officers bomb the government building",
+    "useless corrupt asshole officer should be fired",
+    # Hindi Abuse & Profanity (Devanagari & Transliterated)
+    "ye madarchod bhenchod corrupt log kaam nahi karte",
+    "चूतिया अधिकारी काम नहीं कर रहा है साला हरामी",
+    "मादरचोद सरकारी कर्मचारी पैसे खा रहे हैं",
+    "kutte ke bacche bhenchod sab chor hain yahan",
+    "kamina afsar sunta nahi hai harami",
+    # Tamil Abuse & Profanity (Tamil script & Tanglish)
+    "indha kena mairu thevidya pasanga vela seiyala",
+    "இந்த கூதி அதிகாரி வேலையே செய்ய மாட்டேங்குறான்",
+    "நாயே பேயே மசுரு புண்ட அதிகாரி லஞ்சம் வாங்குறான்",
+    "thevidya paiya kena madhiri pesuraan sunni",
+    "mairu vela seiraangala government officers",
+    "romba kevalamana punda officer lanjam kekraan",
+    # Short / Nonsense
+    "zzzzzzzzzzzzzzzzzzzzz",
+    "qqqqqqqqqqqqqqqqqqqqq",
+    "xxxx xxxxx xxxxx xxxxx",
+]
+
+
+def evaluate_spam_detection(clean_sample_texts: list[str]) -> dict[str, float | int]:
+    """Evaluate spam and abuse detection recall (catch rate) and false positive rate."""
+    backend_path = Path(__file__).resolve().parents[1]
+    if str(backend_path) not in sys.path:
+        sys.path.insert(0, str(backend_path))
+
+    try:
+        from app.ai.spam import detect_spam
+    except ImportError:
+        logger.warning("Could not import detect_spam from app.ai.spam; using fallback heuristic.")
+        def detect_spam(text: str) -> dict:
+            return {"is_spam": False, "is_abusive": False}
+
+    spam_results = [detect_spam(s) for s in SPAM_BENCHMARK_SAMPLES]
+    spam_detected = sum(1 for r in spam_results if r.get("is_spam") or r.get("is_abusive"))
+    spam_samples_count = len(SPAM_BENCHMARK_SAMPLES)
+    spam_catch_rate = round(spam_detected / max(spam_samples_count, 1), 4)
+
+    # Evaluate against legitimate clean petitions to check false positive rate
+    eval_clean = clean_sample_texts[:max(30, min(len(clean_sample_texts), 50))]
+    clean_results = [detect_spam(c) for c in eval_clean]
+    false_positives = sum(1 for r in clean_results if r.get("is_spam") or r.get("is_abusive"))
+    clean_samples_count = len(eval_clean)
+    false_positive_rate = round(false_positives / max(clean_samples_count, 1), 4)
+
+    total_eval = spam_samples_count + clean_samples_count
+    correct = spam_detected + (clean_samples_count - false_positives)
+    spam_accuracy = round(correct / max(total_eval, 1), 4)
+
+    return {
+        "spam_samples": spam_samples_count,
+        "clean_samples": clean_samples_count,
+        "spam_detected": spam_detected,
+        "false_positives": false_positives,
+        "spam_catch_rate": spam_catch_rate,
+        "spam_false_positive_rate": false_positive_rate,
+        "spam_accuracy": spam_accuracy,
+    }
+
 
 def run_evaluation(
     data_path: Path | None = None,
@@ -166,7 +245,10 @@ def run_evaluation(
     cm_lines.append("=" * 80)
     cm_text = "\n".join(cm_lines)
 
-    # 5. Build summary payload
+    # 5. Evaluate spam and abuse detection
+    spam_stats = evaluate_spam_detection(clean_sample_texts=train_texts + test_texts)
+
+    # 6. Build summary payload
     report_data = {
         "summary": {
             "total_dataset_samples": len(rows),
@@ -180,13 +262,15 @@ def run_evaluation(
             "f1_weighted": round(f1_w, 4),
             "f1_macro": round(f1_m, 4),
             "per_language_accuracy": per_language_acc,
+            "spam_metrics": spam_stats,
         },
+        "spam_metrics": spam_stats,
         "per_class_report": report_dict,
         "classes": classes,
         "confusion_matrix": cm.tolist(),
     }
 
-    # 6. Save JSON report to both directories
+    # 7. Save JSON report to both directories
     for target_dir in [output_dir, backend_reports]:
         (target_dir / "evaluation_report.json").write_text(
             json.dumps(report_data, indent=2, ensure_ascii=False),
@@ -194,7 +278,7 @@ def run_evaluation(
         )
         (target_dir / "confusion_matrix.txt").write_text(cm_text, encoding="utf-8")
 
-    # 7. Generate markdown summary
+    # 8. Generate markdown summary
     md_lines = [
         "# PetitionAI Model Evaluation Report",
         "",
@@ -207,6 +291,8 @@ def run_evaluation(
         f"| **Macro F1 Score** | {f1_m:.1%} |",
         f"| **Precision (Weighted)** | {prec_weighted:.1%} |",
         f"| **Recall (Weighted)** | {rec_weighted:.1%} |",
+        f"| **Spam Catch Rate** | **{spam_stats['spam_catch_rate']:.1%}** |",
+        f"| **Spam False Positive Rate** | {spam_stats['spam_false_positive_rate']:.1%} |",
         f"| **Total Labeled Petitions** | {len(rows)} |",
         f"| **Test Evaluation Split** | {len(test_texts)} ({test_size:.0%}) |",
         "",
@@ -215,7 +301,12 @@ def run_evaluation(
         "| Language | Accuracy | Test Samples | Status |",
         "|:---------|:--------:|:------------:|:-------|",
     ]
-    lang_names = {"en": "English", "hi": "Hindi", "ta": "Tamil"}
+    lang_names = {
+        "en": "English",
+        "hi": "Hindi",
+        "ta": "Tamil",
+        "tanglish": "Tanglish",
+    }
     for lang, lang_acc in sorted(per_language_acc.items()):
         samples = per_lang_results[lang]["total"]
         name = lang_names.get(lang, lang.upper())
@@ -223,6 +314,16 @@ def run_evaluation(
         md_lines.append(f"| {name} (`{lang}`) | {lang_acc:.1%} | {samples} | {status} |")
 
     md_lines += [
+        "",
+        "## Spam & Abuse Detection Performance",
+        "",
+        "| Metric | Score | Details |",
+        "|:-------|------:|:--------|",
+        f"| **Spam Catch Rate (Recall)** | **{spam_stats['spam_catch_rate']:.1%}** | Flags keyboard mash, repetition, abuse (EN/HI/TA/Tanglish) |",
+        f"| **False Positive Rate** | **{spam_stats['spam_false_positive_rate']:.1%}** | Legitimate citizen complaints incorrectly flagged |",
+        f"| **Spam Filter Accuracy** | **{spam_stats['spam_accuracy']:.1%}** | Overall discrimination accuracy |",
+        f"| **Spam Test Samples** | {spam_stats['spam_samples']} | Tested across English, Hindi, Tamil & Tanglish |",
+        f"| **Clean Validation Samples** | {spam_stats['clean_samples']} | Sampled from verified citizen petitions |",
         "",
         "## Per-Category Performance Breakdown",
         "",
@@ -266,6 +367,10 @@ def run_evaluation(
         name = lang_names.get(lang, lang.upper())
         bar = "#" * int(lang_acc * 20)
         print(f"    {name:<10} ({lang}): {bar:<20} {lang_acc:.1%}")
+    print("\n  Spam Detection Performance:")
+    print(f"    Catch Rate (Recall): {spam_stats['spam_catch_rate']:.1%}")
+    print(f"    False Positive Rate: {spam_stats['spam_false_positive_rate']:.1%}")
+    print(f"    Overall Accuracy   : {spam_stats['spam_accuracy']:.1%}")
     print("=" * 60 + "\n")
 
     return report_data

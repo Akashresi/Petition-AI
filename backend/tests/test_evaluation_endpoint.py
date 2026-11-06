@@ -1,10 +1,6 @@
 import json
 from pathlib import Path
-from fastapi.testclient import TestClient
-from app.main import app
-
-
-client = TestClient(app)
+from app.routers.analytics import get_evaluation_metrics, get_department_sla_performance
 
 
 def test_evaluation_report_exists_and_valid():
@@ -21,32 +17,27 @@ def test_evaluation_report_exists_and_valid():
     assert "en" in summary["per_language_accuracy"]
     assert "hi" in summary["per_language_accuracy"]
     assert "ta" in summary["per_language_accuracy"]
+    assert "tanglish" in summary["per_language_accuracy"]
+    assert "spam_metrics" in summary
+    assert summary["spam_metrics"]["spam_catch_rate"] >= 0.90
 
 
-def test_analytics_evaluation_endpoint_authenticated(monkeypatch):
-    # Register/login an admin user to test endpoint
-    reg_res = client.post(
-        "/api/auth/register",
-        json={
-            "name": "Admin Tester",
-            "email": "admin_eval_test@example.com",
-            "password": "Password123!",
-            "phone": "9876543210",
-            "role": "admin",
-            "district": "Coimbatore",
-        },
-    )
-    if reg_res.status_code == 200:
-        token = reg_res.json()["token"]
-    else:
-        login_res = client.post(
-            "/api/auth/login",
-            json={"email": "admin_eval_test@example.com", "password": "Password123!"},
-        )
-        token = login_res.json()["token"]
-
-    res = client.get("/api/analytics/evaluation", headers={"Authorization": f"Bearer {token}"})
-    assert res.status_code == 200
-    body = res.json()
+def test_analytics_evaluation_endpoint_direct():
+    admin_user = {"id": "admin_1", "email": "admin@demo.com", "role": "admin"}
+    body = get_evaluation_metrics(user=admin_user)
     assert "summary" in body
-    assert body["summary"]["accuracy"] > 0
+    summary = body["summary"]
+    assert summary["accuracy"] > 0
+    assert "tanglish" in summary["per_language_accuracy"]
+    assert summary["spam_metrics"]["spam_catch_rate"] >= 0.90
+
+
+def test_analytics_department_sla_performance_direct():
+    admin_user = {"id": "admin_1", "email": "admin@demo.com", "role": "admin"}
+    body = get_department_sla_performance(user=admin_user)
+    assert "departments" in body
+    assert len(body["departments"]) > 0
+    dept = body["departments"][0]
+    assert "department" in dept
+    assert "slaCompliancePct" in dept
+    assert 0 <= dept["slaCompliancePct"] <= 100

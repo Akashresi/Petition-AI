@@ -4,36 +4,49 @@
 
 | Metric | Score |
 |:-------|------:|
-| **Overall Accuracy** | **52.8%** |
-| **Weighted F1 Score** | **52.3%** |
-| **Macro F1 Score** | 51.0% |
-| **Precision (Weighted)** | 55.1% |
-| **Recall (Weighted)** | 52.8% |
-| **Total Labeled Petitions** | 431 |
-| **Test Evaluation Split** | 108 (25%) |
+| **Overall Accuracy** | **46.0%** |
+| **Weighted F1 Score** | **44.8%** |
+| **Macro F1 Score** | 41.7% |
+| **Precision (Weighted)** | 45.6% |
+| **Recall (Weighted)** | 46.0% |
+| **Spam Catch Rate** | **100.0%** |
+| **Spam False Positive Rate** | 0.0% |
+| **Total Labeled Petitions** | 451 |
+| **Test Evaluation Split** | 113 (25%) |
 
 ## Per-Language Accuracy
 
 | Language | Accuracy | Test Samples | Status |
 |:---------|:--------:|:------------:|:-------|
-| English (`en`) | 70.0% | 40 | PASSED |
-| Hindi (`hi`) | 38.9% | 36 | NEEDS_TUNING |
-| Tamil (`ta`) | 46.9% | 32 | NEEDS_TUNING |
+| English (`en`) | 57.5% | 40 | NEEDS_TUNING |
+| Hindi (`hi`) | 36.1% | 36 | NEEDS_TUNING |
+| Tamil (`ta`) | 44.4% | 18 | NEEDS_TUNING |
+| Tanglish (`tanglish`) | 42.1% | 19 | NEEDS_TUNING |
+
+## Spam & Abuse Detection Performance
+
+| Metric | Score | Details |
+|:-------|------:|:--------|
+| **Spam Catch Rate (Recall)** | **100.0%** | Flags keyboard mash, repetition, abuse (EN/HI/TA/Tanglish) |
+| **False Positive Rate** | **0.0%** | Legitimate citizen complaints incorrectly flagged |
+| **Spam Filter Accuracy** | **100.0%** | Overall discrimination accuracy |
+| **Spam Test Samples** | 28 | Tested across English, Hindi, Tamil & Tanglish |
+| **Clean Validation Samples** | 50 | Sampled from verified citizen petitions |
 
 ## Per-Category Performance Breakdown
 
 | Category | Precision | Recall | F1 Score | Support |
 |:---------|:---------:|:------:|:--------:|:-------:|
-| Building & Construction | 100.0% | 28.6% | 44.4% | 7 |
-| Education | 54.5% | 50.0% | 52.2% | 12 |
-| Electricity | 50.0% | 41.7% | 45.5% | 12 |
-| Healthcare | 76.9% | 90.9% | 83.3% | 11 |
-| Public Safety | 36.4% | 33.3% | 34.8% | 12 |
-| Public Transport | 75.0% | 81.8% | 78.3% | 11 |
-| Road & Infrastructure | 22.2% | 33.3% | 26.7% | 12 |
+| Building & Construction | 0.0% | 0.0% | 0.0% | 7 |
+| Education | 66.7% | 50.0% | 57.1% | 12 |
+| Electricity | 35.7% | 38.5% | 37.0% | 13 |
+| Healthcare | 72.7% | 66.7% | 69.6% | 12 |
+| Public Safety | 8.3% | 8.3% | 8.3% | 12 |
+| Public Transport | 88.9% | 66.7% | 76.2% | 12 |
+| Road & Infrastructure | 23.8% | 38.5% | 29.4% | 13 |
 | Sanitation | 20.0% | 14.3% | 16.7% | 7 |
-| Waste Management | 53.8% | 58.3% | 56.0% | 12 |
-| Water Supply | 69.2% | 75.0% | 72.0% | 12 |
+| Waste Management | 54.5% | 50.0% | 52.2% | 12 |
+| Water Supply | 57.1% | 92.3% | 70.6% | 13 |
 
 ## Confusion Matrix
 
@@ -42,16 +55,16 @@ PetitionAI Classification Confusion Matrix
 ================================================================================
 True \ Pred               Buildin  Educati  Electri  Healthc  Public   Public   Road &   Sanitat  Waste M  Water S
 --------------------------------------------------------------------------------
-Building & Construction         2        0        1        0        0        0        3        0        1        0
-Education                       0        6        3        0        1        1        0        1        0        0
-Electricity                     0        0        5        1        3        0        3        0        0        0
-Healthcare                      0        0        0       10        0        0        1        0        0        0
-Public Safety                   0        2        0        0        4        1        5        0        0        0
-Public Transport                0        1        1        0        0        9        0        0        0        0
-Road & Infrastructure           0        0        0        1        2        0        4        1        3        1
-Sanitation                      0        2        0        0        1        0        0        1        2        1
-Waste Management                0        0        0        1        0        0        1        1        7        2
-Water Supply                    0        0        0        0        0        1        1        1        0        9
+Building & Construction         0        0        1        0        1        0        4        0        1        0
+Education                       0        6        2        0        1        0        1        1        0        1
+Electricity                     0        0        5        1        3        0        4        0        0        0
+Healthcare                      0        0        0        8        1        0        1        0        1        1
+Public Safety                   0        1        4        0        1        1        3        0        2        0
+Public Transport                0        1        0        1        1        8        1        0        0        0
+Road & Infrastructure           0        1        1        0        3        0        5        1        1        1
+Sanitation                      0        0        0        0        1        0        1        1        0        4
+Waste Management                0        0        1        1        0        0        1        1        6        2
+Water Supply                    0        0        0        0        0        0        0        1        0       12
 ================================================================================
 ```
 
