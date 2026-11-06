@@ -258,7 +258,7 @@ _scheduler: BackgroundScheduler | None = None
 def get_scheduler() -> BackgroundScheduler:
     global _scheduler
     if _scheduler is None:
-        _scheduler = BackgroundScheduler(timezone="UTC")
+        _scheduler = BackgroundScheduler(timezone="UTC", daemon=True)
         _scheduler.add_job(
             check_sla_breaches_and_reminders,
             trigger="interval",

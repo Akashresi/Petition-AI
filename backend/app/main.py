@@ -33,14 +33,18 @@ app.include_router(webhooks.router)
 
 @app.on_event("startup")
 def on_startup() -> None:
+    import os
+    import sys
+    is_testing = "pytest" in sys.modules or bool(os.getenv("PYTEST_CURRENT_TEST"))
     # Demo credentials and seed complaints are only populated in local development
-    if settings.ENV == "development" or settings.DEBUG:
+    if (settings.ENV == "development" or settings.DEBUG) and not is_testing:
         seed_all()
-    try:
-        from app.services.scheduler import start_scheduler
-        start_scheduler()
-    except Exception:
-        pass
+    if not is_testing:
+        try:
+            from app.services.scheduler import start_scheduler
+            start_scheduler()
+        except Exception:
+            pass
 
 
 @app.on_event("shutdown")

@@ -53,7 +53,7 @@ _ABUSIVE_PATTERNS = [
     r"\bkill\s+(you|them|all|officer)\b",
     r"\bbomb\s+(the|government|office|building)\b",
     r"\bterrorist\b",
-    # Hindi profanity
+    # Hindi profanity (transliterated & Devanagari)
     r"\bmadarchod\b",
     r"\bbhenchod\b",
     r"\bchutiya\w*\b",
@@ -61,13 +61,23 @@ _ABUSIVE_PATTERNS = [
     r"\bharami\b",
     r"\bkutte\s+ke\s+bacche\b",
     r"\bkamina\b",
-    # Tamil profanity
+    r"मादरचोद",
+    r"भोसड़ी",
+    r"चूतिया",
+    r"हरामी",
+    r"कुत्ते\s+के\s+बच्चे",
+    # Tamil profanity (transliterated & Tamil script)
     r"\bmairu\b",
     r"\bkoothi\b",
     r"\bpunda\w*\b",
     r"\bsunni\b",
     r"\bthevidya\w*\b",
     r"\bkena\b",
+    r"மயிரு",
+    r"கூதி",
+    r"புண்ட",
+    r"தேவிடியா",
+    r"சுன்னி",
 ]
 
 
@@ -79,89 +89,116 @@ def _count_real_words(text: str) -> int:
 def detect_spam(text: str, *, min_length: int = 15, threshold: float = 0.50) -> dict[str, Any]:
     """
     Score a petition text for spam / abuse.
+    If check errors, returns safe clean result so petition proceeds normally.
 
-    spam_score: 0.0 (clean) → 1.0 (definitely spam)
-    abuse_score: 0.0 → 1.0
+    Output fields conform to Task 4.2 & Rule 5:
+      - spam_score: float (0.0 to 1.0)
+      - reason: short plain language reason
+      - confidence: float confidence score (0.0 to 1.0)
     """
-    score = 0.0
-    reasons: list[str] = []
+    try:
+        score = 0.0
+        reasons: list[str] = []
 
-    stripped = text.strip()
-    lower = stripped.lower()
-    words = re.findall(r"\w+", lower)
+        stripped = text.strip()
+        lower = stripped.lower()
+        words = re.findall(r"\w+", lower)
 
-    # 1. Length check
-    if len(stripped) < min_length:
-        score += 0.5
-        reasons.append(f"Too short ({len(stripped)} chars < {min_length})")
+        # 1. Length check
+        if len(stripped) < min_length:
+            score += 0.5
+            reasons.append(f"Too short ({len(stripped)} chars < {min_length})")
 
-    # 2. Real word count
-    real_words = _count_real_words(stripped)
-    if real_words < 3:
-        score += 0.45
-        reasons.append("Too few real words")
+        # 2. Real word count
+        real_words = _count_real_words(stripped)
+        if real_words < 3:
+            score += 0.45
+            reasons.append("Too few real words")
 
-    # 3. Repeated word spam (e.g. "help help help help help")
-    if len(words) >= 5:
-        unique_words = set(words)
-        unique_ratio = len(unique_words) / len(words)
-        if unique_ratio < 0.30:
-            score += 0.55
-            most_repeated = max(unique_words, key=words.count)
-            reasons.append(f"Repetitive word flooding ('{most_repeated}' repeated {words.count(most_repeated)} times)")
+        # 3. Repeated word spam (e.g. "help help help help help" or "தண்ணீர் தண்ணீர் தண்ணீர்")
+        if len(words) >= 5:
+            unique_words = set(words)
+            unique_ratio = len(unique_words) / len(words)
+            if unique_ratio < 0.30:
+                score += 0.55
+                most_repeated = max(unique_words, key=words.count)
+                reasons.append(f"Repetitive word flooding ('{most_repeated}' repeated {words.count(most_repeated)} times)")
 
-    # 4. Keyboard mash & consonant clusters (e.g. asdfghjkl, bcdfghjkl)
-    if _KEYBOARD_MASH_RE.search(lower):
-        score += 0.60
-        reasons.append("Keyboard mash sequence detected")
-    elif _CONSONANT_CLUSTER_RE.search(lower):
-        score += 0.50
-        reasons.append("Gibberish consonant clusters detected")
+        # 4. Keyboard mash & consonant clusters (e.g. asdfghjkl, bcdfghjkl)
+        if _KEYBOARD_MASH_RE.search(lower):
+            score += 0.60
+            reasons.append("Keyboard mash sequence detected")
+        elif _CONSONANT_CLUSTER_RE.search(lower):
+            score += 0.50
+            reasons.append("Gibberish consonant clusters detected")
 
-    # 5. Repetitive character sequences (e.g. aaaaaa, !!!!!)
-    if _REPEAT_CHAR_RE.search(lower):
-        score += 0.40
-        reasons.append("Repetitive character sequence detected")
+        # 5. Repetitive character sequences (e.g. aaaaaa, !!!!!)
+        if _REPEAT_CHAR_RE.search(lower):
+            score += 0.40
+            reasons.append("Repetitive character sequence detected")
 
-    # 6. Test / fake / placeholder patterns
-    for pat in _TEST_PATTERNS:
-        if re.search(pat, lower):
-            score += 0.65
-            reasons.append("Test or placeholder submission pattern")
-            break
+        # 6. Test / fake / placeholder patterns
+        for pat in _TEST_PATTERNS:
+            if re.search(pat, lower):
+                score += 0.65
+                reasons.append("Test or placeholder submission pattern")
+                break
 
-    # 7. Non-alphabetic ratio (e.g. only punctuation / symbols)
-    alpha_chars = [c for c in stripped if c.isalpha()]
-    alpha_ratio = len(alpha_chars) / max(len(stripped), 1)
-    if alpha_ratio < 0.35 and len(stripped) > 5:
-        score += 0.50
-        reasons.append("High non-alphabetic character ratio (mostly punctuation/symbols)")
+        # 7. Non-alphabetic ratio (e.g. only punctuation / symbols)
+        alpha_chars = [c for c in stripped if c.isalpha()]
+        alpha_ratio = len(alpha_chars) / max(len(stripped), 1)
+        if alpha_ratio < 0.35 and len(stripped) > 5:
+            score += 0.50
+            reasons.append("High non-alphabetic character ratio (mostly punctuation/symbols)")
 
-    # 8. Excessive uppercase (SHOUTING / automated bot)
-    if alpha_chars and len(alpha_chars) > 15 and sum(c.isupper() for c in stripped if c.isalpha()) / len(alpha_chars) > 0.90:
-        score += 0.25
-        reasons.append("Excessive uppercase shouting")
+        # 8. Excessive uppercase (SHOUTING / automated bot)
+        if alpha_chars and len(alpha_chars) > 15 and sum(c.isupper() for c in stripped if c.isalpha()) / len(alpha_chars) > 0.90:
+            score += 0.25
+            reasons.append("Excessive uppercase shouting")
 
-    spam_score = min(score, 1.0)
-    is_spam = spam_score >= threshold
+        spam_score = min(score, 1.0)
+        is_spam = spam_score >= threshold
 
-    # ── Abuse detection (independent) ────────────────────────────────────────
-    abuse_score = 0.0
-    abuse_reasons: list[str] = []
-    for pat in _ABUSIVE_PATTERNS:
-        match = re.search(pat, lower)
-        if match:
-            abuse_score = min(abuse_score + 0.6, 1.0)
-            abuse_reasons.append(f"Abusive keyword/phrase: '{match.group()}'")
+        # ── Abuse detection (independent) ────────────────────────────────────────
+        abuse_score = 0.0
+        abuse_reasons: list[str] = []
+        for pat in _ABUSIVE_PATTERNS:
+            match = re.search(pat, lower)
+            if match:
+                abuse_score = min(abuse_score + 0.6, 1.0)
+                abuse_reasons.append(f"Abusive content detected: '{match.group()}'")
 
-    is_abusive = abuse_score >= 0.5
+        is_abusive = abuse_score >= 0.5
 
-    return {
-        "is_spam": is_spam,
-        "is_abusive": is_abusive,
-        "spam_score": round(spam_score, 3),
-        "abuse_score": round(abuse_score, 3),
-        "spam_reason": "; ".join(reasons) if reasons else None,
-        "abuse_reason": "; ".join(abuse_reasons) if abuse_reasons else None,
-        "real_word_count": real_words,
-    }
+        if is_spam or is_abusive:
+            combined_reasons = reasons + abuse_reasons
+            plain_reason = combined_reasons[0] if combined_reasons else "Potential spam or repetitive content"
+            confidence = round(max(spam_score, abuse_score, 0.85), 2)
+        else:
+            plain_reason = "Valid citizen complaint content"
+            confidence = round(max(1.0 - spam_score, 0.90), 2)
+
+        return {
+            "is_spam": is_spam,
+            "is_abusive": is_abusive,
+            "spam_score": round(spam_score, 3),
+            "abuse_score": round(abuse_score, 3),
+            "reason": plain_reason,
+            "confidence": confidence,
+            "spam_reason": "; ".join(reasons) if reasons else None,
+            "abuse_reason": "; ".join(abuse_reasons) if abuse_reasons else None,
+            "real_word_count": real_words,
+        }
+    except Exception as exc:
+        # Task 4.4: If check fails or errors, proceed normally
+        return {
+            "is_spam": False,
+            "is_abusive": False,
+            "spam_score": 0.0,
+            "abuse_score": 0.0,
+            "reason": "Spam check bypassed safely",
+            "confidence": 0.50,
+            "spam_reason": None,
+            "abuse_reason": None,
+            "real_word_count": len(text.split()),
+        }

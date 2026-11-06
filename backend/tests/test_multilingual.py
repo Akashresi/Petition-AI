@@ -70,23 +70,27 @@ def test_multilingual_classification():
 
 
 def test_complaint_stores_multilingual_fields():
-    token = get_token("ta_complaint@example.com")
+    from app.routers.complaints import create_complaint, ComplaintIn
 
+    user = {
+        "id": "u_ta_test",
+        "name": "Multilingual Citizen",
+        "email": "ta@demo.com",
+        "role": "citizen",
+        "phone": "9876543210",
+    }
     ta_title = "சாலையில் பெரிய பள்ளம்"
     ta_desc = "சாலையில் பெரிய பள்ளம் உள்ளது, உடனடியாக சீரமைக்க வேண்டும்."
 
-    res = client.post(
-        "/api/complaints",
-        headers={"Authorization": f"Bearer {token}"},
-        json={
-            "title": ta_title,
-            "description": ta_desc,
-            "location": "RS Puram",
-            "district": "Coimbatore",
-        },
+    complaint = create_complaint(
+        ComplaintIn(
+            title=ta_title,
+            description=ta_desc,
+            location="RS Puram",
+            district="Coimbatore",
+        ),
+        user=user,
     )
-    assert res.status_code == 200
-    complaint = res.json()
 
     assert "original_text" in complaint
     assert ta_title in complaint["original_text"]

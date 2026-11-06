@@ -101,10 +101,19 @@ def _send_via_twilio(to_phone: str, message: str) -> bool:
         return False
 
 
-def send_complaint_sms(to_phone: str, petition_id: str, status: str) -> bool:
-    message = (
-        f"PetitionAI: Your petition {petition_id} status is now "
-        f"'{status.replace('_', ' ').title()}'. Track with your Petition ID. "
-        f"- PetitionAI"
-    )
+def send_complaint_sms(to_phone: str, petition_id: str, status: str, lang: str = "en") -> bool:
+    """Send SMS notification to citizen in their language (Tamil, Hindi, English)."""
+    normalized_lang = (lang or "en").lower()[:2]
+    status_clean = status.replace('_', ' ').title()
+
+    if normalized_lang == "ta":
+        message = f"PetitionAI: உங்கள் மனு {petition_id} தற்போதைய நிலை: {status_clean}. மனு எண் மூலம் நிலையை அறியலாம்."
+    elif normalized_lang == "hi":
+        message = f"PetitionAI: आपकी शिकायत {petition_id} की स्थिति: {status_clean}। शिकायत संख्या से स्थिति ट्रैक करें।"
+    else:
+        message = (
+            f"PetitionAI: Your petition {petition_id} status is now "
+            f"'{status_clean}'. Track with your Petition ID. "
+            f"- PetitionAI"
+        )
     return send_sms(to_phone, message)

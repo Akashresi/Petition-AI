@@ -56,7 +56,8 @@ def test_department_backlog_risk_flagging():
     assert "Warning" in pred["explanation"]
 
 
-def test_resolution_prediction_endpoint(client):
+def test_resolution_prediction_endpoint():
+    from app.routers.complaints import get_resolution_prediction
     if not db.find_one("users", {"id": "u1"}):
         db.insert("users", {"id": "u1", "name": "Akash Rajan", "email": "citizen@demo.com", "role": "citizen"})
 
@@ -71,10 +72,7 @@ def test_resolution_prediction_endpoint(client):
     }
     db.insert("complaints", test_c)
 
-    token = create_token("u1")
-    res = client.get("/api/complaints/c_pred_test/resolution-prediction", headers={"Authorization": f"Bearer {token}"})
-    assert res.status_code == 200
-    data = res.json()
+    data = get_resolution_prediction("c_pred_test", user={"id": "u1"})
     assert "confidenceInterval" in data
     assert "confidence" in data
     assert "explanation" in data

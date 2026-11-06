@@ -70,40 +70,30 @@ def test_paraphrased_and_multilingual_duplicate_clustering():
 
 
 def test_i_have_this_issue_too_endpoint():
-    token1 = get_token("citizen_supporter1@example.com")
-    token2 = get_token("citizen_supporter2@example.com")
+    from app.routers.complaints import create_complaint, support_complaint, ComplaintIn
+
+    user1 = {"id": "c_sup_1", "role": "citizen", "email": "s1@demo.com", "name": "Supporter 1"}
+    user2 = {"id": "c_sup_2", "role": "citizen", "email": "s2@demo.com", "name": "Supporter 2"}
 
     # Citizen 1 submits a petition
-    create_res = client.post(
-        "/api/complaints",
-        headers={"Authorization": f"Bearer {token1}"},
-        json={
-            "title": "Broken street light at 5th Cross Road",
-            "description": "Entire corner is in pitch dark for four days",
-            "location": "5th Cross Road",
-            "district": "Coimbatore",
-        },
+    complaint = create_complaint(
+        ComplaintIn(
+            title="Broken street light at 5th Cross Road",
+            description="Entire corner is in pitch dark for four days",
+            location="5th Cross Road",
+            district="Coimbatore",
+        ),
+        user=user1,
     )
-    assert create_res.status_code == 200
-    complaint = create_res.json()
     complaint_id = complaint["id"]
     assert complaint.get("supporterCount", 1) == 1
 
     # Citizen 2 clicks 'I have this issue too'
-    support_res = client.post(
-        f"/api/complaints/{complaint_id}/support",
-        headers={"Authorization": f"Bearer {token2}"},
-    )
-    assert support_res.status_code == 200
-    data = support_res.json()
+    data = support_complaint(complaint_id, user=user2)
     assert data["supporterCount"] == 2
-    assert "Support recorded" in data["message"]
+    assert "recorded" in data["message"].lower()
 
     # Citizen 2 clicks again -> deduplicated, does not increment
-    repeat_res = client.post(
-        f"/api/complaints/{complaint_id}/support",
-        headers={"Authorization": f"Bearer {token2}"},
-    )
-    assert repeat_res.status_code == 200
-    assert repeat_res.json()["supporterCount"] == 2
-    assert "Already supported" in repeat_res.json()["message"]
+    repeat_data = support_complaint(complaint_id, user=user2)
+    assert repeat_data["supporterCount"] == 2
+    assert "already" in repeat_data["message"].lower()

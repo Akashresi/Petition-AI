@@ -105,7 +105,11 @@ def list_complaints(
         query["submittedBy"] = submittedBy
     if assignedOfficer:
         query["assignedOfficer"] = assignedOfficer
-    return [_public_complaint(c) for c in db.find("complaints", query, sort=[("submittedAt", -1)])]
+    all_complaints = db.find("complaints", query, sort=[("submittedAt", -1)])
+    # Task 4.3: Officer queue excludes complaints pending human review or flagged as spam
+    if user.get("role") == "officer":
+        all_complaints = [c for c in all_complaints if not c.get("human_review_required") and not c.get("is_spam")]
+    return [_public_complaint(c) for c in all_complaints]
 
 
 @router.post("")
@@ -241,9 +245,10 @@ def create_complaint(req: ComplaintIn, user: dict = Depends(get_current_user)) -
         },
     })
 
-    # Notify user via email + SMS (best-effort)
-    send_complaint_notification(user.get("email", ""), complaint["petitionId"], complaint["title"], complaint["status"])
-    send_complaint_sms(user.get("phone", ""), complaint["petitionId"], complaint["status"])
+    # Notify user via email + SMS in citizen's detected language (Task 2.4)
+    pet_lang = complaint.get("detected_language", "en")
+    send_complaint_notification(user.get("email", ""), complaint["petitionId"], complaint["title"], complaint["status"], lang=pet_lang)
+    send_complaint_sms(user.get("phone", ""), complaint["petitionId"], complaint["status"], lang=pet_lang)
 
     db.insert("notifications", {
         "id": f"n_{int(datetime.now().timestamp() * 1000)}",
@@ -496,6 +501,7 @@ def correct_complaint(
         "category": req.category,
         "assignedDepartment": req.department,
         "priority": req.priority,
+        "status": "assigned",
         "human_review_required": False,
         "statusHistory": history,
     }
@@ -510,12 +516,195 @@ def correct_complaint(
     db.update("complaints", {"id": c["id"]}, updates)
     updated = db.find_one("complaints", {"id": c["id"]})
 
+    # Task 5.5: Notify citizen in their language upon correction and assignment
+    petitioner = db.find_one("users", {"id": c.get("submittedBy")})
+    if petitioner:
+        lang = c.get("detected_language", "en")
+        send_complaint_notification(petitioner.get("email", ""), c.get("petitionId", ""), c.get("title", ""), "assigned", lang=lang)
+        send_complaint_sms(petitioner.get("phone", ""), c.get("petitionId", ""), "assigned", lang=lang)
+
     return {
         "message": "Petition successfully corrected and verified",
         "correction": _clean_doc(correction_record),
         "auditLog": _clean_doc(audit_record),
         "complaint": _public_complaint(updated),
     }
+
+
+@router.post("/{complaint_id}/approve")
+def approve_complaint(complaint_id: str, user: dict = Depends(get_current_user)) -> dict:
+    """One-click 'Approve as is' action: moves petition to officer queue and notifies citizen."""
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin permission required to approve petitions")
+
+    c = db.find_one("complaints", {"id": complaint_id}) or db.find_one("complaints", {"petitionId": complaint_id})
+    if not c:
+        raise HTTPException(status_code=404, detail="Complaint not found")
+
+    now = datetime.now().isoformat()
+    history = list(c.get("statusHistory", []))
+    history.append({
+        "status": "assigned",
+        "timestamp": now,
+        "note": f"Petition approved as-is by admin reviewer ({user.get('name')}) and routed to officer queue.",
+        "updatedBy": f"Admin ({user.get('name')})",
+    })
+
+    updates = {
+        "status": "assigned",
+        "human_review_required": False,
+        "is_spam": False,
+        "statusHistory": history,
+    }
+    if "aiAnalysis" in c and isinstance(c["aiAnalysis"], dict):
+        ai_data = dict(c["aiAnalysis"])
+        ai_data["human_review_required"] = False
+        updates["aiAnalysis"] = ai_data
+
+    db.update("complaints", {"id": c["id"]}, updates)
+
+    # Save to corrections collection for audit/retraining
+    corr_record = {
+        "id": f"corr_{int(datetime.now().timestamp() * 1000)}",
+        "complaintId": c["id"],
+        "petitionId": c.get("petitionId"),
+        "correctedBy": user.get("id"),
+        "correctedByName": user.get("name"),
+        "correctedAt": now,
+        "approved_as_is": True,
+        "before": {"category": c.get("category"), "department": c.get("assignedDepartment"), "priority": c.get("priority")},
+        "after": {"category": c.get("category"), "department": c.get("assignedDepartment"), "priority": c.get("priority")},
+        "note": "Approved as-is by reviewer",
+    }
+    db.insert("corrections", corr_record)
+
+    # Save to audit log
+    audit_record = {
+        "id": f"audit_{int(datetime.now().timestamp() * 1000)}",
+        "action": "admin_approve",
+        "entityType": "complaint",
+        "entityId": c["id"],
+        "petitionId": c.get("petitionId"),
+        "performedBy": user.get("id"),
+        "performedByName": user.get("name"),
+        "timestamp": now,
+        "details": {"action": "approve_as_is", "status": "assigned"},
+    }
+    db.insert("audit_logs", audit_record)
+
+    # Task 5.5: Localized citizen notification
+    petitioner = db.find_one("users", {"id": c.get("submittedBy")})
+    if petitioner:
+        lang = c.get("detected_language", "en")
+        send_complaint_notification(petitioner.get("email", ""), c.get("petitionId", ""), c.get("title", ""), "assigned", lang=lang)
+        send_complaint_sms(petitioner.get("phone", ""), c.get("petitionId", ""), "assigned", lang=lang)
+
+    updated = db.find_one("complaints", {"id": c["id"]})
+    return {"message": "Petition approved and routed to officer queue", "complaint": _public_complaint(updated)}
+
+
+class SpamMarkIn(BaseModel):
+    reason: Optional[str] = "Identified as spam/gibberish by administrator"
+
+
+@router.post("/{complaint_id}/mark-spam")
+def mark_complaint_as_spam(
+    complaint_id: str,
+    req: Optional[SpamMarkIn] = None,
+    user: dict = Depends(get_current_user),
+) -> dict:
+    """One-click 'Mark as spam' action: archives petition without officer dispatch."""
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin permission required")
+
+    c = db.find_one("complaints", {"id": complaint_id}) or db.find_one("complaints", {"petitionId": complaint_id})
+    if not c:
+        raise HTTPException(status_code=404, detail="Complaint not found")
+
+    now = datetime.now().isoformat()
+    reason_note = req.reason if req and req.reason else "Marked as spam by admin reviewer"
+
+    history = list(c.get("statusHistory", []))
+    history.append({
+        "status": "closed",
+        "timestamp": now,
+        "note": f"Admin review: {reason_note}",
+        "updatedBy": f"Admin ({user.get('name')})",
+    })
+
+    updates = {
+        "status": "closed",
+        "is_spam": True,
+        "human_review_required": False,
+        "statusHistory": history,
+    }
+    db.update("complaints", {"id": c["id"]}, updates)
+
+    db.insert("audit_logs", {
+        "id": f"audit_{int(datetime.now().timestamp() * 1000)}",
+        "action": "admin_mark_spam",
+        "entityType": "complaint",
+        "entityId": c["id"],
+        "petitionId": c.get("petitionId"),
+        "performedBy": user.get("id"),
+        "performedByName": user.get("name"),
+        "timestamp": now,
+        "details": {"action": "mark_spam", "reason": reason_note},
+    })
+
+    updated = db.find_one("complaints", {"id": c["id"]})
+    return {"message": "Petition marked as spam and archived", "complaint": _public_complaint(updated)}
+
+
+class RequestDetailsIn(BaseModel):
+    note: str = "Please provide additional location landmarks or photos."
+
+
+@router.post("/{complaint_id}/request-details")
+def request_citizen_details(
+    complaint_id: str,
+    req: RequestDetailsIn,
+    user: dict = Depends(get_current_user),
+) -> dict:
+    """One-click 'Ask citizen for more details' action: notifies citizen and updates status history."""
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin permission required")
+
+    c = db.find_one("complaints", {"id": complaint_id}) or db.find_one("complaints", {"petitionId": complaint_id})
+    if not c:
+        raise HTTPException(status_code=404, detail="Complaint not found")
+
+    now = datetime.now().isoformat()
+    history = list(c.get("statusHistory", []))
+    history.append({
+        "status": c.get("status", "under_review"),
+        "timestamp": now,
+        "note": f"Admin requested additional citizen details: {req.note}",
+        "updatedBy": f"Admin ({user.get('name')})",
+    })
+
+    db.update("complaints", {"id": c["id"]}, {"statusHistory": history})
+
+    db.insert("audit_logs", {
+        "id": f"audit_{int(datetime.now().timestamp() * 1000)}",
+        "action": "admin_request_details",
+        "entityType": "complaint",
+        "entityId": c["id"],
+        "petitionId": c.get("petitionId"),
+        "performedBy": user.get("id"),
+        "performedByName": user.get("name"),
+        "timestamp": now,
+        "details": {"action": "request_details", "note": req.note},
+    })
+
+    petitioner = db.find_one("users", {"id": c.get("submittedBy")})
+    if petitioner:
+        lang = c.get("detected_language", "en")
+        msg = f"PetitionAI: Additional information requested for petition {c.get('petitionId')}: {req.note}"
+        send_sms(petitioner.get("phone", ""), msg)
+
+    updated = db.find_one("complaints", {"id": c["id"]})
+    return {"message": "Details requested from citizen", "complaint": _public_complaint(updated)}
 
 
 @router.get("/{complaint_id}/corrections")
