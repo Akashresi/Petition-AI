@@ -89,3 +89,4 @@
 | **Cognitive Simplicity** | Max 1 primary button per screen, 4-step wizard with "Step X of 4" | Verified |
 | **Multilingual** | Native scripts (தமிழ், हिन्दी, English), modular locales | Verified |
 | **Voice / Speech** | Speech recognition for input, SpeechSynthesis for TTS | Verified |
+

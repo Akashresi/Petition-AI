@@ -64,3 +64,4 @@ export function isSpeaking(): boolean {
   }
   return false;
 }
+
