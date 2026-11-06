@@ -7,13 +7,14 @@ import {
   ArrowRight, 
   Sparkles, 
   History, 
-  Building2, 
-  Tag, 
-  Flame, 
   Check, 
-  Clock,
-  Filter,
-  Search
+  Clock, 
+  Search,
+  Trash2,
+  HelpCircle,
+  Languages,
+  Send,
+  X
 } from "lucide-react";
 import { toast } from "sonner";
 import { useComplaints } from "@/hooks/useComplaints";
@@ -47,6 +48,7 @@ interface CorrectionRecord {
   before: { category: string; department: string; priority: string };
   after: { category: string; department: string; priority: string };
   note?: string;
+  approved_as_is?: boolean;
 }
 
 interface AuditLog {
@@ -71,6 +73,7 @@ interface AuditLog {
     explanation?: string;
     human_review_required?: boolean;
     note?: string;
+    reason?: string;
   };
 }
 
@@ -87,6 +90,12 @@ export default function AdminReviewQueue() {
   // Form state per petition: petitionId -> { category, department, priority, note }
   const [editStates, setEditStates] = useState<Record<string, { category: string; department: string; priority: Priority; note: string }>>({});
   const [submittingId, setSubmittingId] = useState<string | null>(null);
+
+  // Modal / inline prompts for Request Details or Mark Spam
+  const [detailModalId, setDetailModalId] = useState<string | null>(null);
+  const [detailNote, setDetailNote] = useState("Please provide additional location landmarks or photos.");
+  const [spamModalId, setSpamModalId] = useState<string | null>(null);
+  const [spamReason, setSpamReason] = useState("Identified as spam or test content by administrator.");
 
   const filteredAuditLogs = useMemo(() => {
     return auditLogs.filter(log => {
@@ -174,6 +183,44 @@ export default function AdminReviewQueue() {
     }));
   }
 
+  // Action 1: Approve as is
+  async function handleApproveAsIs(petition: Complaint) {
+    setSubmittingId(petition.id);
+    try {
+      const user = getStoredUser();
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (user?.token) headers["Authorization"] = `Bearer ${user.token}`;
+
+      const res = await fetch(`/api/complaints/${petition.id}/approve`, {
+        method: "POST",
+        headers,
+      });
+
+      if (res.ok) {
+        toast.success(`Petition ${petition.petitionId} approved as-is!`, {
+          description: "Routed to officer queue. Citizen notified in their language.",
+        });
+        updateComplaint(petition.id, {
+          status: "assigned",
+          human_review_required: false,
+        });
+        setReviewPetitions(prev => prev.filter(p => p.id !== petition.id));
+      } else {
+        throw new Error(`Server returned ${res.status}`);
+      }
+    } catch {
+      updateComplaint(petition.id, {
+        status: "assigned",
+        human_review_required: false,
+      });
+      toast.success(`Petition ${petition.petitionId} approved as-is locally!`);
+      setReviewPetitions(prev => prev.filter(p => p.id !== petition.id));
+    } finally {
+      setSubmittingId(null);
+    }
+  }
+
+  // Action 2: Correct & dispatch
   async function handleApplyCorrection(petition: Complaint) {
     const edit = editStates[petition.id] || {
       category: petition.category,
@@ -202,7 +249,7 @@ export default function AdminReviewQueue() {
       if (res.ok) {
         const data = await res.json();
         toast.success(`Petition ${petition.petitionId} corrected & verified!`, {
-          description: `Routed to ${edit.department} as ${edit.category} (${edit.priority.toUpperCase()}). Audit record saved.`,
+          description: `Routed to ${edit.department} as ${edit.category} (${edit.priority.toUpperCase()}).`,
         });
 
         if (data.correction) {
@@ -212,30 +259,97 @@ export default function AdminReviewQueue() {
           setAuditLogs(prev => [data.auditLog, ...prev]);
         }
 
-        // Update local complaint state
         updateComplaint(petition.id, {
           category: edit.category,
           assignedDepartment: edit.department,
           priority: edit.priority,
+          status: "assigned",
           human_review_required: false,
         });
 
-        // Remove from pending reviews
         setReviewPetitions(prev => prev.filter(p => p.id !== petition.id));
       } else {
         throw new Error(`Server returned ${res.status}`);
       }
-    } catch (err) {
-      console.warn("Backend correction API failed, applying locally:", err);
+    } catch {
       updateComplaint(petition.id, {
         category: edit.category,
         assignedDepartment: edit.department,
         priority: edit.priority,
+        status: "assigned",
         human_review_required: false,
       });
-
       toast.success(`Petition ${petition.petitionId} corrected locally!`);
       setReviewPetitions(prev => prev.filter(p => p.id !== petition.id));
+    } finally {
+      setSubmittingId(null);
+    }
+  }
+
+  // Action 3: Mark as spam
+  async function handleMarkSpam(petition: Complaint) {
+    setSubmittingId(petition.id);
+    try {
+      const user = getStoredUser();
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (user?.token) headers["Authorization"] = `Bearer ${user.token}`;
+
+      const res = await fetch(`/api/complaints/${petition.id}/mark-spam`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ reason: spamReason }),
+      });
+
+      if (res.ok) {
+        toast.info(`Petition ${petition.petitionId} marked as spam and archived.`, {
+          description: "Excluded from officer queue and saved to audit log.",
+        });
+        updateComplaint(petition.id, {
+          status: "closed",
+          human_review_required: false,
+        });
+        setReviewPetitions(prev => prev.filter(p => p.id !== petition.id));
+      } else {
+        throw new Error(`Server returned ${res.status}`);
+      }
+    } catch {
+      updateComplaint(petition.id, {
+        status: "closed",
+        human_review_required: false,
+      });
+      toast.info(`Petition ${petition.petitionId} marked as spam locally.`);
+      setReviewPetitions(prev => prev.filter(p => p.id !== petition.id));
+    } finally {
+      setSubmittingId(null);
+      setSpamModalId(null);
+    }
+  }
+
+  // Action 4: Ask citizen for more details
+  async function handleRequestDetails(petition: Complaint) {
+    setSubmittingId(petition.id);
+    try {
+      const user = getStoredUser();
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (user?.token) headers["Authorization"] = `Bearer ${user.token}`;
+
+      const res = await fetch(`/api/complaints/${petition.id}/request-details`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ note: detailNote }),
+      });
+
+      if (res.ok) {
+        toast.success(`Additional details requested for ${petition.petitionId}!`, {
+          description: "Notification and SMS sent to citizen.",
+        });
+        setDetailModalId(null);
+      } else {
+        throw new Error(`Server returned ${res.status}`);
+      }
+    } catch {
+      toast.success(`Details request logged locally for ${petition.petitionId}.`);
+      setDetailModalId(null);
     } finally {
       setSubmittingId(null);
     }
@@ -315,13 +429,15 @@ export default function AdminReviewQueue() {
                   const ai = petition.aiAnalysis;
                   const reviewReasons = ai?.review_reasons || petition.review_reasons || [];
                   const isSpam = Boolean(ai?.is_spam);
+                  const isNonEnglish = petition.detected_language && petition.detected_language !== "en";
+                  const langName = petition.language_name || (petition.detected_language === "ta" ? "Tamil (தமிழ்)" : petition.detected_language === "hi" ? "Hindi (हिन्दी)" : "Indian Language");
 
                   return (
                     <div key={petition.id} className="card-base p-6 border-l-4 border-l-amber-500">
                       {/* Petition Header Info */}
                       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-border">
                         <div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <span className="font-mono text-xs font-bold text-navy-600 dark:text-navy-300">
                               {petition.petitionId}
                             </span>
@@ -329,6 +445,12 @@ export default function AdminReviewQueue() {
                             <span className="text-xs text-muted-foreground">{formatDate(petition.submittedAt)}</span>
                             <span className="text-xs text-muted-foreground">•</span>
                             <span className="text-xs font-medium text-foreground">{petition.submittedByName}</span>
+                            {isNonEnglish && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-200">
+                                <Languages className="w-3 h-3" />
+                                {langName}
+                              </span>
+                            )}
                           </div>
                           <h2 className="text-lg font-semibold text-foreground mt-1">{petition.title}</h2>
                           <p className="text-xs text-muted-foreground mt-0.5">{petition.location}, {petition.district}</p>
@@ -338,110 +460,226 @@ export default function AdminReviewQueue() {
                         </span>
                       </div>
 
-                      {/* Description */}
-                      <div className="my-4 p-3 bg-muted/40 rounded-lg">
-                        <p className="text-sm text-foreground/90 whitespace-pre-wrap">{petition.description}</p>
+                      {/* Description & Translation if not English (Task 5.2) */}
+                      <div className="my-4 space-y-2">
+                        <div className="p-3 bg-muted/40 rounded-lg">
+                          <div className="text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wider">
+                            Petition Content {isNonEnglish ? `(Original: ${langName})` : ""}
+                          </div>
+                          <p className="text-sm text-foreground/90 whitespace-pre-wrap">{petition.description}</p>
+                        </div>
+                        {isNonEnglish && petition.original_text && (
+                          <div className="p-3 bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 rounded-lg">
+                            <div className="flex items-center gap-1.5 text-xs font-semibold text-blue-700 dark:text-blue-300 mb-1">
+                              <Languages className="w-3.5 h-3.5" />
+                              Detected Native Script:
+                            </div>
+                            <p className="text-xs text-blue-900 dark:text-blue-200 italic font-sans">{petition.original_text}</p>
+                          </div>
+                        )}
                       </div>
 
-                      {/* AI Diagnostic Reasons */}
+                      {/* AI Diagnostic Reasons & Result */}
                       <div className="mb-5 p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-lg">
-                        <div className="flex items-center gap-2 mb-2">
-                          <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                          <h4 className="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300">
-                            Flags Requiring Human Review
-                          </h4>
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <div className="flex items-center gap-2">
+                            <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                            <h4 className="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300">
+                              AI Result & Review Diagnostic
+                            </h4>
+                          </div>
+                          {ai?.confidence && (
+                            <span className="text-xs font-bold text-amber-800 dark:text-amber-300">
+                              Confidence: {roundPercentage(ai.confidence)}%
+                            </span>
+                          )}
                         </div>
+                        <p className="text-xs text-amber-900/90 dark:text-amber-200 mb-2 font-medium">
+                          {ai?.explanation || "AI routed to department based on text features."}
+                        </p>
                         <ul className="text-xs text-amber-900 dark:text-amber-200 list-disc list-inside space-y-1">
                           {reviewReasons.length > 0 ? (
                             reviewReasons.map((r: string, idx: number) => <li key={idx}>{r}</li>)
                           ) : (
                             <li>Confidence threshold ({roundPercentage(ai?.categoryConfidence)}%) below auto-dispatch cutoff.</li>
                           )}
-                          {isSpam && <li className="font-semibold">Quality check triggered: Potential junk, repeated, or test content.</li>}
+                          {isSpam && <li className="font-semibold text-red-600 dark:text-red-400">Quality check triggered: Potential junk, repeated, or test content.</li>}
                         </ul>
                       </div>
 
-                      {/* One-Click Correction Grid */}
+                      {/* 4 One-Click Actions Bar (Task 5.3) */}
                       <div className="bg-muted/30 p-4 rounded-xl border border-border">
                         <div className="flex items-center gap-2 mb-3">
                           <Sparkles className="w-4 h-4 text-navy-600 dark:text-navy-300" />
                           <h4 className="text-xs font-semibold uppercase tracking-wider text-foreground">
-                            One-Click Administrator Correction
+                            One-Click Administrator Actions
                           </h4>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                          {/* Category Selector */}
-                          <div>
-                            <label className="block text-xs font-medium text-muted-foreground mb-1">
-                              Category
-                            </label>
-                            <select
-                              value={edit.category}
-                              onChange={e => handleCategoryChange(petition.id, e.target.value)}
-                              className="w-full text-sm bg-background border border-border rounded-lg px-3 py-2 text-foreground focus:ring-2 focus:ring-navy-600"
-                            >
-                              {CATEGORIES.map(cat => (
-                                <option key={cat} value={cat}>
-                                  {cat}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
+                        {/* Top quick action buttons */}
+                        <div className="flex flex-wrap items-center gap-2.5 mb-4">
+                          <button
+                            onClick={() => handleApproveAsIs(petition)}
+                            disabled={submittingId === petition.id}
+                            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-50"
+                          >
+                            <CheckCircle2 className="w-4 h-4" />
+                            Approve as is
+                          </button>
 
-                          {/* Department Selector */}
-                          <div>
-                            <label className="block text-xs font-medium text-muted-foreground mb-1">
-                              Assigned Department
-                            </label>
-                            <select
-                              value={edit.department}
-                              onChange={e => handleFieldChange(petition.id, "department", e.target.value)}
-                              className="w-full text-sm bg-background border border-border rounded-lg px-3 py-2 text-foreground focus:ring-2 focus:ring-navy-600"
-                            >
-                              {DEPARTMENTS.map(d => (
-                                <option key={d.name} value={d.name}>
-                                  {d.name}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
+                          <button
+                            onClick={() => setDetailModalId(petition.id)}
+                            disabled={submittingId === petition.id}
+                            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-50"
+                          >
+                            <HelpCircle className="w-4 h-4" />
+                            Ask citizen for more details
+                          </button>
 
-                          {/* Priority Selector */}
-                          <div>
-                            <label className="block text-xs font-medium text-muted-foreground mb-1">
-                              Priority Level
-                            </label>
-                            <select
-                              value={edit.priority}
-                              onChange={e => handleFieldChange(petition.id, "priority", e.target.value as Priority)}
-                              className="w-full text-sm bg-background border border-border rounded-lg px-3 py-2 text-foreground focus:ring-2 focus:ring-navy-600"
-                            >
-                              <option value="low">Low Priority</option>
-                              <option value="medium">Medium Priority</option>
-                              <option value="high">High Priority</option>
-                              <option value="critical">Critical Urgency</option>
-                            </select>
-                          </div>
+                          <button
+                            onClick={() => setSpamModalId(petition.id)}
+                            disabled={submittingId === petition.id}
+                            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-50"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Mark as spam
+                          </button>
                         </div>
 
-                        {/* Note & Action Button */}
-                        <div className="flex flex-col sm:flex-row items-center gap-3">
-                          <input
-                            type="text"
-                            placeholder="Optional correction note or reason (saved to audit trail)..."
-                            value={edit.note}
-                            onChange={e => handleFieldChange(petition.id, "note", e.target.value)}
-                            className="flex-1 w-full text-xs bg-background border border-border rounded-lg px-3 py-2.5 text-foreground placeholder:text-muted-foreground"
-                          />
-                          <button
-                            onClick={() => handleApplyCorrection(petition)}
-                            disabled={submittingId === petition.id}
-                            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-5 py-2.5 bg-navy-600 text-white rounded-lg text-sm font-semibold hover:bg-navy-700 active:scale-95 transition-all disabled:opacity-50 whitespace-nowrap"
-                          >
-                            <Check className="w-4 h-4" />
-                            {submittingId === petition.id ? "Saving..." : "Apply & Approve"}
-                          </button>
+                        {/* Inline Detail Request Form */}
+                        {detailModalId === petition.id && (
+                          <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 rounded-lg">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs font-bold text-blue-900 dark:text-blue-200">
+                                Ask Citizen for Details (via SMS & status notification)
+                              </span>
+                              <button onClick={() => setDetailModalId(null)} className="text-muted-foreground hover:text-foreground">
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                value={detailNote}
+                                onChange={e => setDetailNote(e.target.value)}
+                                className="flex-1 text-xs bg-background border border-border rounded-lg px-3 py-1.5 text-foreground"
+                              />
+                              <button
+                                onClick={() => handleRequestDetails(petition)}
+                                disabled={submittingId === petition.id}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700"
+                              >
+                                <Send className="w-3.5 h-3.5" />
+                                Send
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Inline Spam Reason Form */}
+                        {spamModalId === petition.id && (
+                          <div className="mb-4 p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-lg">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs font-bold text-red-900 dark:text-red-200">
+                                Archive as Spam (Petition will NOT be sent to officer)
+                              </span>
+                              <button onClick={() => setSpamModalId(null)} className="text-muted-foreground hover:text-foreground">
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                value={spamReason}
+                                onChange={e => setSpamReason(e.target.value)}
+                                className="flex-1 text-xs bg-background border border-border rounded-lg px-3 py-1.5 text-foreground"
+                              />
+                              <button
+                                onClick={() => handleMarkSpam(petition)}
+                                disabled={submittingId === petition.id}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-600 text-white text-xs font-semibold rounded-lg hover:bg-red-700"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                Confirm Spam
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Correction Fields: Category / Department / Priority */}
+                        <div className="pt-3 border-t border-border">
+                          <div className="text-xs font-semibold text-muted-foreground mb-2">
+                            Manual Correction (Overrides AI routing and dispatches to officer):
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                            <div>
+                              <label className="block text-[11px] font-medium text-muted-foreground mb-1">
+                                Category
+                              </label>
+                              <select
+                                value={edit.category}
+                                onChange={e => handleCategoryChange(petition.id, e.target.value)}
+                                className="w-full text-xs bg-background border border-border rounded-lg px-2.5 py-2 text-foreground focus:ring-2 focus:ring-navy-600"
+                              >
+                                {CATEGORIES.map(cat => (
+                                  <option key={cat} value={cat}>
+                                    {cat}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+
+                            <div>
+                              <label className="block text-[11px] font-medium text-muted-foreground mb-1">
+                                Assigned Department
+                              </label>
+                              <select
+                                value={edit.department}
+                                onChange={e => handleFieldChange(petition.id, "department", e.target.value)}
+                                className="w-full text-xs bg-background border border-border rounded-lg px-2.5 py-2 text-foreground focus:ring-2 focus:ring-navy-600"
+                              >
+                                {DEPARTMENTS.map(d => (
+                                  <option key={d.name} value={d.name}>
+                                    {d.name}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+
+                            <div>
+                              <label className="block text-[11px] font-medium text-muted-foreground mb-1">
+                                Priority Level
+                              </label>
+                              <select
+                                value={edit.priority}
+                                onChange={e => handleFieldChange(petition.id, "priority", e.target.value as Priority)}
+                                className="w-full text-xs bg-background border border-border rounded-lg px-2.5 py-2 text-foreground focus:ring-2 focus:ring-navy-600"
+                              >
+                                <option value="low">Low Priority</option>
+                                <option value="medium">Medium Priority</option>
+                                <option value="high">High Priority</option>
+                                <option value="critical">Critical Urgency</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row items-center gap-3">
+                            <input
+                              type="text"
+                              placeholder="Correction note or reason for retraining log..."
+                              value={edit.note}
+                              onChange={e => handleFieldChange(petition.id, "note", e.target.value)}
+                              className="flex-1 w-full text-xs bg-background border border-border rounded-lg px-3 py-2 text-foreground placeholder:text-muted-foreground"
+                            />
+                            <button
+                              onClick={() => handleApplyCorrection(petition)}
+                              disabled={submittingId === petition.id}
+                              className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-navy-600 text-white rounded-lg text-xs font-semibold hover:bg-navy-700 active:scale-95 transition-all disabled:opacity-50 whitespace-nowrap"
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                              {submittingId === petition.id ? "Saving..." : "Correct & Dispatch"}
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -484,8 +722,11 @@ export default function AdminReviewQueue() {
               >
                 <option value="all">All Actions ({auditLogs.length})</option>
                 <option value="ai_decision">AI Decision</option>
-                <option value="human_override">Human Override</option>
+                <option value="admin_approve">Admin Approve</option>
                 <option value="admin_correction">Admin Correction</option>
+                <option value="admin_mark_spam">Mark Spam</option>
+                <option value="admin_request_details">Request Details</option>
+                <option value="sla_auto_escalation">SLA Auto Escalation</option>
               </select>
             </div>
 
@@ -519,15 +760,25 @@ export default function AdminReviewQueue() {
                               <Sparkles className="w-3 h-3" />
                               AI Decision
                             </span>
-                          ) : log.action === "human_override" ? (
+                          ) : log.action === "admin_approve" ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                              <CheckCircle2 className="w-3 h-3" />
+                              Approved As Is
+                            </span>
+                          ) : log.action === "admin_mark_spam" ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">
+                              <Trash2 className="w-3 h-3" />
+                              Marked Spam
+                            </span>
+                          ) : log.action === "sla_auto_escalation" ? (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300">
-                              <ShieldAlert className="w-3 h-3" />
-                              Human Override
+                              <AlertTriangle className="w-3 h-3" />
+                              SLA Escalation
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">
                               <Check className="w-3 h-3" />
-                              Admin Correction
+                              {log.action.replace("_", " ")}
                             </span>
                           )}
                         </td>
@@ -548,36 +799,16 @@ export default function AdminReviewQueue() {
                                 {log.details.after.category} • {log.details.after.department} • {log.details.after.priority}
                               </span>
                             </div>
-                          ) : log.action === "human_override" ? (
-                            <div className="text-[11px] text-foreground">
-                              <span>
-                                Status: <strong className="capitalize">{log.details?.beforeStatus?.replace("_", " ") || "original"}</strong> → <strong className="capitalize text-navy-600 dark:text-navy-300">{log.details?.newStatus?.replace("_", " ")}</strong>
-                              </span>
-                              {log.details?.assignedDepartment && (
-                                <span className="ml-2 text-muted-foreground">({log.details.assignedDepartment})</span>
-                              )}
-                            </div>
-                          ) : log.action === "ai_decision" ? (
-                            <div className="text-[11px] text-foreground flex items-center gap-1.5 flex-wrap">
-                              <span className="font-medium">{log.details?.category}</span>
-                              <span className="text-muted-foreground">•</span>
-                              <span className="text-muted-foreground">{log.details?.department}</span>
-                              <span className="text-muted-foreground">•</span>
-                              <span className={priorityClass((log.details?.priority || "medium") as Priority)}>
-                                {(log.details?.priority || "").toUpperCase()}
-                              </span>
-                              {typeof log.details?.confidence === "number" && (
-                                <span className="text-muted-foreground text-[10px]">
-                                  ({roundPercentage(log.details.confidence)}%)
-                                </span>
-                              )}
+                          ) : log.action === "sla_auto_escalation" ? (
+                            <div className="text-[11px] text-red-600 font-medium">
+                              SLA Breached ({log.details?.overdueHours}h overdue) → Auto-escalated
                             </div>
                           ) : (
                             <span className="text-muted-foreground">—</span>
                           )}
                         </td>
                         <td className="py-3 px-3 text-muted-foreground italic max-w-xs truncate">
-                          {log.details?.note || log.details?.officerRemarks || log.details?.resolutionDetails || log.details?.explanation || "—"}
+                          {log.details?.note || log.details?.reason || log.details?.explanation || "—"}
                         </td>
                       </tr>
                     ))}
@@ -596,4 +827,3 @@ function roundPercentage(val?: number): number {
   if (!val) return 0;
   return Math.round(val * 100);
 }
-

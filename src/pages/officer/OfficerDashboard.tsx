@@ -104,6 +104,76 @@ export default function OfficerDashboard() {
           ))}
         </motion.div>
 
+        {/* Task 6.7: Due Today / Overdue Triage Section */}
+        {overdue.length > 0 && (
+          <div className="mb-7 bg-red-50/80 dark:bg-red-950/30 border-2 border-red-300 dark:border-red-800 rounded-2xl p-5 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
+                <h2 className="text-base font-bold text-red-950 dark:text-red-100">
+                  Priority Action Required: Due Today & Overdue ({overdue.length})
+                </h2>
+              </div>
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-200">
+                Breach Risk
+              </span>
+            </div>
+            <p className="text-xs text-red-800/90 dark:text-red-200/90 mb-3">
+              These petitions have breached SLA deadlines or are expiring today. Immediate action or departmental resolution required.
+            </p>
+            <div className="space-y-2">
+              {overdue.map(c => {
+                const SLA_DEADLINES: Record<string, number> = { critical: 24, high: 72, medium: 168, low: 336 };
+                const deadlineMs = (SLA_DEADLINES[c.priority] || 168) * 60 * 60 * 1000;
+                const deadline = new Date(new Date(c.submittedAt).getTime() + deadlineMs);
+                const remainingHours = Math.round((deadline.getTime() - Date.now()) / (1000 * 60 * 60));
+                const isOverdue = remainingHours < 0;
+
+                return (
+                  <Link
+                    key={c.id}
+                    to={`/officer/petition/${c.id}`}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-white dark:bg-slate-900 border border-red-200 dark:border-red-900/60 rounded-xl hover:border-red-400 transition-colors"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="font-mono text-xs font-bold text-red-700 dark:text-red-400">
+                          {c.petitionId}
+                        </span>
+                        <span className="text-xs text-muted-foreground">•</span>
+                        <span className="text-xs font-medium text-foreground truncate">{c.title}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">{c.location} · {formatDate(c.submittedAt)}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${
+                        isOverdue
+                          ? "bg-red-600 text-white"
+                          : "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200"
+                      }`}>
+                        {isOverdue ? (
+                          <>
+                            <AlertTriangle className="w-3.5 h-3.5" />
+                            Overdue by {Math.abs(remainingHours)}h
+                          </>
+                        ) : (
+                          <>
+                            <Clock className="w-3.5 h-3.5" />
+                            Due in {remainingHours}h
+                          </>
+                        )}
+                      </span>
+                      <span className="text-xs font-semibold px-2 py-1 rounded border bg-card text-foreground">
+                        {c.priority.toUpperCase()}
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Filters */}
         <motion.div
           initial={{ opacity: 0 }}
