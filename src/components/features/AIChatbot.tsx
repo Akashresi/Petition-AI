@@ -87,11 +87,11 @@ export default function AIChatbot() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 w-14 h-14 bg-navy-800 hover:bg-navy-700 text-white rounded-full shadow-xl flex items-center justify-center transition-all z-50"
+          className="fixed bottom-6 right-6 w-14 h-14 bg-navy-850 hover:bg-navy-800 text-blue-300 border border-blue-500/40 rounded-full shadow-2xl flex items-center justify-center transition-all z-50 group hover:scale-105 active:scale-95"
           aria-label="Open AI Chatbot"
         >
-          <MessageCircle className="w-6 h-6" />
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
+          <MessageCircle className="w-6 h-6 text-blue-300 group-hover:text-blue-200 transition-colors" />
+          <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-navy-975" />
         </button>
       )}
 

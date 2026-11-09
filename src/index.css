@@ -29,16 +29,16 @@
   }
 
   .dark {
-    --background: 222 47% 7%;
-    --foreground: 210 40% 95%;
-    --card: 222 47% 10%;
-    --card-foreground: 210 40% 95%;
-    --popover: 222 47% 10%;
-    --popover-foreground: 210 40% 95%;
-    --primary: 210 40% 95%;
-    --primary-foreground: 222 47% 10%;
+    --background: 224 53% 7%;
+    --foreground: 210 40% 98%;
+    --card: 224 50% 10%;
+    --card-foreground: 210 40% 98%;
+    --popover: 224 50% 10%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 38 92% 50%;
+    --primary-foreground: 224 53% 7%;
     --secondary: 217 33% 15%;
-    --secondary-foreground: 210 40% 95%;
+    --secondary-foreground: 210 40% 98%;
     --muted: 217 33% 15%;
     --muted-foreground: 215 20% 65%;
     --accent: 38 92% 50%;
@@ -47,7 +47,7 @@
     --destructive-foreground: 0 0% 100%;
     --border: 217 33% 18%;
     --input: 217 33% 18%;
-    --ring: 210 40% 92%;
+    --ring: 217 91% 60%;
   }
 }
 
@@ -66,6 +66,47 @@
 }
 
 @layer components {
+/* ── Reference UI System Tokens & Components ── */
+  .card-reference {
+    @apply bg-card text-card-foreground rounded-2xl sm:rounded-3xl border border-border shadow-md transition-all duration-200;
+  }
+  .card-reference:hover {
+    @apply shadow-lg border-border/80;
+  }
+  .card-header-bar {
+    @apply bg-navy-850 text-white px-5 sm:px-6 py-3.5 sm:py-4 border-b border-navy-700/60 flex items-center justify-between rounded-t-2xl sm:rounded-t-3xl;
+  }
+  .btn-gold {
+    @apply bg-gold-500 hover:bg-gold-400 text-navy-975 font-bold py-2.5 px-5 rounded-full transition-all duration-200 shadow-sm active:scale-[0.98] inline-flex items-center justify-center gap-2;
+  }
+  .btn-royal {
+    @apply bg-navy-600 hover:bg-navy-500 text-white font-semibold py-2.5 px-5 rounded-xl transition-all duration-200 shadow-sm active:scale-[0.98] inline-flex items-center justify-center gap-2;
+  }
+  .btn-outline-dark {
+    @apply bg-surface-card hover:bg-surface-cardLighter text-slate-200 border border-surface-border font-medium py-2 px-4 rounded-full transition-all duration-200 inline-flex items-center justify-center gap-2;
+  }
+  .input-reference {
+    @apply bg-surface-input border border-surface-border text-foreground rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 transition-all placeholder:text-slate-500;
+  }
+  .filter-pill {
+    @apply text-xs px-3.5 py-1.5 rounded-full border font-medium transition-all duration-200 cursor-pointer;
+  }
+  .filter-pill-active {
+    @apply bg-gold-500 text-navy-975 border-gold-500 font-bold shadow-sm;
+  }
+  .filter-pill-inactive {
+    @apply bg-surface-card text-slate-400 border-surface-border hover:border-slate-600 hover:text-slate-200;
+  }
+  .badge-ai {
+    @apply bg-navy-800/80 text-blue-300 border border-navy-600/70 text-xs px-2.5 py-0.5 rounded-full font-semibold inline-flex items-center gap-1;
+  }
+  .badge-sla-safe {
+    @apply bg-emerald-950/40 text-emerald-400 border border-emerald-500/60 text-xs px-2.5 py-1 rounded-full font-semibold inline-flex items-center gap-1.5;
+  }
+  .badge-sla-breach {
+    @apply bg-red-950/50 text-red-400 border border-red-500/60 text-xs px-2.5 py-1 rounded-full font-semibold inline-flex items-center gap-1.5;
+  }
+
   /* Navigation */
   .nav-link {
     @apply text-white/75 hover:text-white transition-colors duration-200 text-sm font-medium relative;

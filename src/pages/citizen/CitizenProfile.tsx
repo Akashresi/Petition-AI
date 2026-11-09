@@ -17,13 +17,13 @@ export default function CitizenProfile() {
   const resolved = complaints.filter(c => c.status === "resolved" || c.status === "closed").length;
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4">
+    <div className="min-h-screen bg-navy-975 text-foreground py-8 px-4">
       <div className="max-w-3xl mx-auto">
         <h1 className="font-serif text-2xl font-bold text-foreground mb-6">My Profile</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           {/* Profile Card */}
-          <div className="lg:col-span-2 card-base p-6">
+          <div className="lg:col-span-2 card-reference p-6 bg-surface-card border-surface-border">
             <div className="flex items-start justify-between mb-5">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 bg-navy-700 rounded-full flex items-center justify-center text-white text-2xl font-bold">
@@ -105,7 +105,7 @@ export default function CitizenProfile() {
         </div>
 
         {/* Recent Complaints */}
-        <div className="card-base p-5 mt-5">
+        <div className="card-reference p-5 bg-surface-card border-surface-border mt-5">
           <h3 className="font-semibold text-foreground mb-4">Recent Petitions</h3>
           {complaints.slice(0, 5).map(c => (
             <div key={c.id} className="flex items-center justify-between py-2.5 border-b border-border last:border-b-0">

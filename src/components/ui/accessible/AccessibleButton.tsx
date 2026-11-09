@@ -5,7 +5,7 @@ interface AccessibleButtonProps {
   children: React.ReactNode;
   icon?: LucideIcon;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  variant?: "primary" | "secondary" | "neutral" | "danger";
+  variant?: "primary" | "secondary" | "neutral" | "danger" | "gold" | "royal";
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
   fullWidth?: boolean;
@@ -26,7 +26,7 @@ export default function AccessibleButton({
   ariaLabel,
   size = "default",
 }: AccessibleButtonProps) {
-  // Calm, high-contrast, non-neon color palette
+  // Calm, high-contrast, non-neon color palette + reference gold/royal styles
   const variantStyles = {
     primary:
       "bg-blue-800 text-white hover:bg-blue-900 border-2 border-blue-900 active:bg-blue-950 focus-visible:ring-4 focus-visible:ring-blue-300 dark:bg-blue-700 dark:border-blue-600 dark:hover:bg-blue-800",
@@ -36,6 +36,10 @@ export default function AccessibleButton({
       "bg-slate-100 text-slate-900 hover:bg-slate-200 border-2 border-slate-400 active:bg-slate-300 focus-visible:ring-4 focus-visible:ring-slate-300 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600",
     danger:
       "bg-rose-800 text-white hover:bg-rose-900 border-2 border-rose-900 active:bg-rose-950 focus-visible:ring-4 focus-visible:ring-rose-300 dark:bg-rose-700 dark:border-rose-600",
+    gold:
+      "bg-amber-500 text-slate-950 hover:bg-amber-400 border-2 border-amber-600 active:bg-amber-600 focus-visible:ring-4 focus-visible:ring-amber-300 dark:bg-amber-500 dark:text-slate-950 dark:border-amber-400 dark:hover:bg-amber-400 font-bold shadow-md rounded-full",
+    royal:
+      "bg-blue-700 text-white hover:bg-blue-800 border-2 border-blue-600 active:bg-blue-900 focus-visible:ring-4 focus-visible:ring-blue-300 dark:bg-blue-600 dark:border-blue-500 dark:hover:bg-blue-700 font-bold shadow-md rounded-xl",
   };
 
   const sizeStyles = {
@@ -50,10 +54,11 @@ export default function AccessibleButton({
       disabled={disabled}
       aria-label={ariaLabel}
       className={`
-        inline-flex items-center justify-center gap-3 rounded-xl font-semibold
+        inline-flex items-center justify-center gap-3 font-semibold
         transition-colors cursor-pointer select-none text-left
         disabled:opacity-50 disabled:cursor-not-allowed
         focus-visible:outline-none shadow-sm
+        ${variant === "gold" ? "rounded-full" : "rounded-xl"}
         ${variantStyles[variant]}
         ${sizeStyles[size]}
         ${fullWidth ? "w-full" : "w-auto"}
@@ -65,4 +70,3 @@ export default function AccessibleButton({
     </button>
   );
 }
-

@@ -211,7 +211,7 @@ export default function ComplaintMap({ complaints, hotspots = [], height = "400p
   }, [complaints, hotspots]);
 
   return (
-    <div className="card-base overflow-hidden">
+    <div className="card-reference overflow-hidden bg-surface-card border-surface-border">
       <div className="p-3 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h3 className="text-sm font-semibold text-foreground">Complaint & Hotspot Geographic Map</h3>

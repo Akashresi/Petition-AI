@@ -41,7 +41,7 @@ export default function FirstLaunchLanguageModal({
       aria-modal="true"
       aria-labelledby="language-modal-title"
     >
-      <div className="w-full max-w-md bg-white border-4 border-blue-900 rounded-3xl p-6 sm:p-8 shadow-2xl dark:bg-slate-900 dark:border-blue-500 animate-in fade-in zoom-in-95 duration-200">
+      <div className="w-full max-w-md bg-surface-card border-2 border-navy-600 rounded-3xl p-6 sm:p-8 shadow-2xl animate-in fade-in zoom-in-95 duration-200 text-foreground">
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-100 text-blue-900 mb-3 dark:bg-blue-950 dark:text-blue-200 border-2 border-blue-300">
             <Languages className="w-10 h-10" aria-hidden="true" />

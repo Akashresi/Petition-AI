@@ -60,7 +60,7 @@ export default function AccessibilityMenu() {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 top-12 w-72 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-4 z-50 text-slate-900 dark:text-slate-100 space-y-3">
+        <div className="absolute right-0 top-12 w-72 bg-surface-card rounded-2xl shadow-2xl border border-surface-border p-4 z-50 text-foreground space-y-3">
           <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2">
               <Accessibility className="w-4 h-4 text-amber-500" />

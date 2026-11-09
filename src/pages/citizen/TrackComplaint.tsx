@@ -194,7 +194,7 @@ export default function TrackComplaint() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 pb-12">
+    <div className="min-h-screen bg-navy-975 text-foreground pb-12">
       <CitizenHeader
         title={t("citizen.trackComplaint", "Track my complaint")}
         showBack={true}
@@ -203,7 +203,7 @@ export default function TrackComplaint() {
 
       <main className="max-w-2xl mx-auto px-4 py-6 space-y-6">
         {/* Search Box Card */}
-        <div className="bg-white border-2 border-slate-400 rounded-2xl p-6 shadow-sm dark:bg-slate-900 dark:border-slate-700">
+        <div className="card-reference p-6 bg-surface-card border-surface-border">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 mb-2">
             {t("citizen.trackBy", "Find by Complaint Number or Mobile Phone")}
           </h1>
@@ -243,7 +243,7 @@ export default function TrackComplaint() {
           <div>
             {!matchedComplaint ? (
               <div
-                className="bg-white border-2 border-slate-300 rounded-2xl p-6 text-center dark:bg-slate-900 dark:border-slate-700 space-y-4"
+                className="card-reference p-6 text-center bg-surface-card border-surface-border space-y-4"
                 role="alert"
               >
                 <div className="w-16 h-16 rounded-full bg-amber-100 text-amber-800 border-2 border-amber-400 flex items-center justify-center mx-auto dark:bg-amber-950/60 dark:text-amber-300">

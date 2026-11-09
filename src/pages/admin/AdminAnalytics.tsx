@@ -4,8 +4,8 @@ import { TrendingUp, Brain, Copy, Clock, CheckCircle, AlertTriangle, FileCode2, 
 import { ANALYTICS_DATA } from "@/constants/mockData";
 import { getStoredUser } from "@/lib/auth";
 
-const COLORS = ["#5c6ef7", "#2d4b8e", "#5c6ef7", "#8098fb", "#a5bcfd", "#c7d7fe", "#e0e9ff"];
-const PIE_COLORS = ["#dc2626", "#ea580c", "#d97706", "#16a34a"];
+const COLORS = ["#2563eb", "#f59e0b", "#10b981", "#a855f7", "#06b6d4", "#ec4899", "#8b5cf6"];
+const PIE_COLORS = ["#ef4444", "#f97316", "#f59e0b", "#10b981"];
 
 interface SpamMetrics {
   spam_samples: number;
@@ -226,7 +226,7 @@ export default function AdminAnalytics() {
   };
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4">
+    <div className="min-h-screen bg-navy-975 text-foreground py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-7">
           <h1 className="font-serif text-2xl font-bold text-foreground">Analytics & Reports</h1>

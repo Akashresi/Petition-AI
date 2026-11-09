@@ -198,10 +198,10 @@ export default function TransparencyPortal() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-10 px-4 sm:px-6 lg:px-8 transition-colors">
+    <div className="min-h-screen bg-navy-975 text-foreground py-10 px-4 sm:px-6 lg:px-8 transition-colors">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header navigation & title */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-surface-border pb-6">
           <div>
             <Link
               to="/"
@@ -232,7 +232,7 @@ export default function TransparencyPortal() {
         </div>
 
         {/* Rule 5 AI Explanation Card */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="card-reference bg-surface-card border-surface-border p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 text-xs text-slate-600 dark:text-slate-400">
             <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
             <span>
@@ -247,7 +247,7 @@ export default function TransparencyPortal() {
 
         {/* Top KPI Metrics Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+          <div className="card-reference bg-surface-card border-surface-border p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Resolved Petitions
@@ -264,7 +264,7 @@ export default function TransparencyPortal() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+          <div className="card-reference bg-surface-card border-surface-border p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Resolution Rate
@@ -281,7 +281,7 @@ export default function TransparencyPortal() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+          <div className="card-reference bg-surface-card border-surface-border p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Avg Resolution Time
@@ -298,7 +298,7 @@ export default function TransparencyPortal() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+          <div className="card-reference bg-surface-card border-surface-border p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 SLA Compliance
@@ -317,8 +317,8 @@ export default function TransparencyPortal() {
         </div>
 
         {/* Department Performance Table */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-          <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <div className="card-reference bg-surface-card border-surface-border shadow-sm overflow-hidden">
+          <div className="p-5 border-b border-surface-border flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Building2 className="w-5 h-5 text-slate-600 dark:text-slate-400" />
               <h2 className="font-display font-bold text-base text-slate-900 dark:text-slate-100">
@@ -332,7 +332,7 @@ export default function TransparencyPortal() {
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 dark:bg-slate-800/50 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+              <thead className="bg-slate-50 dark:bg-slate-800/50 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-surface-border">
                 <tr>
                   <th className="px-5 py-3.5">Department</th>
                   <th className="px-5 py-3.5">Total Petitions</th>
@@ -394,7 +394,7 @@ export default function TransparencyPortal() {
         </div>
 
         {/* Anonymized Resolution Audit Feed */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 space-y-4">
+        <div className="card-reference bg-surface-card border-surface-border shadow-sm p-5 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h2 className="font-display font-bold text-base text-slate-900 dark:text-slate-100">

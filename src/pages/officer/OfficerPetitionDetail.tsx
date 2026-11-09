@@ -209,14 +209,14 @@ export default function OfficerPetitionDetail() {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-background py-8 px-4">
+      <div className="min-h-screen bg-navy-975 text-foreground py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
           <Link to="/officer/dashboard" className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-5 transition-colors">
             <ArrowLeft className="w-4 h-4" /> Back to Dashboard
           </Link>
 
           {/* Header */}
-          <div className="card-base p-5 mb-5">
+          <div className="card-reference p-6 mb-6 bg-surface-card border-surface-border">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -270,7 +270,7 @@ export default function OfficerPetitionDetail() {
           </div>
 
           {/* QR Code */}
-          <div className="card-base p-4 mb-5 flex items-center gap-4">
+          <div className="card-reference p-5 mb-6 flex items-center gap-4 bg-surface-card border-surface-border">
             <QRCode value={`https://petitionai.gov.in/track/${complaint.petitionId}`} size={70} />
             <div>
               <p className="text-sm font-semibold text-foreground">Track this petition</p>
@@ -359,7 +359,7 @@ export default function OfficerPetitionDetail() {
           </div>
 
           {/* Officer Action Panel */}
-          <div className="card-base overflow-hidden">
+          <div className="card-reference overflow-hidden bg-surface-card border-surface-border">
             <div className="bg-navy-800 text-white px-5 py-3 flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-gold-400" />
               <span className="font-semibold text-sm">Officer Action Panel</span>

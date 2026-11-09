@@ -76,7 +76,7 @@ export default function MyPetitions() {
   const activeFilters = [statusFilter !== "all", priorityFilter !== "all"].filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-background dark:to-background py-8 px-4">
+    <div className="min-h-screen bg-navy-975 text-foreground py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div
@@ -88,7 +88,7 @@ export default function MyPetitions() {
             <h1 className="font-display text-3xl font-extrabold text-foreground">{t("nav.myPetitions")}</h1>
             <p className="text-muted-foreground text-sm mt-1">{complaints.length} total petitions filed</p>
           </div>
-          <Link to="/citizen/submit" className="btn-primary flex items-center gap-2 w-fit text-sm">
+          <Link to="/citizen/submit" className="btn-gold flex items-center gap-2 w-fit text-sm">
             <PlusCircle className="w-4 h-4" /> {t("nav.submitPetition")}
           </Link>
         </motion.div>

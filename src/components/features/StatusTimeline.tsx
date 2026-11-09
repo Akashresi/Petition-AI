@@ -30,7 +30,7 @@ export default function StatusTimeline({ currentStatus, history }: Props) {
   const currentIdx = STATUS_ORDER.indexOf(currentStatus);
 
   return (
-    <div className="card-base p-5">
+    <div className="card-reference p-5 sm:p-6 bg-surface-card border-surface-border">
       <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
         <Clock className="w-4 h-4 text-navy-600 dark:text-navy-300" />
         Complaint Status Timeline
