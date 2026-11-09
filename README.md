@@ -232,11 +232,14 @@ Open [http://localhost:8080](http://localhost:8080) in your browser.
 
 In development mode (`ENV=development`), the system automatically seeds initial demo accounts:
 
-| Role | Email | Password | Permissions |
-|---|---|---|---|
-| **Citizen** | `citizen@demo.com` | `Password123!` | File petitions, record voice grievances, track status, view public transparency |
-| **Officer** | `officer@demo.com` | `Password123!` | Department queue, RAG resolution suggestions, edit & approve official replies |
-| **Admin** | `admin@demo.com` | `Password123!` | Analytics, Hotspot alerts, Review Queue, Retraining loop, Fairness audit |
+| Role | Email | Permissions |
+|---|---|---|
+| **Citizen** | `citizen@demo.com` | File petitions, record voice grievances, track status, view public transparency |
+| **Officer** | `officer@demo.com` | Department queue, RAG resolution suggestions, edit & approve official replies |
+| **Admin** | `admin@demo.com` | Analytics, Hotspot alerts, Review Queue, Retraining loop, Fairness audit |
+
+> **Note**: Demo credentials (passwords) are seeded automatically only when `ENV=development`.
+> Run `cat backend/app/main.py | grep seed` to see exact seed logic. Never commit real passwords.
 
 ---
 
@@ -324,3 +327,16 @@ In development mode (`ENV=development`), the system automatically seeds initial 
 ## 9. License
 
 This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## 10. Credits
+
+This project is derived from and extends the original work by
+**Balachandransakthivel** at
+[github.com/Balachandransakthivel/PetitionAI](https://github.com/Balachandransakthivel/PetitionAI).
+
+Enhancements in this fork include: Tamil-first multilingual support, voice input
+via Web Speech API, spam detection, human-in-the-loop review, SLA enforcement
+with APScheduler escalation, evaluation metrics pipeline, and an accessible
+low-literacy UI design system.
