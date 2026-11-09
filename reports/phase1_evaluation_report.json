@@ -1,0 +1,74 @@
+{
+  "sample_count": 640,
+  "train_count": 480,
+  "test_count": 160,
+  "overall_accuracy": 0.6125,
+  "weighted_precision": 0.6196506036365035,
+  "weighted_recall": 0.6125,
+  "weighted_f1": 0.6134263591722469,
+  "macro_f1": 0.6134263591722469,
+  "classification_report": {
+    "Education Department": {
+      "precision": 0.5714285714285714,
+      "recall": 0.6,
+      "f1-score": 0.5853658536585366,
+      "support": 20.0
+    },
+    "Electricity Board": {
+      "precision": 0.6956521739130435,
+      "recall": 0.8,
+      "f1-score": 0.7441860465116279,
+      "support": 20.0
+    },
+    "Health Department": {
+      "precision": 0.4782608695652174,
+      "recall": 0.55,
+      "f1-score": 0.5116279069767442,
+      "support": 20.0
+    },
+    "Public Safety": {
+      "precision": 0.3157894736842105,
+      "recall": 0.3,
+      "f1-score": 0.3076923076923077,
+      "support": 20.0
+    },
+    "Roads & Infrastructure": {
+      "precision": 0.5454545454545454,
+      "recall": 0.6,
+      "f1-score": 0.5714285714285714,
+      "support": 20.0
+    },
+    "Transport Authority": {
+      "precision": 0.8947368421052632,
+      "recall": 0.85,
+      "f1-score": 0.8717948717948718,
+      "support": 20.0
+    },
+    "Waste Management": {
+      "precision": 0.7058823529411765,
+      "recall": 0.6,
+      "f1-score": 0.6486486486486487,
+      "support": 20.0
+    },
+    "Water Works": {
+      "precision": 0.75,
+      "recall": 0.6,
+      "f1-score": 0.6666666666666666,
+      "support": 20.0
+    },
+    "accuracy": 0.6125,
+    "macro avg": {
+      "precision": 0.6196506036365035,
+      "recall": 0.6125,
+      "f1-score": 0.6134263591722469,
+      "support": 160.0
+    },
+    "weighted avg": {
+      "precision": 0.6196506036365035,
+      "recall": 0.6125,
+      "f1-score": 0.6134263591722469,
+      "support": 160.0
+    }
+  },
+  "confusion_matrix_path": "D:\\projects\\DT\\project\\PetitionAI\\docs\\confusion_matrix.png"
+}

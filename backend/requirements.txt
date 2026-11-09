@@ -19,6 +19,7 @@ pymongo>=4.6.0
 
 # ── AI / ML ──────────────────────────────────────────────────────────────────
 scikit-learn>=1.4.0
+matplotlib>=3.8.0
 numpy>=1.26.0
 pandas>=2.0.0
 sentence-transformers>=3.0.0

@@ -1,0 +1,641 @@
+id,text,department,priority,language,length
+PET-0001,Major road collapse near flyover pillar 14 with vehicles falling into crater and severe risk to life.,Roads & Infrastructure,critical,en,long
+PET-0002,"Bridge approach slab has caved in completely after heavy rain; traffic diverted, multiple casualties feared.",Roads & Infrastructure,critical,en,long
+PET-0003,Deep sinkhole opened on national highway without barricades; two motorbikes crashed into it tonight.,Roads & Infrastructure,critical,en,short
+PET-0004,"Landslide completely washed away mountain ghat road, blocking ambulances and supply trucks urgently.",Roads & Infrastructure,critical,en,short
+PET-0005,Overhead pedestrian bridge structure bent and cracking dangerously over active railway tracks.,Roads & Infrastructure,critical,en,short
+PET-0006,Highway bridge joint expanded by two feet; cars bouncing dangerously with immediate risk of structural failure.,Roads & Infrastructure,critical,en,long
+PET-0007,Ghat road retaining wall collapsed down the valley; vehicles teetering on edge of ravine.,Roads & Infrastructure,critical,en,short
+PET-0008,Massive crater on arterial ring road caused bus overturn; emergency medical teams on site.,Roads & Infrastructure,critical,en,short
+PET-0009,Pavement collapsed exposing underground high-pressure stormwater cavern; immediate cordon required.,Roads & Infrastructure,critical,en,short
+PET-0010,"Main market road culvert collapsed under loaded truck, trapped driver and snapped gas pipeline.",Roads & Infrastructure,critical,en,short
+PET-0011,"Sadak achanak dhas gayi hai bridge ke paas, do gadiyan gir chuki hain aur jaan ka khatra hai.",Roads & Infrastructure,critical,hi,long
+PET-0012,"Bada sinkhole sadak ke beech khul gaya hai bina warning board ke, turant road band karo.",Roads & Infrastructure,critical,hi,long
+PET-0013,"Bridge ka pillar crack ho gaya hai aur kabhi bhi gir sakta hai, urgent bandh karo.",Roads & Infrastructure,critical,hi,long
+PET-0014,"Flyover ke upar bada crater ban gaya hai, subah se teen accidents ho chuke hain emergency.",Roads & Infrastructure,critical,hi,long
+PET-0015,"Palathil perum vedippu vanthu idinthu vilum nilayil ullathu, aabathana nilaimai.",Roads & Infrastructure,critical,ta,short
+PET-0016,"Salai aazhamaga pithungi sinkhole aagiyullathu, vandi ulle vizhundhu perum vibathu erpattathu.",Roads & Infrastructure,critical,ta,short
+PET-0017,Malaichaalai idinthu vizhundhathal pokkuvarathu muluvathum thadaipattullathu.,Roads & Infrastructure,critical,en,short
+PET-0018,"Main road palam udaithu poyivittathu, yaarum poga mudiyavillai uyir aabathu.",Roads & Infrastructure,critical,en,short
+PET-0019,Flyover structural crack visible from below; concrete chunks falling onto moving cars below.,Roads & Infrastructure,critical,en,short
+PET-0020,Severe culvert rupture on expressway with rushing flash flood water eroding road base rapidly.,Roads & Infrastructure,critical,en,short
+PET-0021,Dangerous deep pothole on arterial road damaging tires and causing two-wheeler skids daily.,Roads & Infrastructure,high,en,short
+PET-0022,Speed breaker missing reflector paint on dark curved road; vehicles braking abruptly.,Roads & Infrastructure,high,en,short
+PET-0023,Footpath slabs broken with exposed iron rebar injuring pedestrians walking toward metro station.,Roads & Infrastructure,high,en,short
+PET-0024,"Road dug up for pipeline laying left unpaved and muddy for three weeks, blocking driveway.",Roads & Infrastructure,high,en,long
+PET-0025,"Manhole cover broken on service road, residents placed wooden stick as temporary warning.",Roads & Infrastructure,high,en,short
+PET-0026,Fresh asphalt peeled off after single shower; loose gravel causing severe motorcycle skidding.,Roads & Infrastructure,high,en,short
+PET-0027,Subway underpass flooded with two feet of water preventing two-wheelers and pedestrians.,Roads & Infrastructure,high,en,short
+PET-0028,"Dividing median kerb destroyed by truck, causing oncoming traffic to drift into wrong lane.",Roads & Infrastructure,high,en,short
+PET-0029,Road widening work stalled midway leaving sharp concrete edge cutting vehicle tires.,Roads & Infrastructure,high,en,short
+PET-0030,Pedestrian crossing signals damaged and zebra stripes completely worn out outside hospital.,Roads & Infrastructure,high,en,short
+PET-0031,Main sadak par bade bade gaddhe hain jisse bike slip ho rahi hai aur roz log girte hain.,Roads & Infrastructure,high,hi,long
+PET-0032,"Footpath toota hua hai aur lohe ki rods bahar nikli hui hain, paidal chalna mushkil hai.",Roads & Infrastructure,high,hi,long
+PET-0033,"Sadak khod kar chhod di gayi hai pichle ek mahine se, aane jane ka rasta band hai.",Roads & Infrastructure,high,hi,long
+PET-0034,"Speed breaker par white stripes nahi hain, raat me dikhayi nahi deta aur jhatka lagta hai.",Roads & Infrastructure,high,hi,long
+PET-0035,Salai muzhuvathum periya pallangal aagi iru chakkar vahanangal vizhunthu kaayapadugindranar.,Roads & Infrastructure,high,ta,short
+PET-0036,"Nadai paathai idinthu kambi veliye therigirathu, nadanthu sella mudiyavillai.",Roads & Infrastructure,high,en,short
+PET-0037,"Kulaimurivu aana rathavai sari seiya vendum, vandi oatta mudiyamal kashtapadugiroam.",Roads & Infrastructure,high,en,short
+PET-0038,Sadak par asphalt nikal gaya hai aur patthar bikhre hain jisse break lagana khatarnak hai.,Roads & Infrastructure,high,hi,long
+PET-0039,Service lane entrance blocked by broken asphalt heaps left behind by road contractors.,Roads & Infrastructure,high,en,short
+PET-0040,Uneven tar settling along bus route causing violent rocking of public buses and spine injury risk.,Roads & Infrastructure,high,en,long
+PET-0041,Road markings and lane dividers faded along five kilometer stretch of ring road.,Roads & Infrastructure,medium,en,short
+PET-0042,Small potholes developing near street corner before monsoon season sets in.,Roads & Infrastructure,medium,en,short
+PET-0043,Kerb stones displaced by tree roots needing relaying and alignment along colony avenue.,Roads & Infrastructure,medium,en,short
+PET-0044,Street name boards missing at three consecutive road intersections making navigation tough.,Roads & Infrastructure,medium,en,short
+PET-0045,Speed breaker height excessive causing car underbody scraping at recommended speed limit.,Roads & Infrastructure,medium,en,short
+PET-0046,Uneven paving blocks on market walkway causing mild tripping hazards for senior citizens.,Roads & Infrastructure,medium,en,short
+PET-0047,Road resurfacing completed six months ago but expansion joints left unfilled.,Roads & Infrastructure,medium,en,short
+PET-0048,Reflector cat eyes missing along divider curb on sector four residential loop road.,Roads & Infrastructure,medium,en,short
+PET-0049,"Temporary gravel patch sinking slightly after water pipe repair, requires asphalt leveling.",Roads & Infrastructure,medium,en,short
+PET-0050,"Bollards along cycle track damaged by reversing delivery vans, need replacement.",Roads & Infrastructure,medium,en,short
+PET-0051,Colony ke mod par street name board gayab hai jisse delivery walo ko dikkat hoti hai.,Roads & Infrastructure,medium,hi,long
+PET-0052,Speed breaker thoda uncha bana diya gaya hai jisse car ke neeche scratch lagta hai.,Roads & Infrastructure,medium,hi,long
+PET-0053,Sadak ke kinare ke stone slabs thode hil rahe hain unko cement se fix karna hai.,Roads & Infrastructure,medium,hi,long
+PET-0054,"Raste par white line aur lane marking mit chuki hai, dubara paint karwayein.",Roads & Infrastructure,medium,hi,short
+PET-0055,"Salaiyile lane markings azhinthu vittathu, marupadiyum vellai kottugal poda vendum.",Roads & Infrastructure,medium,en,short
+PET-0056,Colony theru munaiyil peyar palagai illamal puthiya aatkallukku kashtamaga ullathu.,Roads & Infrastructure,medium,en,short
+PET-0057,Veethi oram ulla nadai paathai kalgal konjam sariyaga amaykkapadavillai.,Roads & Infrastructure,medium,en,short
+PET-0058,"Speed breaker konjam thazhvaaga seithu thara vendum, car adiyil idikkirathu.",Roads & Infrastructure,medium,en,short
+PET-0059,Residential street asphalt shows minor alligator cracking that should be sealed before rains.,Roads & Infrastructure,medium,en,short
+PET-0060,Bicycle lane green surface coat worn out in patches near community center entrance.,Roads & Infrastructure,medium,en,short
+PET-0061,Requesting installation of cat-eye reflectors along colony lane for aesthetic night visibility.,Roads & Infrastructure,low,en,short
+PET-0062,Suggestion to trim decorative bougainvillea creepers overhanging the street sign board.,Roads & Infrastructure,low,en,short
+PET-0063,Request to repaint zebra crossing outside local library for cleaner neighborhood appearance.,Roads & Infrastructure,low,en,short
+PET-0064,Kerb painting in yellow and black faded along quiet residential dead-end lane.,Roads & Infrastructure,low,en,short
+PET-0065,Inquiry regarding scheduled asphalt resurfacing timeline for ward number twelve lanes.,Roads & Infrastructure,low,en,short
+PET-0066,Requesting information on master road widening proposal for sector eleven avenue.,Roads & Infrastructure,low,en,short
+PET-0067,Feedback on newly laid concrete road surface which is smooth and well constructed.,Roads & Infrastructure,low,en,short
+PET-0068,Request to install a mirror at sharp blind turn in residential hillock layout.,Roads & Infrastructure,low,en,short
+PET-0069,Colony ke dead end raste par safedi aur black paint karwane ka nivedan.,Roads & Infrastructure,low,hi,short
+PET-0070,Colony gate ke bahar chhota convex mirror lagane ki darkhwast blind turn ke liye.,Roads & Infrastructure,low,hi,short
+PET-0071,Sadak resurface hone ki agle saal ki scheme ki jankari chahiye ward barah ke liye.,Roads & Infrastructure,low,hi,long
+PET-0072,"Nayi sadak acchi bani hai, bas thoda sa reflector laga dete to aur behtar hota.",Roads & Infrastructure,low,hi,long
+PET-0073,Theru kodi varai salai sariyaaga ullathu aanaal orathil vanna poonchu poosa vendum.,Roads & Infrastructure,low,ta,short
+PET-0074,Colony sandhippil oru sinna valaivu mirror vaika anurodham panugiroam.,Roads & Infrastructure,low,en,short
+PET-0075,Salai thittam patriya thagaval ariya vendugiroam ward pathinonrukku.,Roads & Infrastructure,low,ta,short
+PET-0076,Request for flower planter boxes along pedestrian boulevard outside cultural complex.,Roads & Infrastructure,low,en,short
+PET-0077,Query regarding permissible ramp angle from house gate to municipal road kerb.,Roads & Infrastructure,low,en,short
+PET-0078,Request to place milestone marker indicating distance to central railway junction.,Roads & Infrastructure,low,en,short
+PET-0079,Appreciation note for swift pothole patching done last week on temple road.,Roads & Infrastructure,low,en,short
+PET-0080,Request to review pedestrian island landscaping layout at northern residential roundabout.,Roads & Infrastructure,low,en,short
+PET-0081,Main drinking water pipeline contaminated with raw sewage; brown stinking water causing acute cholera outbreak.,Water Works,critical,en,long
+PET-0082,High pressure water transmission main burst flooding entire slum settlement with five feet of water.,Water Works,critical,en,long
+PET-0083,Chemical effluent backflowed into municipal water line; residents vomiting with acute chemical poisoning.,Water Works,critical,en,short
+PET-0084,Complete drinking water outage for ten consecutive days in entire municipality; infant dehydration crisis.,Water Works,critical,en,short
+PET-0085,Water distribution pump house caught fire destroying transformers; million citizens without any water.,Water Works,critical,en,short
+PET-0086,Underground water reservoir collapsed into sewer channel; lethal fecal bacterial contamination confirmed.,Water Works,critical,en,short
+PET-0087,Arsenic and cyanide smell detected in overhead water tank supplying pediatric hospital wing.,Water Works,critical,en,short
+PET-0088,Burst 1200mm bulk water conduit washed away three hutments and submerged electrical sub-station.,Water Works,critical,en,short
+PET-0089,Toxic factory sludge seeped into borewell drinking water network; fifty people hospitalized with seizures.,Water Works,critical,en,short
+PET-0090,Potable water supply line flowing with dark black industrial toxic waste; multiple children vomiting blood.,Water Works,critical,en,long
+PET-0091,"Peene ke paani me ganda gutter ka paani mil kar aa raha hai, bache diarrhea se hospital me hain.",Water Works,critical,hi,long
+PET-0092,Main drinking water pipeline phat gayi hai aur basti me paanch foot paani bhar gaya hai turant roko.,Water Works,critical,hi,long
+PET-0093,"Das din se poore ilaqe me paani ki ek boond nahi aayi hai, log bimar pad rahe hain emergency.",Water Works,critical,hi,long
+PET-0094,Paani ki line me chemical ki badboo aa rahi hai aur peene se logo ko ulti dast ho rahe hain.,Water Works,critical,hi,long
+PET-0095,"Kudineeril saakadai kalanthu karuppaaga varugirathu, kuraivaga aayiram per vayitrupokkal baathipattullar.",Water Works,critical,en,short
+PET-0096,Kudineer main pipe vedithu theruvellam perum vellamaga paaynthu veedukalil pugunthuvittathu.,Water Works,critical,ta,short
+PET-0097,"Pattu naalaaga oru sottu thanniyum varavillai, makkal kudi thaneerukku kanner vidugiranar.",Water Works,critical,en,short
+PET-0098,"Kudineer thottiyil visham kalanthiruppathaga sandhegam, kuditha palar maruthuvamanaiyil anumatikkappattullar.",Water Works,critical,en,short
+PET-0099,Sewage line vacuum sucked directly into drinking mains during negative pressure; immediate shutoff required.,Water Works,critical,en,short
+PET-0100,Primary chlorination dosing failed at municipal water treatment plant; raw pathogen water entering grid.,Water Works,critical,en,short
+PET-0101,Continuous water leakage from municipal valve on main street wasting thousands of liters daily.,Water Works,high,en,short
+PET-0102,Extremely low water pressure for two weeks; upper floors unable to fill storage tanks.,Water Works,high,en,short
+PET-0103,Drinking water delivered has yellowish tint and sandy sediment settling in overhead tanks.,Water Works,high,en,short
+PET-0104,Scheduled daily water supply cut down to ten minutes without prior public announcement.,Water Works,high,en,short
+PET-0105,Underground pipeline leakage eroding foundation of adjacent residential apartment building.,Water Works,high,en,short
+PET-0106,Water meter installed incorrectly spinning backward and billing erratic exorbitant sums.,Water Works,high,en,short
+PET-0107,Municipal tanker water distribution irregular and tanker mafia extorting money from residents.,Water Works,high,en,short
+PET-0108,Air lock in distribution line causing sputtering taps and zero flow across sector three.,Water Works,high,en,short
+PET-0109,"Drinking water valve gate rusted shut, depriving forty homes on cross road number two.",Water Works,high,en,short
+PET-0110,Water supply timings shifted to 2 AM in freezing cold causing severe distress to elderly residents.,Water Works,high,en,long
+PET-0111,"Pani ka pressure bahut kam hai, do hafte se second floor par paani chadhta hi nahi hai.",Water Works,high,hi,long
+PET-0112,Sadak ke beech valve se hazaron liter peene ka paani beh raha hai aur barbad ho raha hai.,Water Works,high,hi,long
+PET-0113,Nal me peela aur mitti wala paani aa raha hai jo peene yogya bilkul nahi hai.,Water Works,high,hi,long
+PET-0114,"Water supply ka time subah do baje kar diya hai, budhe logo ko paani bharne me bahut pareshani hai.",Water Works,high,hi,long
+PET-0115,"Kudineer alavu mikavum kuraivaaga ulla thal, mela maadikku thaneer yeravillai.",Water Works,high,en,short
+PET-0116,Theruvil kudineer kuzhai vedithu aayirakkanakkana litre thanneer veenaagi kondirukkirathu.,Water Works,high,en,short
+PET-0117,"Thanniril manal matrum manjal niramaga kalainthu varugirathu, kudika mudiyavillai.",Water Works,high,ta,short
+PET-0118,Kudineer supply varum neram mika thavaraana nerathil iravilirunthu vidividaikkul varugirathu.,Water Works,high,en,short
+PET-0119,Booster pump failure at zonal booster station leaving five blocks dry for four days.,Water Works,high,en,short
+PET-0120,Contaminated muddy water gushing from street standpost where twenty poor families fetch drinking water.,Water Works,high,en,short
+PET-0121,Water billing shows excess meter reading despite premises being locked during vacation month.,Water Works,medium,en,short
+PET-0122,Valve chamber concrete cover cracked and needs replacement before vehicles crush the spindle.,Water Works,medium,en,short
+PET-0123,Mild sulfur odor in morning municipal supply dissipating after two minutes of tap running.,Water Works,medium,en,short
+PET-0124,Public water tap leaking drops continuously due to worn washer at community market park.,Water Works,medium,en,short
+PET-0125,"Water pipeline trench backfilling not compacted properly, sinking slightly along curb line.",Water Works,medium,en,short
+PET-0126,Requesting relocation of water meter box away from building rainwater downspout pipe.,Water Works,medium,en,short
+PET-0127,Water supply delayed by one hour from normal schedule for three alternate mornings.,Water Works,medium,en,short
+PET-0128,"Standpost tap handle broken by children, requiring new brass tap assembly replacement.",Water Works,medium,en,short
+PET-0129,Water quality test report requested for ward eight groundwater tube wells.,Water Works,medium,en,short
+PET-0130,"Low residual chlorine taste noticed in tap water, requesting municipal lab testing.",Water Works,medium,en,short
+PET-0131,"Pani ka bill aam mahino se dugna aaya hai jabki ghar band tha, meter check karwayein.",Water Works,medium,hi,long
+PET-0132,Public tap ki tooti dheeli hai aur boond boond paani tapak raha hai din raat.,Water Works,medium,hi,long
+PET-0133,Subah ke paani me thodi si badboo aati hai jo thodi der me theek ho jati hai.,Water Works,medium,hi,long
+PET-0134,Gali ka water meter box tut gaya hai usko cement se repair karwana hai.,Water Works,medium,hi,short
+PET-0135,"Kudineer kattanam adhika alavil vanthullathu, meter parikshikka vendugiroam.",Water Works,medium,en,short
+PET-0136,"Theru kodi water tap thirugai udaynthu thaneer sottugirathu, puthiya tap maata vendum.",Water Works,medium,en,short
+PET-0137,Kudineer lab parikshai arikkai thevai engal pagudhikku.,Water Works,medium,ta,short
+PET-0138,Water pipeline thondi moodiya idathil konjam pallam ullathu.,Water Works,medium,en,short
+PET-0139,Request to clean sediment filter mesh on feeder line supplying local community center.,Water Works,medium,en,short
+PET-0140,Periodic pressure fluctuation between 6 AM and 7 AM requires valve throttling adjustment.,Water Works,medium,en,short
+PET-0141,Application to transfer existing domestic water connection ownership name to legal heir.,Water Works,low,en,short
+PET-0142,Request for guidance on rainwater harvesting percolation pit subsidy procedure.,Water Works,low,en,short
+PET-0143,Query regarding fee structure for converting residential water connection to commercial tariff.,Water Works,low,en,short
+PET-0144,Request to receive monthly water consumption bill via email and SMS notifications.,Water Works,low,en,short
+PET-0145,Feedback thanking water board junior engineer for timely pipeline leakage repair yesterday.,Water Works,low,en,short
+PET-0146,Inquiry on procedure to install secondary sub-meter for ground floor tenant portion.,Water Works,low,en,short
+PET-0147,Requesting schedule of upcoming planned water maintenance shutdown for ward fifteen.,Water Works,low,en,short
+PET-0148,Application for NOC from water department for residential building plan sanction.,Water Works,low,en,short
+PET-0149,Ghar ke paani ke connection ka naam transfer karwane ke documents ki jankari chahiye.,Water Works,low,hi,short
+PET-0150,Rainwater harvesting lagwane ke sarkari anudan ke baare me poochhna chahte hain.,Water Works,low,hi,short
+PET-0151,Water bill ko email aur mobile SMS par mangwane ke liye number register karwayein.,Water Works,low,hi,short
+PET-0152,Junior engineer sahab ko dhanyawad jinhone kal aakar valve theek kar diya.,Water Works,low,hi,short
+PET-0153,Kudineer inaippu peyar maatram seiyum muraigalai therivikka vendum.,Water Works,low,en,short
+PET-0154,Mazhai neer semarippu thittam patriya sarkaari maniyam thagaval thevai.,Water Works,low,en,short
+PET-0155,Kudineer kattanam online moolam chelutha OTP varavillai udhavi thevai.,Water Works,low,en,short
+PET-0156,Peyar maatram seiya koodiya aavanangal patriya sandhegam.,Water Works,low,en,short
+PET-0157,Request for information brochure on domestic water conservation and greywater reuse.,Water Works,low,en,short
+PET-0158,Inquiry regarding timeline for replacing old mechanical water meters with smart ultrasonic meters.,Water Works,low,en,short
+PET-0159,Request for certificate of water potability for food establishment licensing application.,Water Works,low,en,short
+PET-0160,Suggestion to install digital flow rate display at municipal water dispensing kiosk.,Water Works,low,en,short
+PET-0161,Massive mountain of toxic chemical waste dumped illegally near primary school playground catching fire.,Waste Management,critical,en,short
+PET-0162,"Biohazard medical hospital waste needles, soiled bandages, and amputated tissue dumped in residential alley.",Waste Management,critical,en,short
+PET-0163,Rotting animal carcasses dumped in residential canal creating unbearable bio-hazard and pestilence.,Waste Management,critical,en,short
+PET-0164,Leachate lagoon wall breached at city dump; poisonous black slime entering groundwater aquifer directly.,Waste Management,critical,en,short
+PET-0165,Plastic recycling godown burning toxic dioxin fumes spreading through densely populated slums.,Waste Management,critical,en,short
+PET-0166,Sewage tanker illegally dumping raw septage into open storm drain outside pediatric clinic.,Waste Management,critical,en,short
+PET-0167,Radioactive industrial waste bins found abandoned in empty municipal ground near colony.,Waste Management,critical,en,short
+PET-0168,Dump yard massive trash slide buried two sanitation workers; rescue operations urgently underway.,Waste Management,critical,en,short
+PET-0169,Dead poultry dumped by thousands on roadside during avian flu outbreak; severe public health threat.,Waste Management,critical,en,long
+PET-0170,Chemical sludge fumes causing school students to faint in classrooms adjacent to municipal landfill.,Waste Management,critical,en,short
+PET-0171,"School ke paas kisi ne hospital ka kachra aur used syringes fenk di hain, bacho ko infection ka khatra.",Waste Management,critical,hi,long
+PET-0172,Kachre ke bade dher me aag lag gayi hai aur zaharili gas pure mohalle me fail rahi hai log behosh hain.,Waste Management,critical,hi,long
+PET-0173,"Mara hua janwar gali ke beech sad raha hai aur keede nikal rahe hain, cholera failne ka dar hai.",Waste Management,critical,hi,long
+PET-0174,"Chemical factory ka kachra open nala me bahaya ja raha hai, toxic dhuaan uth raha hai emergency.",Waste Management,critical,hi,long
+PET-0175,"Palli koodam arugil maruthuva kalyvukal oosi panjukal kotti erigirathu, uyirukku aabathu.",Waste Management,critical,ta,short
+PET-0176,Kuppai medu thee pidithu erinthu vishamana pukai nagaram muzhuvathum paravugirathu.,Waste Management,critical,ta,short
+PET-0177,"Iranda maadu theruvil azhugi naatram adikkirathu, noiy thotru aabathu perithaga ullathu.",Waste Management,critical,ta,short
+PET-0178,Hospital waste theruvil kottiyathal kuthanthaihalukku theevira thotru erpadum aabathu.,Waste Management,critical,en,short
+PET-0179,Uncontrolled open incineration of lithium batteries and electronic scrap releasing neurotoxins into air.,Waste Management,critical,en,short
+PET-0180,Spill of hazardous heavy metal galvanic plating sludge over city park jogging track.,Waste Management,critical,en,short
+PET-0181,Community garbage collection bin overflowing for ten days; street dogs dragging waste everywhere.,Waste Management,high,en,short
+PET-0182,Door-to-door waste collection vehicle has not visited our street for two weeks continuously.,Waste Management,high,en,short
+PET-0183,Illegal dumping of construction demolition debris blocking emergency fire lane completely.,Waste Management,high,en,short
+PET-0184,Rotting vegetable waste dumped outside local temple attracting thousands of flies and mosquitoes.,Waste Management,high,en,short
+PET-0185,Green waste from municipal tree trimming left piled on road corner blocking vehicular sightlines.,Waste Management,high,en,short
+PET-0186,Sanitation workers sweeping dirt directly into open storm water drains causing inevitable choking.,Waste Management,high,en,short
+PET-0187,Dead street dog decomposing on public sidewalk outside residential apartment main gate.,Waste Management,high,en,short
+PET-0188,Open garbage transfer point foul odor causing nausea and headache across entire residential block.,Waste Management,high,en,short
+PET-0189,Plastic bags and food containers choking municipal stormwater drain grating before rainy season.,Waste Management,high,en,short
+PET-0190,Commercial hotels dumping kitchen food grease directly into open sidewalk dustbins at midnight.,Waste Management,high,en,short
+PET-0191,"Dus din se kachra uthane wali gaadi nahi aayi hai, pura mohalla kachre ka dher ban gaya hai.",Waste Management,high,hi,long
+PET-0192,Kachre ka dabba pura overflow ho raha hai aur kutte kachra raste par kheench rahe hain.,Waste Management,high,hi,long
+PET-0193,Hotel wale raat me khana aur ganda tel khule dusterbin me daal jate hain jisse badboo aati hai.,Waste Management,high,hi,long
+PET-0194,Ghar ghar se kachra lene wala sanitary worker do hafte se gayab hai gali me gandagi hai.,Waste Management,high,hi,long
+PET-0195,"Kuppai vandi pattu naalaaga varavillai, theruvil kuppai malai pola kuvinthullathu.",Waste Management,high,ta,short
+PET-0196,Kuppai thotti nirainthu vazhinthu theru muzhuvathum naaygal parappugindrana.,Waste Management,high,ta,short
+PET-0197,"Building idipadu kalyvukalai theruvil kotti senru vittanar, vandi sella mudiyavillai.",Waste Management,high,en,short
+PET-0198,"Irandhu pona naai saalayorathil kidakirathu, aal anuppi agarra vendum.",Waste Management,high,en,short
+PET-0199,Commercial fish market dumping offal into street open gutters causing severe vector-borne disease risk.,Waste Management,high,en,short
+PET-0200,Unauthorized burning of dry leaf piles along residential avenue releasing dense choking smoke.,Waste Management,high,en,short
+PET-0201,Public park dustbins missing lids allowing crows to scatter paper and wrappers on lawn.,Waste Management,medium,en,short
+PET-0202,"Community bin wheel broken, tilted sideways and spilling dry contents onto pavement.",Waste Management,medium,en,short
+PET-0203,Request to place separate green and blue color-coded bins for wet and dry waste segregation.,Waste Management,medium,en,long
+PET-0204,Commercial street bins emptied only once daily whereas twice daily collection is required.,Waste Management,medium,en,short
+PET-0205,Sanitation worker demanding informal cash tip for picking up dry garden foliage bags.,Waste Management,medium,en,short
+PET-0206,Garbage tipper truck leaking foul hydraulic oil onto clean residential block pavement.,Waste Management,medium,en,short
+PET-0207,Broken glass bottles left in street corner requiring broom sweeping to protect bicycle tires.,Waste Management,medium,en,short
+PET-0208,Market square dustbin emptied late in afternoon instead of early morning before shops open.,Waste Management,medium,en,short
+PET-0209,Flyers and advertising stickers pasted all over public garbage compactor station wall.,Waste Management,medium,en,short
+PET-0210,Small pile of garden soil and dry leaves left by road sweeper at street corner for three days.,Waste Management,medium,en,long
+PET-0211,"Park ke kachre ke dabbe ka dhakkan tut gaya hai, kauwe kachra ghaas par bikher rahe hain.",Waste Management,medium,hi,long
+PET-0212,Colony ke kachre ke dabbe ka pahiya toota hua hai aur dabba tedha hokar gir jata hai.,Waste Management,medium,hi,long
+PET-0213,Gele aur sookhe kachre ke liye alag alag dabbe lagwane ki maang colony ke liye.,Waste Management,medium,hi,long
+PET-0214,Safai karmi sookhi patti uthane ke liye alag se paise maangta hai niyam ke khilaf.,Waste Management,medium,hi,long
+PET-0215,Poonga kuppai thottiyil moodi illamal kaakkaigal kuppaiyai kotti vidugindrana.,Waste Management,medium,ta,short
+PET-0216,Kuppai thotti chakkaram udaynthu thalaimozhiyaaga kidakirathu.,Waste Management,medium,ta,short
+PET-0217,Pasumai matrum ulaar kuppaikalukku thanithani thotti vaika vendum.,Waste Management,medium,en,short
+PET-0218,Theru kootuvor sariyaana nerathil varuvathillai thuruvil thagaval tharavendum.,Waste Management,medium,en,short
+PET-0219,Street sweeping dust accumulating along median kerbs causing particulate dust when vehicles pass.,Waste Management,medium,en,short
+PET-0220,Request for educational stencil painting on colony walls discouraging open wall urination and spitting.,Waste Management,medium,en,short
+PET-0221,Application to request home composting bin kit under municipal zero-waste green incentive scheme.,Waste Management,low,en,short
+PET-0222,Inquiry regarding designated drop-off schedule for annual household e-waste collection drive.,Waste Management,low,en,short
+PET-0223,Requesting municipal permission to conduct neighborhood citizen plogging cleanup drive on Sunday.,Waste Management,low,en,short
+PET-0224,Query regarding permissible disposal method for household renovation ceramic sanitary ware.,Waste Management,low,en,short
+PET-0225,Suggestion to install solar-powered trash compactors in high-footfall central shopping mall promenade.,Waste Management,low,en,short
+PET-0226,Appreciation for prompt clearance of festival flower waste by morning sanitation team.,Waste Management,low,en,short
+PET-0227,Request for informative pamphlets in Tamil and Hindi promoting home waste segregation practices.,Waste Management,low,en,short
+PET-0228,Inquiry about bulky furniture pickup service fees and online booking procedure.,Waste Management,low,en,short
+PET-0229,Ghar me geela kachra compost karne wali kit lene ke liye apply kaise karein.,Waste Management,low,hi,short
+PET-0230,Purana electronic saman jaise TV fridge disposal drive ka schedule pata karna hai.,Waste Management,low,hi,short
+PET-0231,Sunday ko colony ke logo ke sath milkar safai abhiyan chalane ki permission chahiye.,Waste Management,low,hi,short
+PET-0232,Diwali festival ke baad subah hi kachra saaf karne ke liye safai team ka shukriya.,Waste Management,low,hi,long
+PET-0233,Veettu uram thayarikkum kuppai thotti maniyam pera vinnappikka virumbugiroam.,Waste Management,low,ta,short
+PET-0234,E-waste porutkalai eppadi agarruvadhu enpathu patriya thagaval thevai.,Waste Management,low,en,short
+PET-0235,Colony thooymai paniyalar kalai paaratugirom migavum arumaiyaga velai seithanar.,Waste Management,low,en,short
+PET-0236,Thalaiku vali seiyum kuppai meedhu vizhippunarvu seithi thara vendum.,Waste Management,low,ta,short
+PET-0237,Request for guidance on recycling old automobile rubber tires into community garden swings.,Waste Management,low,en,short
+PET-0238,Proposal to display contact number of sanitary inspector on all community garbage dumpsters.,Waste Management,low,en,short
+PET-0239,Query regarding rules governing disposal of commercial salon hair and packaging material.,Waste Management,low,en,short
+PET-0240,Request to recognize sanitation worker of the month in municipal zonal newsletter.,Waste Management,low,en,short
+PET-0241,11KV high-tension live wire snapped and sparking violently on flooded street with school children present.,Electricity Board,critical,en,long
+PET-0242,Roadside distribution transformer exploded into ball of fire directly adjoining multi-story apartment.,Electricity Board,critical,en,short
+PET-0243,Streetlight pole completely electrified and shocking pedestrians touching it during monsoon downpour.,Electricity Board,critical,en,short
+PET-0244,"Underground cable explosion blew manhole cover into air, smoke and sparks billowing continuously.",Electricity Board,critical,en,short
+PET-0245,Exposed uninsulated electric wire hanging inside public children park swing area at toddler height.,Electricity Board,critical,en,short
+PET-0246,"Substation feeder transformer burning with black toxic smoke, entire locality plunged into darkness.",Electricity Board,critical,en,short
+PET-0247,Electric junction box submerged in drain water buzzing with lethal stray electrical current.,Electricity Board,critical,en,short
+PET-0248,"Snapped overhead power line fell across metal roof of slum dwelling, sparking and setting thatch alight.",Electricity Board,critical,en,long
+PET-0249,"Overhead conductor snapped and coiled across municipal bus, passengers trapped inside safely for now.",Electricity Board,critical,en,short
+PET-0250,Distribution pillar door ripped open with bare copper busbars accessible to street playing children.,Electricity Board,critical,en,short
+PET-0251,"11000 volt ka taar toot kar paani me gir gaya hai aur chingari nikal rahi hai, bache paas me hain.",Electricity Board,critical,hi,long
+PET-0252,Sadak ke transformer me achanak aag lag gayi hai aur dhamaka ho raha hai building ke paas.,Electricity Board,critical,hi,long
+PET-0253,"Streetlight ka khamba current maar raha hai barish me, ek kutte ko shock lag chuka hai emergency.",Electricity Board,critical,hi,long
+PET-0254,Underground electric cable phat gayi hai aur footpath par aag ke shole nikal rahe hain.,Electricity Board,critical,hi,long
+PET-0255,"11KV min kambi arunthu thaneeril vizhundhu thee pori parakkirathu, perum uyir aabathu.",Electricity Board,critical,ta,short
+PET-0256,Theru transformer vedithu thee pidithu erigirathu pakkathu veetirkku thee paravum aabathu.,Electricity Board,critical,ta,short
+PET-0257,"Vilakku thoonil current paaygirathu, thottal shock adikkirathu aabathu.",Electricity Board,critical,en,short
+PET-0258,Min junction box thiranthu kidakirathu chinna pillaigal vilayadum idathil uyir aabathu.,Electricity Board,critical,en,short
+PET-0259,High voltage arc jumping from sagging line to second floor residential balcony during wind gusts.,Electricity Board,critical,en,long
+PET-0260,Power line snapped across metal petrol pump canopy; immediate line isolation urgently demanded.,Electricity Board,critical,en,short
+PET-0261,Frequent power tripping and voltage fluctuation burning expensive household refrigerators and appliances.,Electricity Board,high,en,short
+PET-0262,"Overhead power lines sagging dangerously low over road, snagging tops of passing delivery trucks.",Electricity Board,high,en,short
+PET-0263,Complete power blackout in residential sector lasting over sixteen hours in peak summer heat.,Electricity Board,high,en,short
+PET-0264,Streetlight pole rusted through at base and leaning at sixty degree angle over moving traffic.,Electricity Board,high,en,long
+PET-0265,"Electricity meter sparking inside apartment electrical shaft, burning plastic smell detected.",Electricity Board,high,en,short
+PET-0266,Phase down on our avenue; single-phase power supply unable to run domestic water pumps for two days.,Electricity Board,high,en,long
+PET-0267,Tree branch rubbing against 440V overhead lines producing loud popping sparks in windy conditions.,Electricity Board,high,en,short
+PET-0268,Damaged electric pole knocked by tractor left leaning on residential boundary wall precariously.,Electricity Board,high,en,short
+PET-0269,Underground power cable fault cutting electricity supply to fifty households on street number four.,Electricity Board,high,en,short
+PET-0270,All streetlights unlit on busy bypass road for two weeks causing multiple nighttime muggings and crashes.,Electricity Board,high,en,long
+PET-0271,Bar bar light ja rahi hai aur voltage itna kam hai ki pankha aur fridge jalne ka dar hai.,Electricity Board,high,hi,long
+PET-0272,Bijli ka khamba neeche se gal gaya hai aur sadak ki taraf jhuka hua hai kabhi bhi gir sakta hai.,Electricity Board,high,hi,long
+PET-0273,"Solah ghante se light gayab hai garmi ke mausam me, pani ki motor nahi chal rahi hai.",Electricity Board,high,hi,long
+PET-0274,Bijli ke taar ped ki tahni se ragad rahe hain aur raat me tezi se chingari nikalte hain.,Electricity Board,high,hi,long
+PET-0275,Adikkadi min vettu erpadugirathu matrum voltage kuraivaaga ulla thal TV fridge paazhagirathu.,Electricity Board,high,en,short
+PET-0276,"Min kambi migavum thaazhvaga thongugirathu, larry vanthu modhum aabathu ullathu.",Electricity Board,high,ta,short
+PET-0277,"Pattinaaru manineramaaga current illai, veyilil makkal avathippadugindranar.",Electricity Board,high,en,short
+PET-0278,Vilakku thoon saaivaga irukkirathu ethirpaaraatha vidhamaaga keezhe vilalam.,Electricity Board,high,en,short
+PET-0279,Frequent neutral drop causing 380V surge across residential sockets destroying home routers.,Electricity Board,high,en,short
+PET-0280,Streetlight timer stuck permanently off along highway hospital entrance for past ten nights.,Electricity Board,high,en,short
+PET-0281,Two consecutive streetlights fused on residential cross street leaving dark stretch at night.,Electricity Board,medium,en,short
+PET-0282,Electricity billing dispute: automated meter recorded 800 units during vacant lockdown month.,Electricity Board,medium,en,short
+PET-0283,Streetlight burning continuously during broad daylight due to faulty photo-sensor relay.,Electricity Board,medium,en,short
+PET-0284,Electricity meter display panel blank and unresponsive; unable to read current consumption units.,Electricity Board,medium,en,short
+PET-0285,"Service wire connection clamp loose at weather-head pipe, causing occasional flickering during wind.",Electricity Board,medium,en,short
+PET-0286,Request to trim overgrown neem tree branches intertwining with low-voltage overhead service drops.,Electricity Board,medium,en,short
+PET-0287,Commercial tariff billed erroneously for residential domestic apartment electricity meter.,Electricity Board,medium,en,short
+PET-0288,Streetlight pole junction box cover missing; wires tied with plastic tape needing proper cap.,Electricity Board,medium,en,short
+PET-0289,Delay of three weeks in processing online application for temporary domestic renovation connection.,Electricity Board,medium,en,short
+PET-0290,Surge protector popped on distribution pillar causing low humming noise near apartment gate.,Electricity Board,medium,en,short
+PET-0291,Gali ke do streetlight ke bulb kharab hain jisse raat me gali me andhera rehta hai.,Electricity Board,medium,hi,long
+PET-0292,"Streetlight din ke 12 baje bhi jalti rehti hai, sensor switch kharab ho gaya hai bijli barbad ho rahi.",Electricity Board,medium,hi,long
+PET-0293,"Bijli ke meter ki screen band ho gayi hai, reading dikhayi nahi de rahi hai check karein.",Electricity Board,medium,hi,long
+PET-0294,Bijli ka bill domestic meter par commercial dar se bhej diya gaya hai isko correct karein.,Electricity Board,medium,hi,long
+PET-0295,"Irandu theru vilakkukal eriyavillai, iruttil nadakka kashtamaga ullathu.",Electricity Board,medium,en,short
+PET-0296,Pagal velaiyilum theru vilakku erinthu minsaaram veenaagirathu sensor maata vendum.,Electricity Board,medium,en,short
+PET-0297,"Meter display velai seiyavillai, reading paarkka mudiyavillai.",Electricity Board,medium,en,short
+PET-0298,Min bill thavaraana alavil vanthullathu parikshikka vendum.,Electricity Board,medium,en,short
+PET-0299,Request to realign service drop bracket pulled askew during cable TV wire installation.,Electricity Board,medium,en,short
+PET-0300,Minor humming noise from pole-mounted transformer requiring preventive oil level inspection.,Electricity Board,medium,en,short
+PET-0301,Application to update billing address and mobile phone number for SMS bill notification.,Electricity Board,low,en,short
+PET-0302,Inquiry regarding solar rooftop grid-tie net-metering subsidy application workflow.,Electricity Board,low,en,short
+PET-0303,Requesting duplicate physical copy of last month paid electricity bill receipt for visa application.,Electricity Board,low,en,short
+PET-0304,Query regarding procedure to apply for additional sanctioned load from 3KW to 5KW.,Electricity Board,low,en,short
+PET-0305,Request for guidance on shifting domestic electric meter board two feet during wall plastering.,Electricity Board,low,en,short
+PET-0306,Appreciation note for line staff who restored fallen wire swiftly during yesterday thunderstorm.,Electricity Board,low,en,short
+PET-0307,Inquiry on tariff rates applicable for electric vehicle residential charging slow socket.,Electricity Board,low,en,short
+PET-0308,Request for detailed breakup of fuel surcharge adjustment charges in current bi-monthly bill.,Electricity Board,low,en,short
+PET-0309,Bijli ke bill me mobile number aur naam update karwane ka form chahiye.,Electricity Board,low,hi,short
+PET-0310,Chhat par solar panel lagwane ke baad net meter lagwane ka procedure janna hai.,Electricity Board,low,hi,short
+PET-0311,Pichle mahine ke bhare hue bijli ke bill ki duplicate receipt chahiye visa application ke liye.,Electricity Board,low,hi,long
+PET-0312,Load 3 kilowatt se 5 kilowatt badhwane ke liye kya documents lagenge jankari dein.,Electricity Board,low,hi,short
+PET-0313,Minsara billil mobile ennai maatruvadhu eppadi enru therivikka vendum.,Electricity Board,low,en,short
+PET-0314,Solar net metering inaippu petrukkolla vinnappikkum muraigal thevai.,Electricity Board,low,en,short
+PET-0315,Kadantha maatha min kattana rathidhu thevai aavanangallukkaga.,Electricity Board,low,ta,short
+PET-0316,Min alavai 3kw irunthu 5kw aaga uyartha koodiya kattanam enna.,Electricity Board,low,en,short
+PET-0317,Query regarding permissible wire gauge for residential EV home charger wiring.,Electricity Board,low,en,short
+PET-0318,Request to verify digital seal intactness following meter box tamper check inspection.,Electricity Board,low,en,short
+PET-0319,Feedback suggesting online self-reading submission via mobile app on scheduled meter dates.,Electricity Board,low,en,short
+PET-0320,Inquiry regarding scheduled regional maintenance shutdown dates for quarterly substation overhaul.,Electricity Board,low,en,short
+PET-0321,Armed robbery and knife assault in progress at colony market lane; police response urgently needed.,Public Safety,critical,en,long
+PET-0322,Massive fire outbreak in commercial godown storing chemicals with people trapped on upper floors.,Public Safety,critical,en,short
+PET-0323,Kidnapping attempt of school girl thwarted by citizens; suspects fleeing in black unmarked van.,Public Safety,critical,en,short
+PET-0324,Active communal riot and stone pelting erupting at temple intersection with vehicles set ablaze.,Public Safety,critical,en,short
+PET-0325,Deranged person attacking pedestrians with iron rod near busy metro station exit.,Public Safety,critical,en,short
+PET-0326,Illegal manufacturing unit of hazardous fireworks operating in densely populated slum tenements.,Public Safety,critical,en,short
+PET-0327,Terrorist threat suspicious unattended pressure cooker bag emitting ticking sound at bus terminus.,Public Safety,critical,en,short
+PET-0328,Human trafficking racket suspected in locked godown with screams of young children heard inside.,Public Safety,critical,en,short
+PET-0329,Gang shootout between rival criminals outside government liquor shop with stray bullets hitting homes.,Public Safety,critical,en,short
+PET-0330,Building balcony partially collapsed over crowded street crushing pedestrians beneath rubble.,Public Safety,critical,en,short
+PET-0331,"Chaku se hamla karke lootpat ho rahi hai gali me, turant police bhejiye jaan ka khatra hai.",Public Safety,critical,hi,long
+PET-0332,"Dukaan me aag lag gayi hai aur upar log phanse hue hain, fire brigade jaldi bhejein.",Public Safety,critical,hi,long
+PET-0333,"Black van me bache ko kidnap karne ki koshish ki gayi hai, police naakabandi karein.",Public Safety,critical,hi,long
+PET-0334,"Gali ke mod par firing ho rahi hai badmasho ke beech me, gharo ke andar goli lag rahi hai.",Public Safety,critical,hi,long
+PET-0335,Kathi kuthu nadanthu aalgal rathathil kidakiranar kaval thurai udane vara vendum.,Public Safety,critical,ta,short
+PET-0336,Thee vibathu erpattu buildingil makkal maatikondirukkiranar theeyinaippu padai thevai.,Public Safety,critical,en,short
+PET-0337,Chinna kuzhanthaiyai kadatha muyarsi seithullargal kaval thurai naakkabandi seiya vendum.,Public Safety,critical,ta,short
+PET-0338,Theruvil thupakki choodu nadanthathil palar pathikkappattullar aabathana nilaimai.,Public Safety,critical,en,short
+PET-0339,Severe stampede building up at narrow temple corridor due to barricade collapse.,Public Safety,critical,en,short
+PET-0340,Gas cylinder explosion inside hotel kitchen triggering major blaze spreading toward adjacent school.,Public Safety,critical,en,short
+PET-0341,Drunk antisocial elements gathering at park entrance every evening harassing passing women and girls.,Public Safety,high,en,short
+PET-0342,Pack of aggressive stray dogs attacking school children and elderly walkers on morning walks.,Public Safety,high,en,short
+PET-0343,Rash and negligent motorcycle racing and stunt riding on colony road every night past midnight.,Public Safety,high,en,long
+PET-0344,Gambling and illicit liquor den operating openly in abandoned municipal toilet building.,Public Safety,high,en,short
+PET-0345,Chain snatching incidents repeated for third time this week outside sector five park gate.,Public Safety,high,en,short
+PET-0346,Open uncovered deep stormwater drain without guard railing outside kindergarten school gate.,Public Safety,high,en,short
+PET-0347,Illegal commercial cylinder refilling operation in residential basement creating high blast hazard.,Public Safety,high,en,short
+PET-0348,Heavy container trucks driving at dangerous speeds through narrow residential school zone lanes.,Public Safety,high,en,short
+PET-0349,Street vendor encroaching entire intersection turning road into bottleneck preventing fire engine entry.,Public Safety,high,en,short
+PET-0350,CCTV surveillance cameras installed by police at main crossroads non-functional for three months.,Public Safety,high,en,short
+PET-0351,Shaam ko gunde park ke bahar ladkiyon se chhedkhani karte hain aur sharab peete hain.,Public Safety,high,hi,long
+PET-0352,"Aawara kutto ka aatank hai colony me, kal do bacho ko kaat liya hai hospital me hain.",Public Safety,high,hi,long
+PET-0353,Raat ko 12 baje ke baad ladke bike racing karte hain jisse bhishan accident ka dar bana rehta hai.,Public Safety,high,hi,long
+PET-0354,Sector paanch ke gate par chain snatching ki do ghatnayein ho chuki hain police patrolling badhayein.,Public Safety,high,hi,long
+PET-0355,Iravil kudi magangal poonga vasalil nindru pengalukku thollai tharugindrana kaval thurai thevai.,Public Safety,high,ta,short
+PET-0356,Theru naaygal palli pillaihalai kadippathal bayanthu palli poga marukkiranar.,Public Safety,high,ta,short
+PET-0357,Iravil bike race seithu periya sathamum vibathu aabathum undakkugiranar.,Public Safety,high,en,short
+PET-0358,Chain parippu thiruttu adikkadi nadakirathu patrol vandi anuppa vendum.,Public Safety,high,en,short
+PET-0359,Submerged open manhole in blind street corner during rain without warning signs or barricades.,Public Safety,high,en,short
+PET-0360,School van operating with cracked windshield and missing emergency door latch endangering children.,Public Safety,high,en,short
+PET-0361,Missing mirror at blind T-junction causing frequent minor vehicular bumper collisions.,Public Safety,medium,en,short
+PET-0362,Defective traffic signal stuck permanently on flashing amber at busy hospital crossing.,Public Safety,medium,en,short
+PET-0363,High decibel loudspeakers blasting religious and party music past permissible 10 PM limit.,Public Safety,medium,en,short
+PET-0364,Abandoned rusted car parked on street for six months serving as garbage dump and rat harborage.,Public Safety,medium,en,long
+PET-0365,Construction site workers working at third floor height without safety helmets or safety nets.,Public Safety,medium,en,short
+PET-0366,Overgrown wild shrubs at colony intersection obstructing line of sight for turning drivers.,Public Safety,medium,en,short
+PET-0367,Stray cattle wandering across expressway entrance creating dangerous swerving by fast cars.,Public Safety,medium,en,short
+PET-0368,Temporary political banner hoardings erected loosely on public sidewalk threatening to collapse.,Public Safety,medium,en,short
+PET-0369,Barbed wire fence of vacant plot protruding into pedestrian pathway tearing clothes.,Public Safety,medium,en,short
+PET-0370,No-parking sign board removed by shopkeeper to allow customer double parking on narrow lane.,Public Safety,medium,en,short
+PET-0371,Raat ko 10 baje ke baad bhi tezi se loudspeaker bajta hai jisse bacho ki padhai me dikkat hoti hai.,Public Safety,medium,hi,long
+PET-0372,Sadak ke mod par purani car khadi hai 6 mahine se jisme chuhe aur kachra bhar gaya hai.,Public Safety,medium,hi,long
+PET-0373,Traffic signal amber light par atak gaya hai jisse dono taraf se gaadiyan aapas me takra rahi hain.,Public Safety,medium,hi,long
+PET-0374,Gali ke mod par jhaadiyan itni badh gayi hain ki saamne se aati gaadi dikhayi nahi deti.,Public Safety,medium,hi,long
+PET-0375,Iravil 10 manikku mel oliperukki satham podugirargal padikkum manavargal baathippu.,Public Safety,medium,en,short
+PET-0376,Palaya car saalayorathil kidanthu theruvai adaithu kondirukkirathu.,Public Safety,medium,en,short
+PET-0377,"Traffic light sariyaga velaiseiyavillai, maruthuvamanai sandhippil kuzhappam.",Public Safety,medium,en,short
+PET-0378,Maadukal saalayil thirivathal vandi oattuvorukku thadangal erpadugirathu.,Public Safety,medium,en,short
+PET-0379,Pedestrian traffic signal timing set to only 8 seconds across six-lane wide arterial crossing.,Public Safety,medium,en,short
+PET-0380,Lack of convex mirrors at narrow apartment cellar basement exit causing frequent scrapes.,Public Safety,medium,en,short
+PET-0381,Requesting routine police verification status update for domestic worker background check.,Public Safety,low,en,short
+PET-0382,Application to request police permission bandobast for peaceful annual temple festival procession.,Public Safety,low,en,short
+PET-0383,Inquiry on procedure to register tenant details under community neighborhood watch portal.,Public Safety,low,en,short
+PET-0384,Request for safety awareness lecture on cyber financial fraud for senior citizens club.,Public Safety,low,en,short
+PET-0385,Feedback thanking traffic police sub-inspector for managing smooth school dismissal traffic.,Public Safety,low,en,short
+PET-0386,Inquiry regarding permissible decibel limits for family wedding hall celebration events.,Public Safety,low,en,short
+PET-0387,Request for installation of speed limit sign board (30 km/h) in quiet residential colony.,Public Safety,low,en,short
+PET-0388,Application for clearance certificate to install security boom barrier at residential society gate.,Public Safety,low,en,short
+PET-0389,Ghar ke naukar ke police verification ke status ki jankari chahiye online form bhara tha.,Public Safety,low,hi,long
+PET-0390,Senior citizen club ke liye cyber crime awareness session conduct karwane ka anurodh.,Public Safety,low,hi,short
+PET-0391,Colony gate par boom barrier lagane ke liye police clearance lene ki process batayein.,Public Safety,low,hi,short
+PET-0392,Traffic inspector sahab ko shukriya jinhone school ke bahar jam clear karwaya.,Public Safety,low,hi,short
+PET-0393,Veettu velaikaarar kaval thurai thagaval sariyarippu nilaimai ariya vendum.,Public Safety,low,ta,short
+PET-0394,Kovil thiruvizhavirkku kaval thurai paathukappu thevai vinnappam.,Public Safety,low,ta,short
+PET-0395,Periyavarkalukku online cyber mosadi vizhippunarvu kootam nadatha vendugiroam.,Public Safety,low,en,short
+PET-0396,Colony vasalil barrier amaykka anumathi vendum.,Public Safety,low,en,short
+PET-0397,Query regarding citizen reporting mechanism for recording lost mobile IMEI numbers.,Public Safety,low,en,short
+PET-0398,Request for guidance on installing private CCTV camera facing municipal street safely.,Public Safety,low,en,short
+PET-0399,Suggestion to publish quarterly crime statistics and safety bulletins on district police portal.,Public Safety,low,en,short
+PET-0400,Appreciation for prompt beat constable night patrol presence along colony lane.,Public Safety,low,en,short
+PET-0401,Outbreak of dengue and malaria with twelve confirmed pediatric deaths in slum pocket this week.,Health Department,critical,en,long
+PET-0402,Government primary health center running without oxygen cylinders during respiratory distress wave.,Health Department,critical,en,short
+PET-0403,Deadly food poisoning at community marriage hall affecting four hundred guests; fifty in critical ICU.,Health Department,critical,en,long
+PET-0404,Rabid stray dog bit eight pedestrians including three school children; anti-rabies vaccine out of stock.,Health Department,critical,en,long
+PET-0405,Unlicensed quack performing unsafe deliveries resulting in maternal mortality in dingy tenement.,Health Department,critical,en,short
+PET-0406,Toxic industrial chemical tanker washings dumped in residential open drain causing acute pulmonary edema.,Health Department,critical,en,short
+PET-0407,Hospital mortuary cold storage refrigeration failed; decomposing bodies releasing toxic stench.,Health Department,critical,en,short
+PET-0408,Stagnant contaminated sewer water flooding primary maternity clinic ward; newborn sepsis crisis.,Health Department,critical,en,short
+PET-0409,Counterfeit pediatric cough syrup sold at local pharmacy causing acute kidney failure in children.,Health Department,critical,en,short
+PET-0410,Vector-borne disease outbreak: four hundred residents down with high fever and platelet crashes.,Health Department,critical,en,short
+PET-0411,"Dengue aur malaria se ek hafte me barah bacho ki maut ho chuki hai, turant medical team bhejein.",Health Department,critical,hi,long
+PET-0412,Primary health center me oxygen cylinder khatam ho gaye hain aur mareez saans nahi le pa rahe.,Health Department,critical,hi,long
+PET-0413,Shaadi ke khane se char sau log bimar ho gaye hain aur ICU me bharti hain food poisoning se.,Health Department,critical,hi,long
+PET-0414,Pagal kutte ne aath bacho ko kaat liya hai aur sarkari hospital me rabies vaccine khatam hai.,Health Department,critical,hi,long
+PET-0415,Dengue juram theeviramaga paravi kuzhanthaigal maranam adainthullana maruthuva kulu udane thevai.,Health Department,critical,en,short
+PET-0416,"Sarkari aaspattiriyil oxygen cylinder illai, theevira suvaasa thotru erpattullathu.",Health Department,critical,en,short
+PET-0417,Unavu nanjagi aanooru perukku mel maruthuvamanaiyil theevira sikichai pirivil anumatikkappattullar.,Health Department,critical,en,short
+PET-0418,Veri naai kadithathal palar baathippu aanaal vaccine aaspattiriyil kidaikkavillai uyir aabathu.,Health Department,critical,en,short
+PET-0419,Severe cholera outbreak centered around municipal borehole with rising mortality counts.,Health Department,critical,en,short
+PET-0420,Ambulance dispatch paralyzed at zonal hospital due to fuel shortage during emergency surge.,Health Department,critical,en,short
+PET-0421,Government clinic pharmacy stockout of vital insulin and blood pressure medications for three months.,Health Department,high,en,short
+PET-0422,Open stagnant green cesspool of rainwater breeding millions of mosquitoes in empty municipal plot.,Health Department,high,en,short
+PET-0423,Local butcher shop slaughtering diseased cattle on public road in unsanitary conditions.,Health Department,high,en,short
+PET-0424,Primary health center doctor absent continuously on duty days leaving patients waiting outside.,Health Department,high,en,short
+PET-0425,Street food stalls using contaminated water and unwashed oil near school gate causing typhoid.,Health Department,high,en,short
+PET-0426,Municipal fumigation fogging truck has not visited ward twelve during peak mosquito season.,Health Department,high,en,short
+PET-0427,"Dead animal carcass not picked up by veterinary team, rotting near public kindergarten school.",Health Department,high,en,short
+PET-0428,Waste disposal from private clinic dumping blood vials and swabs into regular public bin.,Health Department,high,en,short
+PET-0429,Diagnostic lab operating without licensed pathologist providing false blood test reports.,Health Department,high,en,short
+PET-0430,Ambulance service number 108 unreachable or taking over ninety minutes to respond to medical calls.,Health Department,high,en,long
+PET-0431,"Hospital me sugar aur BP ki dawai teen mahine se nahi mil rahi hai, garib log pareshan hain.",Health Department,high,hi,long
+PET-0432,Khaali plot me ganda paani bhara hua hai jisme machhar paida ho rahe hain aur dengue fail raha hai.,Health Department,high,hi,long
+PET-0433,Sarkari dispensary me doctor subah aate hi nahi hain aur mareez dhoop me baithe rehte hain.,Health Department,high,hi,long
+PET-0434,Colony me machhar marne wali fogging machine ek mahine se nahi aayi hai log bimar pad rahe hain.,Health Department,high,hi,long
+PET-0435,"Maruthuvamanaiyil sugar BP marundhukal kidaippathillai, yezhai makkal avathippadugindranar.",Health Department,high,en,short
+PET-0436,"Kaali idathil saakadai thengi kosukkal perugugindrana, fogging seiya vendum.",Health Department,high,en,short
+PET-0437,Sarkari dispensary doctor sariyana nerathirku varuvathillai.,Health Department,high,en,short
+PET-0438,Theruvil kalyvu thengi noiy paravum abayam perithaga ullathu.,Health Department,high,en,short
+PET-0439,Ultrasound facility non-functional at sub-district hospital forcing pregnant mothers to private clinics.,Health Department,high,en,short
+PET-0440,Public park walking trail heavily infested with rodent burrows and rat fleas threatening visitors.,Health Department,high,en,short
+PET-0441,"Government clinic toilet dirty and taps dry, forcing visiting patients into great discomfort.",Health Department,medium,en,short
+PET-0442,Vaccination drive schedule for infants not displayed on notice board outside health center.,Health Department,medium,en,short
+PET-0443,Overcrowding and lack of seated benches in patient waiting hall at zonal maternity dispensary.,Health Department,medium,en,short
+PET-0444,Stray cattle dung accumulating on hospital entrance porch requiring regular floor washing.,Health Department,medium,en,short
+PET-0445,Noise disturbance from commercial diesel generator located adjacent to maternity convalescence ward.,Health Department,medium,en,short
+PET-0446,Request to conduct a free community blood pressure and diabetes screening camp in sector nine.,Health Department,medium,en,long
+PET-0447,Delay of two months in issuing official birth certificate from municipal health registrar office.,Health Department,medium,en,short
+PET-0448,"Anti-larval chemical spray completed only on main road, ignoring narrow interior residential lanes.",Health Department,medium,en,short
+PET-0449,Public health inspector not inspecting restaurant kitchens despite multiple citizen hygiene complaints.,Health Department,medium,en,short
+PET-0450,First aid box at municipal community center empty without antiseptic liquid or bandages.,Health Department,medium,en,short
+PET-0451,"Dispensary ke toilet me paani nahi hai aur gandagi hai, mareezon ko dikkat hoti hai.",Health Department,medium,hi,long
+PET-0452,Bacho ke vaccination ka chart notice board par nahi lagaya gaya hai kab aana hai pata nahi chalta.,Health Department,medium,hi,long
+PET-0453,Municipal office se bache ka birth certificate do mahine se issue nahi hua hai check karein.,Health Department,medium,hi,long
+PET-0454,Sector nine me free diabetes aur BP checkup camp lagwane ki maang colony ke buzurgo ke liye.,Health Department,medium,hi,long
+PET-0455,"Aaspattiri toilet suthamaaga illai, thanneer vasathiyum illai.",Health Department,medium,en,short
+PET-0456,Pillaihalukku thadupoosi podum naal vivaram palagaiyil ezhudhavillai.,Health Department,medium,en,short
+PET-0457,Pirappu saandrithazh peruvathil kooduthal thaamatham erpadugirathu.,Health Department,medium,ta,short
+PET-0458,Udal nala vizhippunarvu camp amaykka vendum engal pagudhikku.,Health Department,medium,ta,short
+PET-0459,Drinking water dispenser at outpatient waiting lobby dispensing lukewarm and cloudy water.,Health Department,medium,en,short
+PET-0460,Delay in dispensing subsidized dietary iron supplements to registered anemic lactating mothers.,Health Department,medium,en,short
+PET-0461,Application to correct minor spelling error in mother name on infant birth certificate.,Health Department,low,en,short
+PET-0462,Inquiry regarding eligible criteria for chief minister comprehensive health insurance card.,Health Department,low,en,short
+PET-0463,Requesting information on location and timings of nearest government yoga and wellness center.,Health Department,low,en,short
+PET-0464,Feedback complimenting nursing staff at primary health center for courteous infant vaccination.,Health Department,low,en,short
+PET-0465,Query regarding procedure to donate unused wheelchair and medical crutches to government hospital.,Health Department,low,en,short
+PET-0466,Request for educational posters on dengue prevention and clean water storage for colony gates.,Health Department,low,en,short
+PET-0467,Inquiry on procedure to register private dental clinic under clinical establishments act.,Health Department,low,en,short
+PET-0468,Request to conduct awareness session on adolescent mental health and nutrition at school.,Health Department,low,en,short
+PET-0469,Birth certificate me maa ke naam ki spelling theek karwane ka application form chahiye.,Health Department,low,hi,short
+PET-0470,Sarkari health insurance card banwane ke liye kya documents chahiye jankari dein.,Health Department,low,hi,short
+PET-0471,"Hospital ke nursing staff ne bache ko vaccination bahut pyaar se lagaya, unka shukriya.",Health Department,low,hi,short
+PET-0472,Dengue se bachav ke posters aur pamphlets colony ke notice board par lagwane ke liye chahiye.,Health Department,low,hi,long
+PET-0473,Pirappu saandrithazhil thaai peyar pizhai thirutham seiya vinnappam.,Health Department,low,en,short
+PET-0474,Sarkari kaappitu aattai pera thevaiyana aavanangal patriya vivaram.,Health Department,low,en,short
+PET-0475,Maruthuvamanai semiliyalarkku nandrith therivithu kolgiroam.,Health Department,low,en,short
+PET-0476,Dengue kosu thavirpu vizhippunarvu thagaval thevai.,Health Department,low,en,short
+PET-0477,Inquiry regarding government schedule for free geriatric eye cataract screening camp.,Health Department,low,en,short
+PET-0478,Request for official certified copy of immunization card misplaced during house relocation.,Health Department,low,en,short
+PET-0479,Suggestion to install token display numbering system at busy government pharmacy counter.,Health Department,low,en,short
+PET-0480,Query regarding permissible parameters for rainwater harvesting testing at public health laboratory.,Health Department,low,en,short
+PET-0481,"Government primary school ceiling plaster collapsed into classroom, injuring eight students critically.",Education Department,critical,en,short
+PET-0482,School bus carrying forty children caught fire due to illegal gas kit; rescue underway on highway.,Education Department,critical,en,long
+PET-0483,Midday meal consumed by hundred school children contaminated with pesticide; children vomiting blood.,Education Department,critical,en,short
+PET-0484,School building wall cracked wide open and tilting after rain; collapse imminent with children inside.,Education Department,critical,en,long
+PET-0485,Teacher physically assaulted and tortured class three student causing bone fractures and unconsciousness.,Education Department,critical,en,short
+PET-0486,Electrical live wire snapped and dangling inside school playground puddle while students at recess.,Education Department,critical,en,short
+PET-0487,School compound wall collapsed on sidewalk burying two students; fire services digging rubble.,Education Department,critical,en,short
+PET-0488,Chemical explosion in unmonitored high school chemistry lab with acid burns to five student faces.,Education Department,critical,en,long
+PET-0489,Intoxicated intruders armed with weapons entered girls school hostel threatening inmates.,Education Department,critical,en,short
+PET-0490,Total structural failure of concrete staircase at municipal school during stampede panic.,Education Department,critical,en,short
+PET-0491,School ki chhat ka plaster girne se aath bache zakhmi ho gaye hain hospital me bharti hain.,Education Department,critical,hi,long
+PET-0492,Midday meal khane se sau bache bimar pad gaye hain aur ulti kar rahe hain turant ambulance bhejiye.,Education Department,critical,hi,long
+PET-0493,School bus me aag lag gayi hai highway par bache andar phanse hue hain emergency.,Education Department,critical,hi,long
+PET-0494,School ki deewar achanak gir gayi hai aur bache malbe ke neeche dabe hue hain jaldi aao.,Education Department,critical,hi,long
+PET-0495,Palli kooda koorai idinthu vilunthathal ettu manavargal mandai udaynthu theevira sikichaiyil.,Education Department,critical,ta,short
+PET-0496,Mathiya unavu saapitta nooru pillaigalukku visham aagi aaspattiriyil anumatikkappattullar.,Education Department,critical,en,short
+PET-0497,Palli bus thee pidithu erigirathu manavargal maattikkondanar theeyinaippu padai thevai.,Education Department,critical,ta,short
+PET-0498,Palli madhil suvar idinthu vilunthathal uyir chetham erpadum aabathu udane vara vendum.,Education Department,critical,ta,short
+PET-0499,School toilet sewage septic tank slab caved in; high risk of students falling into sludge pit.,Education Department,critical,en,long
+PET-0500,Contaminated well water provided to primary school students testing positive for arsenic and cholera.,Education Department,critical,en,short
+PET-0501,Government girls school has no functional toilets or running water; girls dropping out in large numbers.,Education Department,high,en,long
+PET-0502,Primary school operating without mathematics and science teachers for entire academic year.,Education Department,high,en,short
+PET-0503,Midday meal food quality rotten with insects and stones found repeatedly in rice sambar.,Education Department,high,en,short
+PET-0504,"School building roof leaking torrents of rainwater inside classrooms, flooding desks and textbooks.",Education Department,high,en,short
+PET-0505,Private matriculation school collecting illegal capitation fee and withholding transfer certificates.,Education Department,high,en,short
+PET-0506,School playground converted into unauthorized commercial parking lot for private tourist buses.,Education Department,high,en,short
+PET-0507,High school laboratory lacks basic fire extinguishers and first aid equipment despite orders.,Education Department,high,en,short
+PET-0508,Broken desks and chairs with protruding nails injuring primary school children every day.,Education Department,high,en,short
+PET-0509,School boundary wall broken allowing stray dogs and antisocial elements to loiter near classrooms.,Education Department,high,en,short
+PET-0510,Drinking water cooler at government school broken for four months; students bringing dirty water from home.,Education Department,high,en,long
+PET-0511,"Girls school me toilet band pade hain aur paani nahi hai, ladkiyan school chhodne par majboor hain.",Education Department,high,hi,long
+PET-0512,Midday meal ke chawal me keede aur kankad nikal rahe hain bache khana nahi kha pa rahe hain.,Education Department,high,hi,long
+PET-0513,School me science aur math ke teacher hi nahi hain pura saal nikal gaya padhai band hai.,Education Department,high,hi,long
+PET-0514,School ki boundary tooti hui hai jisse aawara kutte aur gunde school ke andar ghumte hain.,Education Department,high,hi,long
+PET-0515,"Palli koodathil pengalukku kazhivarai vasadhi illai, thanneerum illai migavum kashtam.",Education Department,high,ta,short
+PET-0516,Mathiya unavu arisiyil puzhukkal ulla thal manavargal saapida mudiyavillai.,Education Department,high,en,short
+PET-0517,"Palli koodathil ariviyal ganitha aasiriyargal illai, kalvi tharam migavum baathikkappadugirathu.",Education Department,high,ta,short
+PET-0518,Palli madhil suvar udaynthu kidappathal naaygal ulle nuzhaigindrana.,Education Department,high,ta,short
+PET-0519,School bus operating without speed governor and overloading ninety kids in forty-seater bus.,Education Department,high,en,short
+PET-0520,Broken electrical switchboards with bare wires exposed at hand height in primary school corridor.,Education Department,high,en,short
+PET-0521,Government school library books locked inside cupboards and never issued to interested students.,Education Department,medium,en,short
+PET-0522,Ceiling fans not working in classroom number four causing unbearable heat during summer exams.,Education Department,medium,en,short
+PET-0523,School playground overgrown with thorny weeds preventing children from playing football and games.,Education Department,medium,en,short
+PET-0524,Free textbook and uniform distribution delayed by three months after academic year commenced.,Education Department,medium,en,short
+PET-0525,"Blackboard in primary section cracked and paint peeled off, making chalk writing illegible.",Education Department,medium,en,short
+PET-0526,"School bell sound system malfunctioning, creating scheduling confusion between class periods.",Education Department,medium,en,short
+PET-0527,Parent-Teacher Association meetings not convened for past two quarters contrary to regulations.,Education Department,medium,en,short
+PET-0528,Tube lights flickering in class ten study hall causing eyestrain during evening study hours.,Education Department,medium,en,short
+PET-0529,Request to install a water filter purifier for the primary school drinking water standpost.,Education Department,medium,en,short
+PET-0530,Sports equipment balls and nets locked away and not provided during designated physical training hour.,Education Department,medium,en,long
+PET-0531,Class room me pankha kharab hai jisse garmi me bacho ko padhne me bahut pareshani hoti hai.,Education Department,medium,hi,long
+PET-0532,Sarkari kitabein aur uniform session shuru hone ke teen mahine baad bhi nahi mili hain.,Education Department,medium,hi,long
+PET-0533,Blackboard pura ghisa hua hai aur chalk se likha hua bacho ko bilkul dikhayi nahi deta.,Education Department,medium,hi,long
+PET-0534,School ke playground me kaantedar jhaadiyan ug aayi hain bache khel nahi sakte safai karwayein.,Education Department,medium,hi,long
+PET-0535,"Vagupparaiyil fan velaiseiyavillai, kodaikaalathil manavargal avathippadugindranar.",Education Department,medium,en,short
+PET-0536,Palli puthagam matrum seervudai innum vazhangappadavillai kooduthal thaamatham.,Education Department,medium,ta,short
+PET-0537,Blackboard theivathal ezhuthukal theriyavillai puthiya board poda vendum.,Education Department,medium,en,short
+PET-0538,Palli vilayattu thidalil kaatu chedigal valarnthullana suthapadutha vendum.,Education Department,medium,ta,short
+PET-0539,Lack of designated ramps for wheelchair access to first-floor computer lab in composite school.,Education Department,medium,en,short
+PET-0540,Delay in reimbursement of student scholarship stipends under pre-matric tribal welfare quota.,Education Department,medium,en,short
+PET-0541,Application for bonafide student study certificate for passport and scholarship application.,Education Department,low,en,short
+PET-0542,Inquiry regarding admission schedule and age criteria for Right to Education (RTE) entry quota.,Education Department,low,en,short
+PET-0543,Request to change spelling of father surname in secondary school leaving certificate records.,Education Department,low,en,short
+PET-0544,Feedback thanking headmistress and staff for organizing excellent annual science project exhibition.,Education Department,low,en,short
+PET-0545,Query regarding procedure to donate children storybooks to school reading room corner.,Education Department,low,en,short
+PET-0546,Request for permission to conduct free weekend spoken English workshop at government school hall.,Education Department,low,en,short
+PET-0547,Inquiry on syllabus and examination timetable for upcoming state board secondary examinations.,Education Department,low,en,short
+PET-0548,Request for guidelines on registering school alumni association with education department.,Education Department,low,en,short
+PET-0549,Passport banwane ke liye school se bonafide certificate lene ki process pata karni hai.,Education Department,low,hi,short
+PET-0550,Right to Education ke tehat admission ke form kab se bhare jayenge jankari chahiye.,Education Department,low,hi,short
+PET-0551,School certificate me pita ke naam ki spelling theek karwane ke aavedan ki process.,Education Department,low,hi,short
+PET-0552,School me annual day aur science exhibition bahut accha organize kiya gaya teacher ka shukriya.,Education Department,low,hi,long
+PET-0553,Palli bonafide saandrithazh pera vinnappikkum muraigal thevai.,Education Department,low,ta,short
+PET-0554,RTE thittathil palli serkkai eppothu thodangum enru ariya virumbugiroam.,Education Department,low,ta,short
+PET-0555,Palli saandrithazhil peyar pizhai thirutham seiya vinnappam.,Education Department,low,ta,short
+PET-0556,Palli ariviyal kankaatchi arumaiyaga nadanthathu aasiriyarukku nandrith therivikkiroam.,Education Department,low,ta,short
+PET-0557,Inquiry regarding eligibility for state laptop distribution scheme for meritorious students.,Education Department,low,en,short
+PET-0558,Request for transfer certificate application form for student relocating to another district.,Education Department,low,en,short
+PET-0559,Suggestion to introduce chess and carrom clubs during weekly extracurricular activity period.,Education Department,low,en,short
+PET-0560,Feedback requesting updated timetable publication on school website for working parents.,Education Department,low,en,short
+PET-0561,Brake failure on municipal public bus descending hill road; bus crashing through guard rails.,Transport Authority,critical,en,short
+PET-0562,City bus caught fire in middle of busy highway flyover; passengers kicking window glass to escape.,Transport Authority,critical,en,long
+PET-0563,Reckless public transport bus ran over five pedestrians at designated zebra crossing near railway station.,Transport Authority,critical,en,long
+PET-0564,Overcrowded municipal bus door opened while in motion; school boy fell under rear wheels fatally.,Transport Authority,critical,en,long
+PET-0565,Intoxicated city bus driver driving zigzag at 80 km/h on wrong side of highway threatening head-on crash.,Transport Authority,critical,en,long
+PET-0566,Public transit bus steering rod snapped on bridge; bus hanging precariously over river gorge.,Transport Authority,critical,en,short
+PET-0567,City bus gas cylinder leaking CNG fuel with intense hissing sound and passengers panicking inside.,Transport Authority,critical,en,long
+PET-0568,Major multi-bus pileup inside central bus terminus due to fuel spill; twenty passengers trapped.,Transport Authority,critical,en,short
+PET-0569,Bus conductor and driver assaulting passenger with iron rod causing severe bleeding skull injury.,Transport Authority,critical,en,short
+PET-0570,Municipal bus axle snapped at high speed on expressway rolling over twice across lanes.,Transport Authority,critical,en,short
+PET-0571,City bus ka break fail ho gaya hai aur bus divider tod kar doosri taraf ghus gayi hai bhishan accident.,Transport Authority,critical,hi,long
+PET-0572,Bus me achanak aag lag gayi hai flyover ke upar log khidki tod kar nikal rahe hain emergency.,Transport Authority,critical,hi,long
+PET-0573,Nashe me dhutt bus driver wrong side me 80 ki speed se gaadi bhaga raha hai jaan ka khatra hai.,Transport Authority,critical,hi,long
+PET-0574,Chalti bus ka darwaza khulne se school ka bacha neeche gir gaya pahiya upar se nikal gaya jaldi aao.,Transport Authority,critical,hi,long
+PET-0575,"Sarkari bus break fail aagi perum vibathu erpattullathu, aaspattirikku ambulance thevai.",Transport Authority,critical,ta,short
+PET-0576,"Bus thee pidithu erigirathu, makkal ulle maattikondirukkiranar theeyinaippu padai udane thevai.",Transport Authority,critical,en,short
+PET-0577,Kudibothaiyil bus driver vandiyai vegamaaga oattuvathaal periya vibathu aabathu.,Transport Authority,critical,en,short
+PET-0578,"Chalti bus kattai murinthu palam methu thongugirathu, uyir kaapatha aal thevai.",Transport Authority,critical,en,short
+PET-0579,High-pressure hydraulic line burst in crowded articulated bus spraying boiling oil on commuters.,Transport Authority,critical,en,short
+PET-0580,City bus plunged into deep canal after hitting broken culvert; water filling cabin rapidly.,Transport Authority,critical,en,short
+PET-0581,Public buses skipping designated bus stop consistently leaving hundreds of daily commuters stranded.,Transport Authority,high,en,short
+PET-0582,Bus route number twenty-four frequency cut from every fifteen minutes to once every two hours.,Transport Authority,high,en,long
+PET-0583,Extreme dangerous overcrowding on morning school route buses with students hanging from footboards.,Transport Authority,high,en,short
+PET-0584,Auto-rickshaws refusing to turn on digital fare meters and charging three times exorbitant rates.,Transport Authority,high,en,short
+PET-0585,Bus shelter collapsed completely during rainstorm leaving elderly commuters standing in rain.,Transport Authority,high,en,short
+PET-0586,City bus emitting thick black toxic diesel exhaust smoke blinding motorists driving behind it.,Transport Authority,high,en,short
+PET-0587,Bus conductor abusing and refusing to accept legal coin currency and concession student bus passes.,Transport Authority,high,en,long
+PET-0588,Women reserved seats on city buses occupied by aggressive men; bus crew refusing to intervene.,Transport Authority,high,en,long
+PET-0589,Municipal bus floor rusted through with gaping holes through which moving road surface is visible.,Transport Authority,high,en,long
+PET-0590,Private omnibuses parking illegally on main road creating massive two-kilometer traffic jams daily.,Transport Authority,high,en,short
+PET-0591,"Bus stop par bus rukti hi nahi hai aur aage nikal jati hai, roz office aur school late hote hain.",Transport Authority,high,hi,long
+PET-0592,"Bus number 24 do do ghante tak nahi aati hai, frequency badhwayein commuter pareshan hain.",Transport Authority,high,hi,long
+PET-0593,Subah ke time bus me itni bheed hoti hai ki bache footboard par latak kar jate hain jaan ka jokhim.,Transport Authority,high,hi,long
+PET-0594,Auto wale meter se nahi chalte hain aur manmana kiraya vasool karte hain police complaint karein.,Transport Authority,high,hi,long
+PET-0595,Bus standil bus nirkkaamal sella thal velaiyirkku selvor daily thaamathamaga sendru paathikkappadugindranar.,Transport Authority,high,en,short
+PET-0596,"Bus en 24 adikkadi varuvathillai, kooduthal bus vidavendum.",Transport Authority,high,en,short
+PET-0597,Palli velai nerathil bus footboardil thongi chellum abayamaga ullathu.,Transport Authority,high,ta,short
+PET-0598,Auto meter pottu oatta marukkirargal kooduthal panam ketkiranar.,Transport Authority,high,en,short
+PET-0599,"Bus passenger door pneumatic ram broken, staying open during high speed travel on ring road.",Transport Authority,high,en,long
+PET-0600,"Bus shelter roof metal sheet detached and flapping in wind, threatening to slice passing motorists.",Transport Authority,high,en,long
+PET-0601,Digital route destination LED display on public bus broken or showing incorrect route number.,Transport Authority,medium,en,short
+PET-0602,"Bus stop name board damaged and unreadable, causing confusion for outside travelers.",Transport Authority,medium,en,short
+PET-0603,Bus seats torn with exposed metal springs injuring clothing and skin of passengers.,Transport Authority,medium,en,short
+PET-0604,"Ticketing machine running out of paper frequently, conductors giving handwritten paper chits.",Transport Authority,medium,en,short
+PET-0605,"Bus stop solar lighting panel damaged, leaving waiting shelter completely dark at night.",Transport Authority,medium,en,short
+PET-0606,Bell wire inside city bus snapped; passengers forced to shout loudly to signal bus stop request.,Transport Authority,medium,en,long
+PET-0607,Bus schedule time table chart missing from notice board at sector seven bus shelter.,Transport Authority,medium,en,short
+PET-0608,Air conditioner in premium electric bus non-functional despite passengers paying AC fare ticket.,Transport Authority,medium,en,short
+PET-0609,Broken window latch inside bus rattling loudly and vibrating violently throughout journey.,Transport Authority,medium,en,short
+PET-0610,"Bus driver halting thirty feet away from designated bus bay, forcing commuters to wade through mud.",Transport Authority,medium,en,long
+PET-0611,Bus ke aage ka digital LED board kharab hai pata nahi chalta bus kahan ja rahi hai.,Transport Authority,medium,hi,long
+PET-0612,Bus stop par schedule timetable ka board nahi laga hai kis time bus aayegi jankari nahi hai.,Transport Authority,medium,hi,long
+PET-0613,Electric AC bus ka AC kharab tha jabki pura AC ticket ka paisa liya gaya refund karwayein.,Transport Authority,medium,hi,long
+PET-0614,Bus ki seat fati hui hai aur spring bahar nikla hua hai jisse kapde phat jate hain.,Transport Authority,medium,hi,long
+PET-0615,"Bus boardil peyar theriyavillai, enga pogirathu enru theriyamal thavikkinroam.",Transport Authority,medium,en,short
+PET-0616,"Bus standil nerattavanai palagai illai, bus eppo varum enru theriyavillai.",Transport Authority,medium,en,short
+PET-0617,Bus asanangal kizhithu kambi veliye therigirathu.,Transport Authority,medium,en,short
+PET-0618,AC busil AC velaiseiyavillai aanaal AC ticket kattanam vasool seithanar.,Transport Authority,medium,en,short
+PET-0619,Commuter queue barrier railings broken at central bus terminus creating chaotic boarding scuffles.,Transport Authority,medium,en,short
+PET-0620,Audio announcement system inside new metro feeder buses non-functional for visually impaired.,Transport Authority,medium,en,short
+PET-0621,Inquiry on procedure to renew monthly subsidized student bus concession travel pass online.,Transport Authority,low,en,short
+PET-0622,Application to update residential address linked with senior citizen free travel smart card.,Transport Authority,low,en,short
+PET-0623,Feedback praising driver of bus route fifteen for courteous driving and assisting wheelchair user.,Transport Authority,low,en,short
+PET-0624,Query regarding lost property lost bag retrieval counter at central mofussil bus terminus.,Transport Authority,low,en,short
+PET-0625,Suggestion to introduce digital QR code payment ticketing option inside city transport buses.,Transport Authority,low,en,short
+PET-0626,Request for route map and timing booklet of newly introduced electric feeder feeder buses.,Transport Authority,low,en,short
+PET-0627,Inquiry on procedure to apply for conductor badge and heavy passenger vehicle driving license.,Transport Authority,low,en,short
+PET-0628,Feedback requesting installation of mobile phone USB charging sockets on long distance bus routes.,Transport Authority,low,en,short
+PET-0629,Student bus pass online renew karwane ka procedure kya hai jankari chahiye.,Transport Authority,low,hi,short
+PET-0630,Senior citizen bus pass me address change karwane ke liye kya document lagenge.,Transport Authority,low,hi,short
+PET-0631,"Bus route number 15 ke driver ne wheel chair wale ko chadne me madad ki, unki tareef karte hain.",Transport Authority,low,hi,long
+PET-0632,Bus me bhoola hua bag wapas lene ke liye lost and found office kahan par hai pata karein.,Transport Authority,low,hi,long
+PET-0633,Manavar bus pass pudhikkum muraigal patriya thagaval thevai.,Transport Authority,low,en,short
+PET-0634,Muthior bus passil mugavari maatram seiya enna aavanangal thevai.,Transport Authority,low,en,short
+PET-0635,Bus route 15 driver arumaiyaga vandi oattinar avarkku paaraattu.,Transport Authority,low,en,short
+PET-0636,Busil thavari vitta bagai petrukkolla lost property office enga ullathu.,Transport Authority,low,en,short
+PET-0637,Query regarding group concession ticket booking discount for school educational heritage tour.,Transport Authority,low,en,short
+PET-0638,Request for timetable information regarding late-night suburban railway connecting feeder buses.,Transport Authority,low,en,short
+PET-0639,Suggestion to plant shade trees around open bus terminal passenger waiting concourse.,Transport Authority,low,en,short
+PET-0640,Inquiry regarding validity extension policy on unutilized digital smart travel card balances.,Transport Authority,low,en,short

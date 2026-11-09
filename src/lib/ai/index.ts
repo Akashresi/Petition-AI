@@ -44,6 +44,8 @@ export function generateMockAIAnalysis(
     similarComplaints: d.similarComplaints,
     urgencyLevel: p.priority,
     keywords: keywords.length > 0 ? keywords : ["complaint", "repair", "service"],
+    contributingKeywords: keywords.length > 0 ? keywords : ["complaint", "repair", "service"],
+    priorityReason: `Assigned ${p.priority} priority based on offline civic urgency heuristic.`,
     summaryNote: `AI classified this as ${category} (${Math.round(
       c.categoryConfidence * 100
     )}% confidence). Routed to ${c.department}. Priority: ${p.priority.toUpperCase()}. Confidence: ${Math.round(c.confidence * 100)}% - ${c.explanation}`,

@@ -75,6 +75,11 @@ export default function AIAnalysisCard({ analysis, compact = false }: Props) {
               />
             </div>
             <p className="text-[10px] mt-1 opacity-75">{Math.round(analysis.priorityScore * 100)}% score</p>
+            {analysis.priorityReason && (
+              <p className="text-[11px] mt-2 font-medium opacity-95 border-t border-black/10 dark:border-white/10 pt-1.5 leading-snug">
+                <span className="font-semibold">Reason:</span> {analysis.priorityReason}
+              </p>
+            )}
           </div>
           <div className={cn("rounded-md p-3 border", sentimentBg(analysis.sentiment))}>
             <div className="flex items-center gap-1.5 mb-1">
@@ -124,13 +129,22 @@ export default function AIAnalysisCard({ analysis, compact = false }: Props) {
           </div>
         )}
 
-        {/* Keywords */}
-        {!compact && analysis.keywords.length > 0 && (
+        {/* Contributing Keywords */}
+        {!compact && (analysis.contributingKeywords || analysis.keywords)?.length > 0 && (
           <div>
-            <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide">Extracted Keywords</p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Contributing Keywords</p>
+              {analysis.confidence !== undefined && (
+                <span className="text-[10px] font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                  {Math.round(analysis.confidence * 100)}% Confidence
+                </span>
+              )}
+            </div>
             <div className="flex flex-wrap gap-1.5">
-              {analysis.keywords.map((kw, i) => (
-                <span key={i} className="text-[11px] bg-navy-100 text-navy-700 dark:bg-navy-800 dark:text-navy-200 px-2 py-0.5 rounded-full">{kw}</span>
+              {(analysis.contributingKeywords || analysis.keywords).map((kw, i) => (
+                <span key={i} className="text-[11px] font-medium bg-navy-100 text-navy-800 dark:bg-navy-800 dark:text-navy-200 px-2.5 py-0.5 rounded-full border border-navy-200 dark:border-navy-700">
+                  #{kw}
+                </span>
               ))}
             </div>
           </div>

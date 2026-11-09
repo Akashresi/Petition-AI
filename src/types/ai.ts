@@ -23,9 +23,11 @@ export interface AIAnalysis {
   similarComplaints: SimilarComplaint[];
   urgencyLevel: "critical" | "high" | "medium" | "low";
   keywords: string[];
+  contributingKeywords?: string[];
   summaryNote: string;
   confidence?: number;
   explanation?: string;
+  priorityReason?: string;
   human_review_required?: boolean;
   review_reasons?: string[];
   is_spam?: boolean;

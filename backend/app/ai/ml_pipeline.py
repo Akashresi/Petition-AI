@@ -10,7 +10,7 @@ import math
 import re
 from collections import Counter
 
-from app.ai.classifier import CATEGORIES, DEPARTMENT_MAP, get_tfidf_classifier, llm_classify
+from app.ai.classifier import get_tfidf_classifier, llm_classify
 from app.ai.priority import detect_priority
 from app.ai.spam import detect_spam
 from app.config import settings
@@ -280,6 +280,8 @@ def generate_ai_analysis(title: str, description: str, category: str | None = No
             f"and routed to {department} at {priority.upper()} priority."
         )
 
+    priority_reason = pri_info.get("priority_explanation") or f"Assigned {priority} priority based on civic severity assessment."
+
     return {
         "category": ai_category,
         "categoryConfidence": conf,
@@ -287,6 +289,8 @@ def generate_ai_analysis(title: str, description: str, category: str | None = No
         "departmentConfidence": round(min(conf + 0.04, 0.99), 2),
         "priority": priority,
         "priorityScore": priority_score,
+        "priority_reason": priority_reason,
+        "priorityReason": priority_reason,
         "sentiment": sentiment,
         "sentimentScore": sentiment_score,
         "isDuplicate": False,
@@ -294,6 +298,8 @@ def generate_ai_analysis(title: str, description: str, category: str | None = No
         "similarComplaints": [],
         "urgencyLevel": priority,
         "keywords": keywords or ["complaint", "repair", "maintenance"],
+        "contributing_keywords": keywords or ["complaint", "repair", "maintenance"],
+        "contributingKeywords": keywords or ["complaint", "repair", "maintenance"],
         "confidence": conf,
         "explanation": explanation,
         "human_review_required": human_review_required,
