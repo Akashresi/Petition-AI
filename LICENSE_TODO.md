@@ -15,3 +15,4 @@ You **must** choose a license before making this project public.
 3. Add the SPDX identifier to `README.md`.
 
 This file was created automatically as a placeholder.
+

@@ -11,3 +11,4 @@ This file logs problems noticed during the upgrade/all workstream that were NOT 
 | 5 | demo passwords in backend/.env.example SEED section | backend/.env.example | Move to seed.py only; env example already noted as template |
 | 6 | `src/lib/pdfExport.ts` and `src/lib/excelExport.ts` unused by core citizen flow | src/lib/ | Evaluate removal or move to officer-only bundle |
 | 7 | `backend/ai_engine/` shadow copy of AI logic (old folder) | backend/ai_engine/ | Consolidate into backend/app/ai/ in future sprint |
+
