@@ -2,9 +2,9 @@ name: PetitionAI CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, "upgrade/all"]
   pull_request:
-    branches: [main]
+    branches: [main, "upgrade/all"]
 
 jobs:
   frontend:
