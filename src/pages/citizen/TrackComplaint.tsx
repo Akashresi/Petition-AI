@@ -20,7 +20,6 @@ import { useComplaints } from "@/hooks/useComplaints";
 import { useLanguage } from "@/lib/i18n";
 import { speakText, isSpeaking, stopSpeaking } from "@/lib/tts";
 import { Complaint } from "@/types";
-import CitizenHeader from "@/components/ui/accessible/CitizenHeader";
 import AccessibleButton from "@/components/ui/accessible/AccessibleButton";
 import BigTextInput from "@/components/ui/accessible/BigTextInput";
 import StatusBadge from "@/components/ui/accessible/StatusBadge";
@@ -194,14 +193,17 @@ export default function TrackComplaint() {
   };
 
   return (
-    <div className="min-h-screen bg-navy-975 text-foreground pb-12">
-      <CitizenHeader
-        title={t("citizen.trackComplaint", "Track my complaint")}
-        showBack={true}
-        onBack={() => navigate("/citizen")}
-      />
+    <div className="min-h-screen bg-navy-975 text-foreground py-8 pb-12">
+      <main className="max-w-2xl mx-auto px-4 space-y-6">
+        <button
+          type="button"
+          onClick={() => navigate("/citizen")}
+          className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>{t("common.back", "Back to Citizen Portal")}</span>
+        </button>
 
-      <main className="max-w-2xl mx-auto px-4 py-6 space-y-6">
         {/* Search Box Card */}
         <div className="card-reference p-6 bg-surface-card border-surface-border">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 mb-2">

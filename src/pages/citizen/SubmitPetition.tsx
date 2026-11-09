@@ -34,7 +34,6 @@ import { speakText, isSpeaking, stopSpeaking } from "@/lib/tts";
 import { generateAIAnalysis, generatePetitionId } from "@/lib/utils";
 import { Complaint, StatusUpdate } from "@/types";
 import { CATEGORIES } from "@/constants/mockData";
-import CitizenHeader from "@/components/ui/accessible/CitizenHeader";
 import AccessibleVoiceInput from "@/components/features/AccessibleVoiceInput";
 import FirstLaunchLanguageModal from "@/components/features/FirstLaunchLanguageModal";
 
@@ -46,11 +45,10 @@ export default function SubmitPetition() {
   const { user } = useAuth();
   const { addComplaint } = useComplaints();
   const { addNotification } = useNotifications(user?.id);
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
 
   const [step, setStep] = useState<"form" | "analyzing" | "result">("form");
   const [submittedComplaint, setSubmittedComplaint] = useState<Complaint | null>(null);
-  const [langModalOpen, setLangModalOpen] = useState(false);
   const [isTtsReading, setIsTtsReading] = useState(false);
   const [smsSent, setSmsSent] = useState(false);
 
@@ -556,23 +554,19 @@ export default function SubmitPetition() {
   // ── Form Screen (matches Figure 4.1a exactly) ──
   return (
     <div className="min-h-screen bg-navy-975 text-foreground py-8 px-4 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="max-w-3xl mx-auto mb-6">
-        <CitizenHeader
-          title={t("citizen.title", "Citizen Portal")}
-          subtitle={t("citizen.submitSubtitle", "Submit your grievance in Tamil, Hindi, or English")}
-          showBack={true}
-          onBack={() => navigate("/citizen/dashboard")}
-          onOpenLanguage={() => setLangModalOpen(true)}
-        />
-      </div>
-
-      <FirstLaunchLanguageModal
-        forceOpen={langModalOpen}
-        onClose={() => setLangModalOpen(false)}
-      />
+      <FirstLaunchLanguageModal />
 
       <div className="max-w-3xl mx-auto space-y-6">
+        {/* Back Link */}
+        <button
+          type="button"
+          onClick={() => navigate("/citizen/dashboard")}
+          className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Dashboard</span>
+        </button>
+
         {/* Title & Subtitle */}
         <div>
           <h1 className="text-3xl sm:text-4xl font-display font-extrabold text-white tracking-tight">

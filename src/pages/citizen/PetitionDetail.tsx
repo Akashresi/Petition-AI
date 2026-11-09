@@ -22,7 +22,6 @@ import { useComplaints } from "@/hooks/useComplaints";
 import { useAuth } from "@/lib/auth";
 import { useLanguage } from "@/lib/i18n";
 import { speakText, isSpeaking, stopSpeaking } from "@/lib/tts";
-import CitizenHeader from "@/components/ui/accessible/CitizenHeader";
 import StatusBadge from "@/components/ui/accessible/StatusBadge";
 import AccessibleButton from "@/components/ui/accessible/AccessibleButton";
 import AIAnalysisCard from "@/components/features/AIAnalysisCard";

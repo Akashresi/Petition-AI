@@ -57,3 +57,4 @@ export function Tabs<T extends string = string>({
 }
 
 export default Tabs;
+

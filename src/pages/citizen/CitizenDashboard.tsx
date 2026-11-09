@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   PlusCircle,
@@ -18,9 +18,7 @@ import {
 import { useAuth } from "@/lib/auth";
 import { useComplaints } from "@/hooks/useComplaints";
 import { useNotifications } from "@/hooks/useNotifications";
-import { useLanguage } from "@/lib/i18n";
 import { formatDate } from "@/lib/utils";
-import CitizenHeader from "@/components/ui/accessible/CitizenHeader";
 import FirstLaunchLanguageModal from "@/components/features/FirstLaunchLanguageModal";
 
 export default function CitizenDashboard() {
@@ -28,8 +26,6 @@ export default function CitizenDashboard() {
   const { user } = useAuth();
   const { complaints, getByUser } = useComplaints();
   const { notifications } = useNotifications(user?.id);
-  const { t } = useLanguage();
-  const [langModalOpen, setLangModalOpen] = useState(false);
 
   const myComplaints = getByUser(user?.id || "u1");
   const recentComplaints = myComplaints.slice(0, 5);
@@ -42,21 +38,8 @@ export default function CitizenDashboard() {
   const firstName = user?.name ? user.name.split(" ")[0] : "Citizen";
 
   return (
-    <div className="min-h-screen bg-navy-975 text-foreground py-6 px-4 sm:px-6 lg:px-8">
-      {/* Accessible Header with A+/A- scaler and Language Selector */}
-      <div className="max-w-7xl mx-auto mb-6">
-        <CitizenHeader
-          title={t("citizen.title", "Citizen Portal")}
-          subtitle={user?.name ? `${t("citizen.welcome", "Welcome")}, ${user.name}` : undefined}
-          showBack={false}
-          onOpenLanguage={() => setLangModalOpen(true)}
-        />
-      </div>
-
-      <FirstLaunchLanguageModal
-        forceOpen={langModalOpen}
-        onClose={() => setLangModalOpen(false)}
-      />
+    <div className="min-h-screen bg-navy-975 text-foreground py-8 px-4 sm:px-6 lg:px-8">
+      <FirstLaunchLanguageModal />
 
       <main className="max-w-7xl mx-auto space-y-8">
         {/* ── Top Welcome Bar & Primary CTA ── */}
