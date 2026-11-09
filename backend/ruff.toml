@@ -1,0 +1,18 @@
+# Ruff configuration for PetitionAI backend
+target-version = "py311"
+line-length = 120
+exclude = ["ai_engine"]
+
+[lint]
+select = ["E", "F"]
+ignore = [
+    "E501",  # line length
+    "E402",  # module level import not at top of file
+    "E741",  # ambiguous variable name
+    "F401",  # unused import
+    "F841",  # unused variable
+]
+
+[lint.per-file-ignores]
+"__init__.py" = ["F401", "F403"]
+"tests/*" = ["F401", "F841", "E712"]

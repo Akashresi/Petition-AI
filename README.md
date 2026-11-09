@@ -305,6 +305,43 @@ In development mode (`ENV=development`), the system automatically seeds initial 
 
 ---
 
+## 7.5 Benchmark Evaluation & Explainability
+
+The model is evaluated using [`backend/app/ai/evaluation.py`](file:///d:/projects/DT/project/PetitionAI/backend/app/ai/evaluation.py) on a balanced 640-row dataset (`backend/data/petitions_labeled.csv`) across all 8 civic departments and 4 priority tiers:
+
+```bash
+# Run standalone evaluation from backend directory:
+cd backend
+python -m app.ai.evaluation
+```
+
+### Benchmark Results (Held-Out Test Set)
+
+| Department | Precision | Recall | F1-Score | Support |
+|---|:---:|:---:|:---:|:---:|
+| **Transport Authority** | 89.5% | 85.0% | 87.2% | 20 |
+| **Water Works** | 75.0% | 60.0% | 66.7% | 20 |
+| **Waste Management** | 70.6% | 60.0% | 64.9% | 20 |
+| **Electricity Board** | 69.6% | 80.0% | 74.4% | 20 |
+| **Education Department** | 57.1% | 60.0% | 58.5% | 20 |
+| **Roads & Infrastructure** | 54.5% | 60.0% | 57.1% | 20 |
+| **Health Department** | 47.8% | 55.0% | 51.2% | 20 |
+| **Public Safety** | 31.6% | 30.0% | 30.8% | 20 |
+| **Overall Weighted Average** | **62.0%** | **61.3%** | **61.3%** | **160** |
+
+### Confusion Matrix
+The confusion matrix heatmap is automatically plotted to `docs/confusion_matrix.png`:
+
+![Confusion Matrix](docs/confusion_matrix.png)
+
+### Explainability Features
+Every AI classification output now surfaces:
+- **Calibrated Confidence Score**: 0.0 to 1.0 probability.
+- **Top Contributing Keywords**: Extracted feature tokens highlighted in the UI.
+- **One-Line Priority Reason**: Rationale explaining why the urgency level was designated (e.g., active hazard vs. negation).
+
+---
+
 ## 8. One-Page Before/After Metrics Summary
 
 | Dimension | Initial Baseline | Upgraded Production System (PetitionAI) |
@@ -321,6 +358,67 @@ In development mode (`ENV=development`), the system automatically seeds initial 
 | **Accessibility & Connectivity**| Fixed font sizes, heavy animations | **Accessibility Controls**: Large text ($+18\%$), High Contrast, Reduced-Data mode ($2\text{G}/3\text{G}$) |
 | **Deployment Footprint** | Manual multi-terminal setup | **One-command Docker Compose stack** (`docker compose up --build`) |
 | **Security & Privacy** | Gemini API key exposed in frontend bundle | **Zero frontend secrets**, backend image analysis, upload validation, and automated PII masking |
+
+---
+
+## 8.5 Comparative Civic Tech Benchmark
+
+| Feature / Dimension | CPGRAMS (India) | Singapore OneService | FixMyStreet (UK) | **PetitionAI (This Project)** |
+|---|:---:|:---:|:---:|:---:|
+| **Target User Group** | Literate citizens with desktop internet | Smartphone-literate urban residents | Citizens reporting local street faults | **Low-literacy citizens & general public** |
+| **Voice & Speech Input** | ❌ None | ❌ None | ❌ None | ✅ **Tamil, Hindi, & English Web Speech STT + TTS** |
+| **Multilingual AI** | ⚠️ English/Hindi forms only | ⚠️ English-centric | ⚠️ English-centric | ✅ **Native Tamil (தமிழ்), Hindi (हिन्दी), & Tanglish normalization** |
+| **Automated SLA Escalation** | ⚠️ Periodic administrative review | ⚠️ Departmental internal SLAs | ❌ Manual council reporting | ✅ **Automated APScheduler alerts ($25\%$ pre-breach) & auto-escalation** |
+| **Weak Closure AI Audit** | ❌ None | ❌ None | ❌ None | ✅ **Semantic resolution quality check scoring officer remarks** |
+| **Duplicate Clustering** | ❌ Manual citizen search | ⚠️ Basic GIS grouping | ⚠️ Map pin proximity | ✅ **Geo-semantic ($\le 10\text{km}$) clustering + citizen endorsement counts** |
+| **Explainable AI Routing** | ❌ Rule-based drop-down | ⚠️ Proprietary categorizer | ❌ Citizen selects council | ✅ **Rule 5 confidence score, feature keywords, & priority reasoning** |
+| **Omnichannel Access** | Web portal & mobile app | Mobile app | Web & email | ✅ **Web Wizard, Browser Voice, Fast2SMS, WhatsApp & Telegram Bot** |
+| **Public Transparency** | Annual static reports | Department dashboards | Public issue map | ✅ **Live anonymized resolution ledger with zero citizen PII** |
+
+---
+
+## 8.6 Cloud Deployment Guide
+
+### Frontend Deployment (Vercel)
+1. Fork or push this repository to GitHub.
+2. Sign in to [Vercel](https://vercel.com) and click **"Add New Project"**.
+3. Select `PetitionAI` repository.
+4. Configure Build Settings:
+   - **Framework Preset**: Vite
+   - **Root Directory**: `./` (leave default)
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+5. Configure Environment Variables:
+   - `VITE_API_URL`: URL of your deployed backend (e.g. `https://petitionai-backend.onrender.com/api`).
+6. Click **Deploy**. Vercel will build and assign a global CDN URL.
+
+### Backend Deployment (Render)
+1. Sign in to [Render](https://render.com) and click **"New +" → "Web Service"**.
+2. Connect your `PetitionAI` GitHub repository.
+3. Configure Service Settings:
+   - **Root Directory**: `backend`
+   - **Environment**: `Python 3`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+4. Configure Environment Variables:
+   - `ENV`: `production`
+   - `SECRET_KEY`: Long random string (generate with `python -c "import secrets; print(secrets.token_urlsafe(48))"`)
+   - `USE_MONGODB`: `false` (or provide Render MongoDB / MongoDB Atlas URI)
+   - `CORS_ORIGINS`: Your Vercel frontend URL (e.g. `https://petitionai.vercel.app`)
+   - `GEMINI_API_KEY`: Google Gemini API key (optional, falls back gracefully)
+5. Click **Create Web Service**.
+
+---
+
+## 8.7 UI & System Screenshot Gallery
+
+| Screen | Description | Preview |
+|---|---|---|
+| **Citizen 4-Step Wizard** | Low-literacy accessible flow with large tap targets and Web Speech mic | ![Citizen Wizard](docs/screenshots/wizard_placeholder.png) |
+| **Voice Input & TTS** | Real-time speech transcription in Tamil, Hindi, and English | ![Voice Input](docs/screenshots/voice_placeholder.png) |
+| **Officer Triage Dashboard** | Priority SLA countdowns, Overdue badges, and RAG suggestions | ![Officer Dashboard](docs/screenshots/officer_placeholder.png) |
+| **Admin Review Queue** | One-click override actions for low-confidence AI and spam filtering | ![Admin Review](docs/screenshots/review_placeholder.png) |
+| **Public Transparency Ledger** | Citywide resolution metrics and verified anonymized live feed | ![Transparency Ledger](docs/screenshots/transparency_placeholder.png) |
 
 ---
 
