@@ -12,7 +12,7 @@ from app.database import db
 from app.routers.auth import get_current_user
 from app.security import mask_pii, submission_limiter, validate_upload_content
 from app.services.email_service import send_complaint_notification
-from app.services.sms_service import send_complaint_sms
+from app.services.sms_service import send_complaint_sms, send_sms
 
 router = APIRouter(prefix="/api/complaints", tags=["complaints"])
 
@@ -217,7 +217,6 @@ def create_complaint(req: ComplaintIn, user: dict = Depends(get_current_user)) -
             },
         ],
         "reopenCount": 0,
-        "isEscalated": False,
         "images": req.images,
     }
     from app.services.resolution_time import predict_resolution_time
@@ -337,6 +336,16 @@ def update_complaint(
     if req.resolutionDetails:
         updates["resolutionDetails"] = req.resolutionDetails
 
+    if req.status in ["resolved", "closed"]:
+        from app.services.closure_check import score_resolution_remarks
+        closure_eval = score_resolution_remarks(
+            f"{c.get('title', '')} {c.get('description', '')}",
+            req.resolutionDetails or req.note or "",
+        )
+        updates["resolutionQualityScore"] = closure_eval["quality_score"]
+        updates["isWeakClosure"] = closure_eval["is_weak_closure"]
+        updates["closureFeedback"] = closure_eval["recommendation"]
+
     history = list(c.get("statusHistory", []))
     history.append({
         "status": req.status,
@@ -385,47 +394,6 @@ def update_complaint(
         })
 
     return _public_complaint(updated)
-
-
-@router.post("/{complaint_id}/support")
-def support_complaint(complaint_id: str, user: dict = Depends(get_current_user)) -> dict:
-    """Citizen clicks 'I have this issue too' to support a petition."""
-    c = db.find_one("complaints", {"id": complaint_id}) or db.find_one("complaints", {"petitionId": complaint_id})
-    if not c:
-        raise HTTPException(status_code=404, detail="Complaint not found")
-
-    supporters = list(c.get("supporters", []))
-    if user["id"] in supporters:
-        return {
-            "message": "Already supported",
-            "supporterCount": c.get("supporterCount", len(supporters) or 1),
-            "complaint": _public_complaint(c),
-        }
-
-    supporters.append(user["id"])
-    new_count = c.get("supporterCount", 1) + 1
-    db.update("complaints", {"id": c["id"]}, {
-        "supporterCount": new_count,
-        "supporters": supporters,
-    })
-
-    if c.get("masterPetitionId"):
-        master = db.find_one("complaints", {"id": c["masterPetitionId"]}) or db.find_one("complaints", {"petitionId": c["masterPetitionId"]})
-        if master and master["id"] != c["id"]:
-            m_supporters = list(master.get("supporters", []))
-            if user["id"] not in m_supporters:
-                m_supporters.append(user["id"])
-                db.update("complaints", {"id": master["id"]}, {
-                    "supporterCount": master.get("supporterCount", 1) + 1,
-                    "supporters": m_supporters,
-                })
-
-    updated = db.find_one("complaints", {"id": c["id"]})
-    return {
-        "message": "Support recorded successfully",
-        "supporterCount": new_count,
-        "complaint": _public_complaint(updated),
-    }
 
 
 @router.post("/{complaint_id}/correct")
@@ -880,3 +848,53 @@ def get_resolution_prediction(complaint_id: str, user: dict = Depends(get_curren
 
     from app.services.resolution_time import predict_resolution_time
     return predict_resolution_time(c)
+
+
+class RateComplaintIn(BaseModel):
+    rating: int  # 1 to 5 stars
+    comment: Optional[str] = None
+
+
+@router.post("/{complaint_id}/rate")
+def rate_resolved_complaint(
+    complaint_id: str,
+    payload: RateComplaintIn,
+    user: dict = Depends(get_current_user),
+) -> dict:
+    """Citizen rating and feedback submission after petition resolution."""
+    c = db.find_one("complaints", {"id": complaint_id}) or db.find_one("complaints", {"petitionId": complaint_id})
+    if not c:
+        raise HTTPException(status_code=404, detail="Complaint not found")
+    if payload.rating < 1 or payload.rating > 5:
+        raise HTTPException(status_code=400, detail="Rating must be between 1 and 5 stars.")
+
+    now = datetime.now().isoformat()
+    feedback = {
+        "rating": payload.rating,
+        "comment": mask_pii(payload.comment or ""),
+        "submittedAt": now,
+        "submittedBy": user.get("id"),
+        "submittedByName": user.get("name", "Citizen"),
+    }
+    db.update("complaints", {"id": c["id"]}, {"feedback": feedback, "rating": payload.rating})
+
+    # Update assigned officer rating
+    officer_id = c.get("assignedOfficer")
+    if officer_id:
+        all_rated = [
+            comp for comp in db.find("complaints", {"assignedOfficer": officer_id})
+            if comp.get("feedback", {}).get("rating") is not None
+        ]
+        if all_rated:
+            ratings = [comp["feedback"]["rating"] for comp in all_rated]
+            avg_rating = round(sum(ratings) / len(ratings), 1)
+            db.update("users", {"id": officer_id}, {"rating": avg_rating})
+            db.update("officers", {"id": officer_id}, {"rating": avg_rating})
+
+    return {
+        "status": "success",
+        "petitionId": c.get("petitionId"),
+        "rating": payload.rating,
+        "feedback": feedback,
+        "message": "Thank you for rating this resolution. Your feedback promotes civic accountability.",
+    }

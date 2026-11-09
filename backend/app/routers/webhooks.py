@@ -300,3 +300,39 @@ async def handle_whatsapp_webhook(request: Request) -> dict:
         "explanation": result["explanation"],
     }
 
+
+# ── Telegram Bot Webhook ──────────────────────────────────────────────────
+
+@router.post("/telegram")
+async def handle_telegram_webhook(request: Request) -> dict:
+    """Handle inbound message from Telegram Bot webhook."""
+    try:
+        data = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON payload")
+
+    msg = data.get("message") or data.get("edited_message") or {}
+    sender = str(msg.get("from", {}).get("id", "")) or str(msg.get("chat", {}).get("id", ""))
+    message = msg.get("text", "")
+
+    if not sender or not message:
+        return {
+            "status": "ignored",
+            "detail": "Non-message event or missing sender/text payload",
+            "confidence": 1.0,
+            "explanation": "Event did not contain text message payload.",
+        }
+
+    result = _process_inbound_message(message, sender, channel="telegram")
+
+    return {
+        "status": "ok",
+        "action": result["action"],
+        "success": result["success"],
+        "reply": result["reply"],
+        "petitionId": result.get("petitionId"),
+        "confidence": result["confidence"],
+        "explanation": result["explanation"],
+    }
+
+

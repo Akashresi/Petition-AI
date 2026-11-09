@@ -156,3 +156,44 @@ def test_whatsapp_service_fallback_and_helpers():
     assert send_whatsapp("9876543210", "Test WhatsApp fallback message") is True
     assert send_complaint_whatsapp("9876543210", "PET-2026-001", "resolved") is True
 
+
+def test_telegram_webhook_status_and_filing():
+    # 1. Status query via Telegram bot update
+    res = client.post(
+        "/api/webhooks/telegram",
+        json={
+            "update_id": 9991,
+            "message": {
+                "message_id": 101,
+                "from": {"id": 12345678, "first_name": "Ravi"},
+                "chat": {"id": 12345678},
+                "text": "STATUS PET-2026-999",
+            },
+        },
+    )
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "ok"
+    assert data["action"] == "status_inquiry"
+    assert "PET-2026-999" in data["reply"]
+
+    # 2. File grievance via Telegram bot update
+    file_res = client.post(
+        "/api/webhooks/telegram",
+        json={
+            "update_id": 9992,
+            "message": {
+                "message_id": 102,
+                "from": {"id": 12345678, "first_name": "Ravi"},
+                "chat": {"id": 12345678},
+                "text": "FILE Broken road divider causing dangerous traffic near bus stand",
+            },
+        },
+    )
+    assert file_res.status_code == 200
+    fdata = file_res.json()
+    assert fdata["action"] == "grievance_filed"
+    assert fdata["success"] is True
+    assert fdata["petitionId"] is not None
+
+

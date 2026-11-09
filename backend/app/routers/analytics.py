@@ -328,3 +328,55 @@ def get_public_transparency_metrics() -> dict:
         "confidence": 1.0,
         "explanation": "Citywide civic transparency analytics computed across all departments with verified anonymization.",
     }
+
+
+@router.get("/officer-leaderboard")
+def get_officer_accountability_leaderboard(user: dict = Depends(get_current_user)) -> dict:
+    """Officer accountability leaderboard scoring resolution efficiency, SLA compliance, and citizen ratings."""
+    all_users = db.find("users", {})
+    officers = [u for u in all_users if u.get("role") == "officer"]
+    complaints = db.find("complaints", {})
+
+    leaderboard = []
+    for off in officers:
+        off_id = off.get("id")
+        assigned = [c for c in complaints if c.get("assignedOfficer") == off_id]
+        tot = len(assigned)
+        resolved = [c for c in assigned if c.get("status") in ("resolved", "closed")]
+        res_count = len(resolved)
+
+        rate = round((res_count / tot) * 100, 1) if tot > 0 else 0.0
+
+        # Calculate SLA compliance
+        sla_met = sum(1 for c in resolved if not c.get("isEscalated"))
+        sla_pct = round((sla_met / res_count) * 100, 1) if res_count > 0 else 100.0
+
+        # Average citizen rating
+        rated = [c.get("rating") for c in assigned if c.get("rating") is not None]
+        avg_rating = round(sum(rated) / len(rated), 1) if rated else float(off.get("rating", 4.5))
+
+        # Composite accountability score: 40% Resolution Rate + 40% SLA Compliance + 20% Citizen Rating
+        comp_score = round(0.40 * rate + 0.40 * sla_pct + 0.20 * (avg_rating / 5.0 * 100), 1)
+
+        leaderboard.append({
+            "id": off_id,
+            "name": off.get("name", "Officer"),
+            "email": off.get("email", ""),
+            "department": off.get("department", "General Administration"),
+            "assignedCount": tot,
+            "resolvedCount": res_count,
+            "resolutionRatePct": rate,
+            "slaCompliancePct": sla_pct,
+            "citizenRating": avg_rating,
+            "accountabilityScore": comp_score,
+            "ratingCount": len(rated),
+        })
+
+    leaderboard.sort(key=lambda x: x["accountabilityScore"], reverse=True)
+
+    return {
+        "totalOfficers": len(leaderboard),
+        "leaderboard": leaderboard,
+        "confidence": 1.0,
+        "explanation": "Officer accountability metrics evaluated across resolution throughput, SLA adherence, and verified citizen ratings.",
+    }
